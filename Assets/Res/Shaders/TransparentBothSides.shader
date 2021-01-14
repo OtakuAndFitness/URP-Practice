@@ -44,6 +44,50 @@ Shader "Otaku/TransparentBothSides"
 
         Pass
         {
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+                float3 normal : NORMAL;
+
+            };
+
+            struct v2f
+            {
+                float2 uv : TEXCOORD0;
+                float4 vertex : SV_POSITION;
+
+
+            };
+
+
+            v2f vert (appdata v)
+            {
+                v2f o;
+                v.vertex.xyz += v.normal * 0.2; 
+                o.vertex = TransformObjectToHClip(v.vertex);
+                
+
+                return o;
+            }
+
+            half4 frag (v2f i) : SV_Target
+            {
+                return half4(1,0,0,1);
+            }
+            ENDHLSL
+        }
+
+        Pass
+        {
             Tags {"LightMode"="SRPDefaultUnlit"}
             Blend SrcAlpha OneMinusSrcAlpha
             Cull Front
