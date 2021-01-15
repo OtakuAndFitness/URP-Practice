@@ -9,3 +9,5 @@ Assembly-CSharp-Editor.csproj
 URP-Practice.sln
 /.vs
 /.vscode
+Packages/packages-lock.json
+ProjectSettings/QualitySettings.asset
