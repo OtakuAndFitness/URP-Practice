@@ -38,7 +38,7 @@ Shader "Otaku/TransparentZwrite"
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
             
-
+            #define _Alpha_ON
             #include "ShadowCaster.hlsl"
             ENDHLSL
         }

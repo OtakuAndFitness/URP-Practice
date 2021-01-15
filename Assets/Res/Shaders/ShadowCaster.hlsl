@@ -10,7 +10,11 @@ SAMPLER(sampler_MainTex);
 
 CBUFFER_START(UnityPerMaterial)
     float4 _MainTex_ST;
-    float _Alpha;
+    #ifdef _Alpha_ON
+        float _Alpha;
+    #else
+        half4 _MainCol;
+    #endif
 CBUFFER_END
 
 struct Attributes
@@ -56,6 +60,8 @@ Varyings ShadowPassVertex(Attributes input)
 half4 ShadowPassFragment(Varyings input) : SV_TARGET
 {
     half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
-    clip(_Alpha * 1.5 - col.a);
+    #ifdef _Alpha_ON
+        clip(_Alpha * 1.5 - col.a);
+    #endif
     return 0;
 }
