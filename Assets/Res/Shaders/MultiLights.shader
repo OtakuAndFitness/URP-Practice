@@ -4,6 +4,8 @@ Shader "Otaku/MultiLights"
     {
         _MainCol ("Main Color", Color) = (1,1,1,1)
         _MainTex ("Texture", 2D) = "white" {}
+        [Toggle]_IsDir ("Directional LightMap ?", int) = 0
+
     }
     SubShader
     {
@@ -51,11 +53,16 @@ Shader "Otaku/MultiLights"
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            
+            #pragma shader_feature _ISDIR_ON
             // make fog work
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _SHADOWS_SOFT
+            #pragma multi_compile LIGHTMAP_OFF LIGHTMAP_ON
+            #pragma multi_compile SHADOWS_SHADOWMASK
+
             #pragma enable_cbuffer
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
@@ -65,6 +72,7 @@ Shader "Otaku/MultiLights"
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+                float2 lightmapUV : TEXCOORD1;
                 float3 normal : NORMAL;
 
             };
@@ -72,6 +80,7 @@ Shader "Otaku/MultiLights"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
+                DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 5);
                 float4 vertex : SV_POSITION;
                 float3 normalWS : TEXCOORD3;
                 float3 posWS : TEXCOORD4;
@@ -99,6 +108,8 @@ Shader "Otaku/MultiLights"
                 o.shadowCoord = GetShadowCoord(vertexInput);
                 o.normalWS = TransformObjectToWorldNormal(v.normal);
                 o.posWS = TransformObjectToWorld(v.vertex.xyz);
+                OUTPUT_LIGHTMAP_UV(v.lightmapUV, unity_LightmapST, o.lightmapUV);
+                OUTPUT_SH(o.normalWS, o.vertexSH);
                 return o;
             }
 
@@ -124,6 +135,10 @@ Shader "Otaku/MultiLights"
 
                 mainCol += addCol;
 
+                mainCol.rgb *= SAMPLE_GI(i.lightmapUV, i.vertexSH, i.normalWS);
+
+                // float4 shadowmask = SAMPLE_SHADOWMASK(i.uvLM);
+                // mainCol *= shadowmask;
                 // apply fog
                 mainCol.rgb = MixFog(mainCol,i.fogCoord);
                 return mainCol;
