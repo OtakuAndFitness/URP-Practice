@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MultiLightings
+  m_Name: Player
   m_Shader: {fileID: 4800000, guid: 084b212b3025848d393eaefebcd65b33, type: 3}
-  m_ShaderKeywords: _ISDIR_ON
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -20,14 +20,10 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: b3be6222e1e4a724a829c29f8690f44a, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _ClearCoatMap:
+    - _BumpMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -48,7 +44,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: b3be6222e1e4a724a829c29f8690f44a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 39e51e28b0b53d747a9440d043f78b17, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -83,7 +79,6 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _ClearCoat: 0
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -95,7 +90,7 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _IsDir: 1
+    - _IsDir: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -115,7 +110,7 @@ Material:
     - _MainCol: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
---- !u!114 &4586000642395446821
+--- !u!114 &6045319901983498554
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

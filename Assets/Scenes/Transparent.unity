@@ -197,7 +197,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 3.4e-44, w: 6.3267e-41}
+  m_BoundingSphereOverride: {x: 0, y: 9.419824e-33, z: 1e-45, w: 0}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -228,6 +228,7 @@ GameObject:
   - component: {fileID: 213778010}
   - component: {fileID: 213778009}
   - component: {fileID: 213778008}
+  - component: {fileID: 213778012}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -267,7 +268,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c4733fc77b94c4dc4996580fda97ee1d, type: 2}
+  - {fileID: 2100000, guid: 45357798f35ed4ec38892e013447a8c1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -305,12 +306,25 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 213778007}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.02, y: -0.71, z: 0.46}
+  m_LocalPosition: {x: -2.74, y: -0.71, z: 2.79}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &213778012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 213778007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 147fdab1a399f471ca6bc16bdf9da99a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 5
 --- !u!1 &233589953
 GameObject:
   m_ObjectHideFlags: 0
@@ -565,7 +579,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 0
@@ -1137,8 +1151,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1645035980}
-  m_LocalRotation: {x: -0.16359286, y: 0.5633822, z: -0.11497166, w: -0.8016355}
-  m_LocalPosition: {x: 5.7526617, y: 2.5689063, z: -1.7111229}
+  m_LocalRotation: {x: 0.055678815, y: -0.82328874, z: 0.55889916, w: 0.08201945}
+  m_LocalPosition: {x: 1.3835753, y: 12.610273, z: 4.895471}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1244,7 +1258,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 0
@@ -1386,7 +1400,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 0
