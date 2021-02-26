@@ -72,7 +72,9 @@ Shader "Otaku/MultiLights"
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
-                float2 lightmapUV : TEXCOORD1;
+                #if LIGHTMAP_ON
+                    float2 lightmapUV : TEXCOORD1;
+                #endif
                 float3 normal : NORMAL;
 
             };
@@ -80,7 +82,9 @@ Shader "Otaku/MultiLights"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
+                #if LIGHTMAP_ON
                 DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 5);
+                #endif
                 float4 vertex : SV_POSITION;
                 float3 normalWS : TEXCOORD3;
                 float3 posWS : TEXCOORD4;
@@ -108,8 +112,11 @@ Shader "Otaku/MultiLights"
                 o.shadowCoord = GetShadowCoord(vertexInput);
                 o.normalWS = TransformObjectToWorldNormal(v.normal);
                 o.posWS = TransformObjectToWorld(v.vertex.xyz);
-                OUTPUT_LIGHTMAP_UV(v.lightmapUV, unity_LightmapST, o.lightmapUV);
-                OUTPUT_SH(o.normalWS, o.vertexSH);
+                #if LIGHTMAP_ON
+                    OUTPUT_LIGHTMAP_UV(v.lightmapUV, unity_LightmapST, o.lightmapUV);
+                    OUTPUT_SH(o.normalWS, o.vertexSH);
+                #endif
+
                 return o;
             }
 
@@ -135,10 +142,13 @@ Shader "Otaku/MultiLights"
 
                 mainCol += addCol;
 
-                mainCol.rgb *= SAMPLE_GI(i.lightmapUV, i.vertexSH, i.normalWS);
+                #if LIGHTMAP_ON
+                    mainCol.rgb *= SAMPLE_GI(i.lightmapUV, i.vertexSH, i.normalWS);
 
-                // float4 shadowmask = SAMPLE_SHADOWMASK(i.uvLM);
-                // mainCol *= shadowmask;
+                    // float4 shadowmask = SAMPLE_SHADOWMASK(i.lightmapUV);
+                    // mainCol *= shadowmask;
+                #endif
+
                 // apply fog
                 mainCol.rgb = MixFog(mainCol,i.fogCoord);
                 return mainCol;
