@@ -8,10 +8,14 @@
       <Path>Library/PackageCache/com.unity.ide.rider@2.0.7</Path>
       <Path>Library/PackageCache/com.unity.mathematics@1.1.0</Path>
       <Path>Library/PackageCache/com.unity.render-pipelines.core@10.3.1</Path>
+      <Path>Library/PackageCache/com.unity.render-pipelines.core@10.4.0</Path>
       <Path>Library/PackageCache/com.unity.render-pipelines.universal@10.3.1</Path>
+      <Path>Library/PackageCache/com.unity.render-pipelines.universal@10.4.0</Path>
       <Path>Library/PackageCache/com.unity.searcher@4.3.1</Path>
       <Path>Library/PackageCache/com.unity.shadergraph@10.3.1</Path>
+      <Path>Library/PackageCache/com.unity.shadergraph@10.4.0</Path>
       <Path>Library/PackageCache/com.unity.test-framework@1.1.22</Path>
+      <Path>Library/PackageCache/com.unity.test-framework@1.1.24</Path>
       <Path>Library/PackageCache/com.unity.textmeshpro@3.0.4</Path>
       <Path>Packages</Path>
       <Path>ProjectSettings</Path>
@@ -19,9 +23,7 @@
     <explicitExcludes>
       <Path>.git</Path>
       <Path>.idea</Path>
-      <Path>Library</Path>
       <Path>Logs</Path>
-      <Path>Temp</Path>
       <Path>UserSettings</Path>
       <Path>obj</Path>
     </explicitExcludes>
