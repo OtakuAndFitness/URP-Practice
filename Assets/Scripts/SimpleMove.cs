@@ -12,7 +12,6 @@ public class SimpleMove : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SRDebug.Init();
         speed *= Time.deltaTime;
         bool flag = SystemInfo.supportsComputeShaders;
         string gdn = SystemInfo.graphicsDeviceName;
