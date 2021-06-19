@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SimpleMove : MonoBehaviour
+public class PrintDevicesInfo : MonoBehaviour
 {
     public float speed = 10f;
 
@@ -76,25 +76,5 @@ public class SimpleMove : MonoBehaviour
         sb.AppendLine("设备的模型: " + SystemInfo.deviceModel);
         return sb;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKey(KeyCode.W))
-        {
-            transform.Translate(Vector3.forward * speed);
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.Translate(Vector3.left * speed);
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.Translate(Vector3.back * speed);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.Translate(Vector3.right * speed);
-        }
-    }
+    
 }
