@@ -37,9 +37,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - Height: 10
+    - Height: 15
     - WhereToStart: 1
-    - _Range: 1
+    - _Range: 4.88
     m_Colors:
     - PlayerPos: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
