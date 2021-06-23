@@ -68,7 +68,6 @@ Shader "Otaku/Bastion"
 
             }
             
-
             Varyings vert (Attributes input)
             {
                 Varyings output;
