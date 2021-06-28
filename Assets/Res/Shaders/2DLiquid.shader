@@ -76,7 +76,9 @@ Shader "Otaku/2DLiquid"
                 half4 mask : TEXCOORD2;
             };
 
-            sampler2D _MainTex;
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
+            
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
                 half4 _TextureSampleAdd;
@@ -104,7 +106,7 @@ Shader "Otaku/2DLiquid"
                 output.worldPosition = input.positionOS;
 
                 float2 pixelSize = vertexInput.positionCS.w;
-                pixelSize /= float2(1, 1) * abs(mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy));
+                pixelSize /= abs(mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy));
 
                 float4 clampedRect = clamp(_ClipRect, -2e10, 2e10);
                 float2 maskUV = (input.positionOS.xy - clampedRect.xy) / (clampedRect.zw - clampedRect.xy);
@@ -116,7 +118,7 @@ Shader "Otaku/2DLiquid"
                 return output;
             }
 
-            half4 drawWater(half4 water_color, sampler2D color, float transparency, float height, float angle, float wave_strength, float wave_frequency, half2 uv)
+            half4 drawWater(half4 water_color, float transparency, float height, float angle, float wave_strength, float wave_frequency, half2 uv)
             {
                 float iTime = _Time;
                 angle *= uv.y/height+angle/1.5;
@@ -129,10 +131,10 @@ Shader "Otaku/2DLiquid"
                 if(uv.y - wave <= height)
                     return lerp(
                     lerp(
-                        tex2D(color, half2(uv.x, ((1.0 + angle)*(height + wave) - angle*uv.y + wave))),
+                        SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, half2(uv.x, ((1.0 + angle)*(height + wave) - angle*uv.y + wave))),
                         water_color,
                         0.6-(0.3-(0.3*uv.y/height))),
-                    tex2D(color, half2(uv.x + wave, uv.y - wave)),
+                    SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, half2(uv.x + wave, uv.y - wave)),
                     transparency-(transparency*uv.y/height));
                 else
                     return half4(0,0,0,0);
@@ -141,6 +143,7 @@ Shader "Otaku/2DLiquid"
             half4 frag (Varyings i) : SV_Target
             {
                 half2 uv = i.uv;
+
                 float WATER_HEIGHT = _Progress;
                 float4 WATER_COLOR = _WaterColor;
                 float WAVE_STRENGTH = _WaveStrength;
@@ -148,7 +151,7 @@ Shader "Otaku/2DLiquid"
                 float WATER_TRANSPARENCY = _WaterTransparency;
                 float WATER_ANGLE = _WaterAngle;
 
-                half4 fragColor = drawWater(WATER_COLOR, _MainTex, WATER_TRANSPARENCY, WATER_HEIGHT, WATER_ANGLE, WAVE_STRENGTH, WAVE_FREQUENCY, uv);
+                half4 fragColor = drawWater(WATER_COLOR, WATER_TRANSPARENCY, WATER_HEIGHT, WATER_ANGLE, WAVE_STRENGTH, WAVE_FREQUENCY, uv);
 
 
                 #ifdef UNITY_UI_CLIP_RECT
