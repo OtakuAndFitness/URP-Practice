@@ -39,7 +39,7 @@ Material:
     m_Floats:
     - _ColorMask: 15
     - _EnableExternalAlpha: 0
-    - _Progress: 0.238
+    - _Progress: 0.567
     - _Stencil: 0
     - _StencilComp: 8
     - _StencilOp: 0
