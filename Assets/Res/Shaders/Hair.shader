@@ -20,11 +20,8 @@ Shader "Otaku/Hair"
 
         Pass
         {
-            
-            Cull Front
-            
 
-            HLSLPROGRAM
+	        HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma enable_cbuffer
