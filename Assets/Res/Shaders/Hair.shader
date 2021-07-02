@@ -45,7 +45,7 @@ Shader "Otaku/Hair"
                 float3 normalWS : TEXCOORD1;
                 float3 bitangent : TEXCOORD2;
                 float3 positionWS : TEXCOORD3;
-            	// float3 tangent : TEXCOORD4;
+            	float3 tangent : TEXCOORD4;
             };
 
             TEXTURE2D(_MainTex);
@@ -107,6 +107,7 @@ Shader "Otaku/Hair"
             	// output.tangent = TransformObjectToWorldDir(input.tangent);
             	output.bitangent = cross(input.normalOS,input.tangent) * input.tangent.w * unity_WorldTransformParams.w;
             	output.positionWS = TransformObjectToWorld(input.positionOS);
+            	// output.tangent = input.tangent;
             	
                 return output;
             }
@@ -122,6 +123,7 @@ Shader "Otaku/Hair"
             	float3 specular = HairSpecular(bitangent, normalWS, l, v, i.uv);
             	float4 finalCol = float4(_MainLightColor * (diffuse + specular), 1);
             	
+            	// return float4(i.tangent,1);
             	return finalCol;
             }
             ENDHLSL

@@ -22,7 +22,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: SSSLUT
   m_Shader: {fileID: 4800000, guid: 02675f173aae94b57b3837a6c1d2f304, type: 3}
-  m_ShaderKeywords: _RADIANCE_G1 _TONE_ACES
+  m_ShaderKeywords: _RADIANCE_G2 _TONE_UNCHARTED
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -111,14 +111,14 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _Radiance: 1
+    - _Radiance: 2
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
-    - _Tone: 2
+    - _Tone: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:

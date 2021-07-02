@@ -9,8 +9,8 @@ Shader "Otaku/PreIntegratedLUT"
         _DiffColor2 ("NormDiff Color 2", Color) = (0,0,0,0)
         _DiffColor3 ("NormDiff Color 2", Color) = (0,0,0,0)
         _DiffColor4 ("NormDiff Color 2", Color) = (0,0,0,0)
-        [KeywordEnum(None, Uncharted, ACES)] _Tone ("Tone type", Float) = 0
-        _AdaptedLum ("AdaptedLum", float) = 1
+//        [KeywordEnum(None, Uncharted, ACES)] _Tone ("Tone type", Float) = 0
+//        _AdaptedLum ("AdaptedLum", float) = 1
         [Toggle] _Gamma ("Gamma", Float) = 0
  
     }
@@ -28,7 +28,7 @@ Shader "Otaku/PreIntegratedLUT"
 
             #pragma shader_feature _GAMMA_ON
             #pragma multi_compile _RADIANCE_NORMDIFF _RADIANCE_G1 _RADIANCE_G2
-            #pragma multi_compile _TONE_NONE _TONE_UNCHARTED _TONE_ACES
+            // #pragma multi_compile _TONE_NONE _TONE_UNCHARTED _TONE_ACES
 
             #include "LUTCore.hlsl"
             

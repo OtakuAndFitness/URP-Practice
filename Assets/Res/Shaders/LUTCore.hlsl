@@ -4,7 +4,7 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 CBUFFER_START(UnityPerMaterial)
-    float _AdaptedLum;
+    // float _AdaptedLum;
     float _Max1R;
     float4 _D;
     half4 _DiffColor1;
@@ -128,13 +128,13 @@ float3 IntegratedLUT(float x, float radius)
     totalLight *= 2;
     float3 param = totalLight / totalWeight;
 
-    #if _TONE_UNCHARTED
-        float3 color = Uncharted2ToneMapping(param, _AdaptedLum);
-    #elif _TONE_ACES
-        float3 color = ACESToneMapping(param, _AdaptedLum);
-    #else
+    // #if _TONE_UNCHARTED
+    //     float3 color = Uncharted2ToneMapping(param, _AdaptedLum);
+    // #elif _TONE_ACES
+    //     float3 color = ACESToneMapping(param, _AdaptedLum);
+    // #else
         float3 color = param;
-    #endif
+    // #endif
 
     #if _GAMMA_ON
         color = pow(color,1/2.2);
