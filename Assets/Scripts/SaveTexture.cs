@@ -21,7 +21,7 @@ public class SaveTexture : MonoBehaviour
         Graphics.Blit(null,rt,mat);
         RenderTexture.active = rt;
         tex.ReadPixels(new Rect(0,0,textureSize,textureSize),0,0,false);
-        File.WriteAllBytes(Application.dataPath + "/Res/Textures/" + "SkinLUT.tga", tex.EncodeToTGA());
+        File.WriteAllBytes(Application.dataPath + "/Res/Textures/" + "SkinLUT2.tga", tex.EncodeToTGA());
     }
     
     

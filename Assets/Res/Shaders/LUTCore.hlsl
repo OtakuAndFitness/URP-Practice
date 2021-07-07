@@ -4,7 +4,7 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
 CBUFFER_START(UnityPerMaterial)
-    // float _AdaptedLum;
+    float _AdaptedLum;
     float _Max1R;
     float4 _D;
     half4 _DiffColor1;
@@ -104,18 +104,20 @@ float3 Profile(float distance)
 float3 IntegratedLUT(float x, float radius)
 {
     float theta = acos(x);
-    float a = 0;
+    float a = -PI;
     float b = 0;
     float3 totalWeight = float3(0,0,0);
     float3 totalLight = float3(0,0,0);
     while (b <= 0.5 * PI)
     {
-        a = 0;
-        while (a <= 2 * PI)
+        a = -PI;
+        while (a <= PI)
         {
             float sampleDist = sqrt(2 - 2 * cos(a) * cos(b)) * radius;
+            // float sampleDist = 2 * radius * sin(a / 2);
 
             float diffuse = saturate(cos(b) * cos(theta + a));
+            // float diffuse = saturate(cos(theta + a));
 
             float3 weight = Profile(sampleDist);
             totalLight += diffuse * weight;
@@ -128,13 +130,13 @@ float3 IntegratedLUT(float x, float radius)
     totalLight *= 2;
     float3 param = totalLight / totalWeight;
 
-    // #if _TONE_UNCHARTED
-    //     float3 color = Uncharted2ToneMapping(param, _AdaptedLum);
-    // #elif _TONE_ACES
-    //     float3 color = ACESToneMapping(param, _AdaptedLum);
-    // #else
+    #if _TONE_UNCHARTED
+        float3 color = Uncharted2ToneMapping(param, _AdaptedLum);
+    #elif _TONE_ACES
+        float3 color = ACESToneMapping(param, _AdaptedLum);
+    #else
         float3 color = param;
-    // #endif
+    #endif
 
     #if _GAMMA_ON
         color = pow(color,1/2.2);
