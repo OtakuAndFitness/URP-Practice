@@ -11,3 +11,4 @@ URP-Practice.sln
 /.vscode
 Packages/packages-lock.json
 ProjectSettings/QualitySettings.asset
+*.csproj
