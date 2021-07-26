@@ -89,7 +89,7 @@ Shader "Otaku/TransparentZwrite"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
-                float _Alpha;
+                // float _Alpha;
             CBUFFER_END
 
             v2f vert (appdata v)
