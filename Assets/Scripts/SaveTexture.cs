@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class SaveTexture : MonoBehaviour
 {
     public int textureSize = 1024;
+    public string texName = "SkinLut";
 
     private Texture2D tex;
 
@@ -21,7 +22,8 @@ public class SaveTexture : MonoBehaviour
         Graphics.Blit(null,rt,mat);
         RenderTexture.active = rt;
         tex.ReadPixels(new Rect(0,0,textureSize,textureSize),0,0,false);
-        File.WriteAllBytes(Application.dataPath + "/Res/Textures/" + "SkinLUT2.tga", tex.EncodeToTGA());
+        File.WriteAllBytes(Application.dataPath + "/Resources/Textures/" + texName + ".tga", tex.EncodeToTGA());
+        AssetDatabase.Refresh();
     }
     
     
