@@ -4,17 +4,18 @@ Shader "Otaku/Outline"
     {
         _OutlineColor ("Outline Color", Color) = (0,0,0,1)
         _OutlineWidth ("Outline Width", Range(0,1)) = 0.1
- 
+//        _MainTex ("Main Texture", 2D) = "white"{}
+//        _Alpha ("Alpha", Range(0,1)) = 1
     }
+    
     SubShader
     {
-        Tags { "RenderType"="Opaque" "Queue"="Geometry" "RenderPipeline"="UniversalPipeline"}
 
         Pass
         {
-            
+            Tags { "RenderType"="Opaque" "Queue"="Geometry" "RenderPipeline"="UniversalPipeline"}
+
             Cull Front
-            
 
             HLSLPROGRAM
             #pragma vertex vert
@@ -57,6 +58,8 @@ Shader "Otaku/Outline"
             }
             ENDHLSL
         }
+        
+        
 
         
     }
