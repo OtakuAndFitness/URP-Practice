@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a950801046db47ffb5fde50ec41d6fc, type: 3}
-  m_Name: NewCustomRenderPassFeature
+  m_Name: TransparentFeature
   m_EditorClassIdentifier: 
   m_Active: 1
 --- !u!114 &-8897427827767588485
@@ -26,6 +26,21 @@ MonoBehaviour:
   m_Name: MyOutlineFeature
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &-6318525880265005584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aadbaeec8e4f447a8869b7802c02963f, type: 3}
+  m_Name: FunctionalRenderPassFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  settings:
+    buffer: 0
 --- !u!114 &-2279555701087228421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -80,7 +95,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: -2279555701087228421}
   - {fileID: -9211086459116845694}
-  m_RendererFeatureMap: fbadfade2a645de08205eef8aaa52b80
+  - {fileID: -6318525880265005584}
+  m_RendererFeatureMap: fbadfade2a645de08205eef8aaa52b80f025b15a301650a8
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
   shaders:
