@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +22,6 @@ public class SaveTexture : MonoBehaviour
         RenderTexture.active = rt;
         tex.ReadPixels(new Rect(0,0,textureSize,textureSize),0,0,false);
         File.WriteAllBytes(Application.dataPath + "/Resources/Textures/" + texName + ".tga", tex.EncodeToTGA());
-        AssetDatabase.Refresh();
     }
     
     

@@ -68,9 +68,16 @@ half4 Fragment(VertexOutput input) : SV_Target {
     float colorLerp = input.uv;
     float3 albedo = lerp(_BaseColor.rgb, _TipColor.rgb, colorLerp);
 
+    SurfaceData surface_data = (SurfaceData)0;
+    surface_data.albedo = albedo;
+    surface_data.specular = half3(1,1,1);
+    surface_data.smoothness = 0;
+    surface_data.emission = half3(0,0,0);
+    surface_data.alpha = 1;
+
     // The URP simple lit algorithm
     // The arguments are lighting input data, albedo color, specular color, smoothness, emission color, and alpha
-    return UniversalFragmentBlinnPhong(lightingInput, albedo, 1, 0, 0, 1);
+    return UniversalFragmentBlinnPhong(lightingInput, surface_data);
 }
 
 #endif

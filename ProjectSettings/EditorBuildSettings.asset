@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Grass.unity
-    guid: a67256f7828f447b689681d363314906
+    path: Assets/Scenes/DeferredRendering.unity
+    guid: ae9a0988751fce2409dbb0e1cb8d6d78
   m_configObjects: {}

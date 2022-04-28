@@ -16,6 +16,7 @@ public class SaveTextureEditor : Editor
         if (GUILayout.Button("SaveTexture"))
         {
             st.Save();
+            AssetDatabase.Refresh();
         }
     }
 }
