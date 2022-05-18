@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: AnimeLine
-  m_Shader: {fileID: 4800000, guid: 1d8523ff29fc18f4eb5755b2cf940b1a, type: 3}
+  m_Name: ScreenRain
+  m_Shader: {fileID: 4800000, guid: 118990a9c8a95264cacc0e3b66c36a2f, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -20,18 +20,24 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _BaseMap:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTex:
         m_Texture: {fileID: 2800000, guid: 51e0b4a51b10efd4084c7e1bdd37493b, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Rain:
+        m_Texture: {fileID: 2800000, guid: 59946827193ec47e79390b9fe3a7055f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Ripple:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _RayMultiply: 1.55
-    - _RayPower: 1.72
-    - _RotateSpeed: 5
-    - _Threshold: 0.321
-    m_Colors:
-    - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Center: {r: 0.5, g: 0.5, b: 0, a: 0}
-    - _SecondColor: {r: 1, g: 1, b: 1, a: 1}
+    - _RainForce: 1.74
+    m_Colors: []
   m_BuildTextureStacks: []

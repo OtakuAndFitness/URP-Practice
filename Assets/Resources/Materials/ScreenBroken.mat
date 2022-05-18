@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: AnimeLine
-  m_Shader: {fileID: 4800000, guid: 1d8523ff29fc18f4eb5755b2cf940b1a, type: 3}
+  m_Name: ScreenBroken
+  m_Shader: {fileID: 4800000, guid: 91538360736d76145ac2fe1054b38521, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -20,18 +20,16 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: 51e0b4a51b10efd4084c7e1bdd37493b, type: 3}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ScreenBrokenNormal:
+        m_Texture: {fileID: 2800000, guid: 152199bc82bb38243941e5aa0e143be3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _RayMultiply: 1.55
-    - _RayPower: 1.72
-    - _RotateSpeed: 5
-    - _Threshold: 0.321
-    m_Colors:
-    - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
-    - _Center: {r: 0.5, g: 0.5, b: 0, a: 0}
-    - _SecondColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BrokenScale: 1
+    m_Colors: []
   m_BuildTextureStacks: []
