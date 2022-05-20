@@ -46,6 +46,7 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
         private RenderTargetIdentifier destination { get; set; }
 
         RenderTargetHandle m_TemporaryColorTexture;
+        private RenderTexture m_renderTexture;
         RenderTargetHandle m_DestinationTexture;
         string m_ProfilerTag;
         public BlitPass(RenderPassEvent renderPassEvent, BlitSettings settings, string tag)
@@ -83,6 +84,7 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
 
             if (settings.srcType == Target.CameraColor)
             {
+                // cmd.GenerateMips(renderer.cameraColorTarget);
                 source = renderer.cameraColorTarget;
             }else if (settings.srcType == Target.TextureID)
             {
@@ -116,7 +118,7 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
                 }
                 cmd.GetTemporaryRT(m_DestinationTexture.id, opaqueDesc, filterMode);
             }
-
+            
             if (source == destination || (settings.srcType == settings.dstType && settings.srcType == Target.CameraColor))
             {
                 cmd.GetTemporaryRT(m_TemporaryColorTexture.id, opaqueDesc, filterMode);

@@ -29,7 +29,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Rain:
-        m_Texture: {fileID: 2800000, guid: 59946827193ec47e79390b9fe3a7055f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 01dce55f082199e4292afc250c5a481a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Ripple:
@@ -38,6 +38,6 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _RainForce: 1.74
+    - _RainForce: 0.73
     m_Colors: []
   m_BuildTextureStacks: []
