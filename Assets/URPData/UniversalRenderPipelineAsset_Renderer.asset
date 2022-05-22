@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a950801046db47ffb5fde50ec41d6fc, type: 3}
   m_Name: TransparentFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
 --- !u!114 &-8897427827767588485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26,6 +26,33 @@ MonoBehaviour:
   m_Name: MyOutlineFeature
   m_EditorClassIdentifier: 
   m_Active: 1
+--- !u!114 &-3935514202656126420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4134e18c1fbf9b042b75d0c49aaa3802, type: 3}
+  m_Name: Distortion
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings:
+    PassEvent: 550
+    blitMaterial: {fileID: 2100000, guid: c4ddee81559926d4c9792533b0c9c1a2, type: 2}
+    blitMaterialPassIndex: 0
+    setInverseViewMatrix: 0
+    requireDepthNormals: 0
+    srcType: 0
+    srcTextureId: _CameraColorTexture
+    srcTextureObject: {fileID: 0}
+    dstType: 0
+    dstTextureId: _BlitPassTexture
+    dstTextureObject: {fileID: 0}
+    overrideGraphicsFormat: 0
+    graphicsFormat: 4
 --- !u!114 &-3906134788787945871
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53,7 +80,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b3d386ba5cd94485973aee1479b272e, type: 3}
   m_Name: Outline
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     passTag: Outline
     Event: 300
@@ -127,7 +154,9 @@ MonoBehaviour:
   - {fileID: -3906134788787945871}
   - {fileID: 8218266213018616331}
   - {fileID: -875905420751796347}
-  m_RendererFeatureMap: fbadfade2a645de08205eef8aaa52b8071be7fed1a9fcac90bc2911894250d728507401ba928d8f3
+  - {fileID: 8525881253142399699}
+  - {fileID: -3935514202656126420}
+  m_RendererFeatureMap: fbadfade2a645de08205eef8aaa52b8071be7fed1a9fcac90bc2911894250d728507401ba928d8f3d30ab7e2d30352762c4a2d16af3e62c9
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -230,3 +259,24 @@ MonoBehaviour:
     dstTextureObject: {fileID: 0}
     overrideGraphicsFormat: 0
     graphicsFormat: 4
+--- !u!114 &8525881253142399699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 218d219a5e076454d9312dd960f41995, type: 3}
+  m_Name: DistortionMask
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  renderMaskSetting:
+    renderPassEvent: 500
+    layerMask:
+      serializedVersion: 2
+      m_Bits: 16
+    material: {fileID: 2100000, guid: bc5f8022c4fcbe3498e6dc383f2c26b8, type: 2}
+    RTWidth: 512
+    RTHeight: 512
