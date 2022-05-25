@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CustomTransparent
-  m_Shader: {fileID: 4800000, guid: 89a0927cf8e46457c875f0721d397987, type: 3}
+  m_Name: Unlit_Dissolve_Ramp
+  m_Shader: {fileID: 4800000, guid: a1a3bbf3fc382cd4c880fa528856df6c, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -21,11 +21,20 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: e6b5cf78551e443358eabc87c500ce0c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6fba0859c85344435a50260cba6164e6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: 963b35429b0c67446b59b608f038931e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RampTex:
+        m_Texture: {fileID: 2800000, guid: 7ba077a3feb0f1f45bb503ab307954a2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Alpha: 0.512
+    - _EdgeLength: 0.1234
+    - _Threshold: 0.399
     m_Colors: []
   m_BuildTextureStacks: []

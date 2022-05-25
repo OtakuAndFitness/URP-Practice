@@ -38,7 +38,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4134e18c1fbf9b042b75d0c49aaa3802, type: 3}
   m_Name: Distortion
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     PassEvent: 550
     blitMaterial: {fileID: 2100000, guid: c4ddee81559926d4c9792533b0c9c1a2, type: 2}
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4134e18c1fbf9b042b75d0c49aaa3802, type: 3}
   m_Name: AnimeLine
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     PassEvent: 550
     blitMaterial: {fileID: 2100000, guid: f568cd27efd21b742a289f6101999dd9, type: 2}
@@ -244,7 +244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4134e18c1fbf9b042b75d0c49aaa3802, type: 3}
   m_Name: RainDrops
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     PassEvent: 550
     blitMaterial: {fileID: 2100000, guid: a76483d1f776dbd4cb9a9778d423e805, type: 2}
@@ -271,7 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 218d219a5e076454d9312dd960f41995, type: 3}
   m_Name: DistortionMask
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   renderMaskSetting:
     renderPassEvent: 500
     layerMask:
