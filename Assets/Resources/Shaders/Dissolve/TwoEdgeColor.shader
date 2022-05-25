@@ -8,8 +8,9 @@ Shader "Unlit/Dissolve/Two Edge Color"
         _NoiseTex ("Noise Tex", 2D) = "white" { }
         _Threshold ("Threshold", Range(0, 1)) = 0
         _EdgeLength ("Edge Length", Range(0.0, 0.2)) = 0.1
-        _EdgeFirstColor ("First Edge Color", Color) = (1, 1, 1, 1)
-        _EdgeSecondColor ("Second Edge Color", Color) = (1, 1, 1, 1)
+        [HDR]_EdgeFirstColor ("First Edge Color", Color) = (1, 1, 1, 1)
+        [HDR]_EdgeSecondColor ("Second Edge Color", Color) = (1, 1, 1, 1)
+        [HDR]_EdgeSecondColor ("Second Edge Color", Color) = (1, 1, 1, 1)
     }
     SubShader
     {

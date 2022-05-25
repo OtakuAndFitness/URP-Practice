@@ -33,6 +33,6 @@ Material:
     - _EdgeLength: 0.1253
     - _Threshold: 0.48
     m_Colors:
-    - _EdgeFirstColor: {r: 1, g: 0, b: 0, a: 1}
-    - _EdgeSecondColor: {r: 1, g: 0.8036438, b: 0, a: 1}
+    - _EdgeFirstColor: {r: 2, g: 0, b: 0, a: 1}
+    - _EdgeSecondColor: {r: 2, g: 1.6078432, b: 0, a: 1}
   m_BuildTextureStacks: []
