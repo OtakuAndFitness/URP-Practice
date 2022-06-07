@@ -1,6 +1,4 @@
-﻿//https://www.jianshu.com/p/d8b535efa9db
-
-Shader "Unlit/Dissolve/Edge Color"
+﻿Shader "Unlit/Dissolve/Edge Color"
 {
     Properties
     {
