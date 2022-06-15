@@ -73,15 +73,16 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, m_GaussianBlur.filterMode.value);
             cmd.GetTemporaryRT(m_TemporaryColorTexture03.id, opaqueDesc, m_GaussianBlur.filterMode.value);
             cmd.BeginSample("GaussianBlur");
+            cmd.Blit(this.m_ColorAttachment, m_TemporaryColorTexture03.Identifier());
             for (int i = 0; i < m_GaussianBlur.blurCount.value; i++) {
-                gaussianBlur.SetVector("_Offsets", new Vector4(0, m_GaussianBlur.indensity.value, 0, 0));
+                gaussianBlur.SetVector("_Offset", new Vector4(0, m_GaussianBlur.indensity.value, 0, 0));
                 cmd.Blit(m_TemporaryColorTexture03.Identifier(), m_TemporaryColorTexture01.Identifier(), gaussianBlur);
-                gaussianBlur.SetVector("_Offsets", new Vector4(m_GaussianBlur.indensity.value, 0, 0, 0));
+                gaussianBlur.SetVector("_Offset", new Vector4(m_GaussianBlur.indensity.value, 0, 0, 0));
                 cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_TemporaryColorTexture02.Identifier(), gaussianBlur);
                 cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture03.Identifier());
             }
             cmd.Blit(m_TemporaryColorTexture03.Identifier(), m_ColorAttachment);
-            cmd.EndSample("Blur");
+            cmd.EndSample("GaussianBlur");
         }
 
         // Cleanup any allocated resources that were created during the execution of this render pass.
@@ -95,35 +96,38 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_ColorAttachment = cameraColorTarget;
             m_CameraDepthAttachment = cameraDepth;
             m_Destination = dest;
+            // m_Materials = new MaterialLibrary(data);
         }
     }
 
     CustomPostProcessingPass m_ScriptablePass;
-    CustomPostProcessingData m_CustomPostProcessingData;
+    public RenderPassEvent evt = RenderPassEvent.AfterRenderingTransparents;
+    public CustomPostProcessingData m_CustomPostProcessingData;
 
     /// <inheritdoc/>
     public override void Create()
     {
-        if (m_CustomPostProcessingData == null)
-        {
-            Debug.LogError("There is no Custom Post Processing Data created!!!");
-            return;
-        }
         m_ScriptablePass = new CustomPostProcessingPass(m_CustomPostProcessingData);
 
         // Configures where the render pass should be injected.
-        m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
+        // m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingOpaques;
     }
 
     // Here you can inject one or multiple render passes in the renderer.
     // This method is called when setting up the renderer once per-camera.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
+        if (m_CustomPostProcessingData == null)
+        {
+            Debug.LogError("There is no Custom Post Processing Data assigned!!!");
+            return;
+        }
+        
         var cameraColorTarget = renderer.cameraColorTarget;
         var cameraDepth = renderer.cameraDepthTarget;
         var dest = RenderTargetHandle.CameraTarget;
-        
-        m_ScriptablePass.Setup(m_ScriptablePass.renderPassEvent, cameraColorTarget, cameraDepth, dest);
+
+        m_ScriptablePass.Setup(evt, cameraColorTarget, cameraDepth, dest);
         renderer.EnqueuePass(m_ScriptablePass);
     }
 }

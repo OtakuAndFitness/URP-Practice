@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,15 +18,28 @@ namespace UnityEngine.Rendering.Universal
         {
             //ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreatePostProcessDataAsset>(), "CustomPostProcessData.asset", null, null);
             var instance = CreateInstance<CustomPostProcessingData>();
-            AssetDatabase.CreateAsset(instance, string.Format("Assets/Settings/{0}.asset", typeof(CustomPostProcessingData).Name));
-            Selection.activeObject = instance;
+            string assetPath = AssetDatabase.GUIDToAssetPath(Selection.assetGUIDs[0]);
+            assetPath = Path.Combine(assetPath, nameof(CustomPostProcessingData) + ".asset");
+            if (File.Exists(assetPath))
+            {
+                File.Delete(assetPath);
+                // AssetDatabase.CreateAsset(instance, assetPath);
+                // Selection.activeObject = instance;
+                // AssetDatabase.Refresh();
+            }
+            // else
+            // {
+                AssetDatabase.CreateAsset(instance, assetPath);
+                Selection.activeObject = instance;
+                AssetDatabase.Refresh();
+            // }
+            
         }
 #endif
 
-        [Serializable, ReloadGroup]
+        [Serializable]
         public sealed class CustomShaders
         {
-            [Reload("Custom/PostProcessing/GaussianBlur")]
             public Shader gaussianBlur;
         }
 

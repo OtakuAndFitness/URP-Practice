@@ -13,7 +13,7 @@ namespace UnityEngine.Rendering.Universal
         public GaussianFilerModeParameter filterMode = new GaussianFilerModeParameter(FilterMode.Bilinear);
         public ClampedIntParameter blurCount = new ClampedIntParameter(1, 1, 4);
         public ClampedIntParameter downSample = new ClampedIntParameter(1, 1, 4);
-        public ClampedFloatParameter indensity = new ClampedFloatParameter(0f, 0, 20);
+        public ClampedFloatParameter indensity = new ClampedFloatParameter(0f, 0, 2);
 
         public bool IsActive()
         {

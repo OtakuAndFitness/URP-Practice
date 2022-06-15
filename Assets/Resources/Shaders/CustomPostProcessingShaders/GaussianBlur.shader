@@ -49,6 +49,7 @@ Shader "Custom/PostProcessing/GaussianBlur"
 
             CBUFFER_START(UnityPerMaterial)
                 float4 _MainTex_ST;
+                float4 _MainTex_TexelSize;
                 half4 _Offset;
             CBUFFER_END
 
@@ -63,7 +64,7 @@ Shader "Custom/PostProcessing/GaussianBlur"
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(IN.positionOS.xyz);
                 OUT.positionHCS = vertexInput.positionCS;
                 OUT.uv = IN.uv;
-                _Offset *= _MainTex_ST.xyxy;
+                _Offset *= _MainTex_TexelSize.xyxy;
                 OUT.uv01 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1);
 	    	    OUT.uv23 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1) * 2.0;
 	    	    OUT.uv45 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1) * 3.0;
