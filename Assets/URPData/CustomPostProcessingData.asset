@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   customShaders:
     gaussianBlur: {fileID: 4800000, guid: 3c802762de6da4a37aa53a68ba40767a, type: 3}
+    boxBlur: {fileID: 4800000, guid: 8247a682d4fd04d188b4ccbb33ac950d, type: 3}

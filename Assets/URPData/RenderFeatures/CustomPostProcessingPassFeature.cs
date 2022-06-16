@@ -14,6 +14,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         const string k_RenderCustomPostProcessingTag = "Render Custom PostProcessing Pass";
 
         private GaussianBlur m_GaussianBlur;
+        private BoxBlur m_BoxBlur;
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
         
@@ -26,7 +27,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_Data = data;
             m_Materials = new MaterialLibrary(m_Data);
             
-            //for gaussian blur
+            //for blur
             m_TemporaryColorTexture01.Init("m_TemporaryColorTexture01");
             m_TemporaryColorTexture02.Init("m_TemporaryColorTexture02");
             // m_TemporaryColorTexture03.Init("m_TemporaryColorTexture03");
@@ -49,6 +50,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         {
             var stack = VolumeManager.instance.stack;
             m_GaussianBlur = stack.GetComponent<GaussianBlur>();
+            m_BoxBlur = stack.GetComponent<BoxBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -62,8 +64,41 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupGaussianBlur(cmd, ref renderingData, m_Materials.gaussianBlur);
             }
+
+            if (m_BoxBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                //可以重复使用高斯模糊方法
+                SetupBoxBlur(cmd, ref renderingData, m_Materials.boxBlur);
+            }
             
         }
+
+        #region BoxBlur
+
+        private void SetupBoxBlur(CommandBuffer cmd, ref RenderingData renderingData, Material boxBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.width = opaqueDesc.width >> m_BoxBlur.downSample.value;
+            opaqueDesc.height = opaqueDesc.height >> m_BoxBlur.downSample.value;
+            opaqueDesc.depthBufferBits = 0;
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_BoxBlur.filterMode.value);
+            cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, m_BoxBlur.filterMode.value);
+            cmd.BeginSample("BoxBlur");
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            for (int i = 0; i < m_BoxBlur.blurCount.value; i++) {
+                boxBlur.SetVector("_Offset", new Vector4(m_BoxBlur.indensity.value, m_BoxBlur.indensity.value, 0, 0));
+                cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_TemporaryColorTexture02.Identifier(), boxBlur);
+                boxBlur.SetVector("_Offset", new Vector4(m_BoxBlur.indensity.value, m_BoxBlur.indensity.value, 0, 0));
+                cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture01.Identifier(), boxBlur);
+            }
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment);
+            cmd.EndSample("BoxBlur");
+        }
+
+        #endregion
+        
+
+        #region GaussianBlur
 
         private void SetupGaussianBlur(CommandBuffer cmd, ref RenderingData renderingData, Material gaussianBlur)
         {
@@ -90,6 +125,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             // cmd.Blit(m_ColorAttachment, m_Destination.Identifier());
             cmd.EndSample("GaussianBlur");
         }
+
+        #endregion
 
         // Cleanup any allocated resources that were created during the execution of this render pass.
         public override void OnCameraCleanup(CommandBuffer cmd)

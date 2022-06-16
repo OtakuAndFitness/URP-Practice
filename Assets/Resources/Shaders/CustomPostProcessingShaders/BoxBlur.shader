@@ -1,19 +1,19 @@
-Shader "Custom/PostProcessing/GaussianBlur"
+Shader "Custom/PostProcessing/BoxBlur"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
         _Offset("Offset", vector) = (1,1,1,1)
+        _MainTex("Main Tex", 2D) = "white"{}
     }
 
     SubShader
     {
         Tags {"RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
-
+        
         ZTest Always
         Cull Off
         Zwrite Off
-        
+
         Pass
         {
             Tags {"LightMode" = "UniversalForward"}
@@ -37,9 +37,6 @@ Shader "Custom/PostProcessing/GaussianBlur"
             {
                 float2 uv : TEXCOORD0;
                 float4 positionHCS : SV_POSITION;
-                float4 uv01 : TEXCOORD1;
-                float4 uv23 : TEXCOORD2;
-                float4 uv45 : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
@@ -64,10 +61,6 @@ Shader "Custom/PostProcessing/GaussianBlur"
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(IN.positionOS.xyz);
                 OUT.positionHCS = vertexInput.positionCS;
                 OUT.uv = IN.uv;
-                _Offset *= _MainTex_TexelSize.xyxy;
-                OUT.uv01 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1);
-	    	    OUT.uv23 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1) * 2.0;
-	    	    OUT.uv45 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1) * 3.0;
                 
                 return OUT;
             }
@@ -76,17 +69,18 @@ Shader "Custom/PostProcessing/GaussianBlur"
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
-
-                half4 color = half4(0,0,0,0);
-                color = 0.4 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv);
-	    	    color += 0.15 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv01.xy);
-	    	    color += 0.15 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv01.zw);
-	    	    color += 0.10 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv23.xy);
-	    	    color += 0.10 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv23.zw);
-	    	    color += 0.05 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv45.xy);
-	    	    color += 0.05 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv45.zw);
-
-                return color;
+                
+		        // half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
+                _Offset *= _MainTex_TexelSize.xyxy;
+                float4 d = _Offset.xyxy * float4(-1.0, -1.0, 1.0, 1.0);
+		
+		        half4 s = 0;
+		        s = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + d.xy) * 0.25h;  // 1 MUL
+		        s += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + d.zy) * 0.25h; // 1 MAD
+		        s += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + d.xw) * 0.25h; // 1 MAD
+		        s += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + d.zw) * 0.25h; // 1 MAD
+                
+                return s;
             }
             ENDHLSL
         }

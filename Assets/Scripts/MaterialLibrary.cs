@@ -8,11 +8,13 @@ namespace UnityEngine.Rendering.Universal
     public class MaterialLibrary
     {
         public readonly Material gaussianBlur;
+        public readonly Material boxBlur;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
             gaussianBlur = Load(data.customShaders.gaussianBlur);
-            
+            boxBlur = Load(data.customShaders.boxBlur);
+
         }
 
         Material Load(Shader shader)

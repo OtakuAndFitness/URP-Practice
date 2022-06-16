@@ -41,6 +41,7 @@ namespace UnityEngine.Rendering.Universal
         public sealed class CustomShaders
         {
             public Shader gaussianBlur;
+            public Shader boxBlur;
         }
 
         public CustomShaders customShaders;

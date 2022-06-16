@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-6821996675934696793
+--- !u!114 &-4066766497225193151
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41a428dd30c3c4267b7e6918f06d3c5a, type: 3}
-  m_Name: GaussianBlur
+  m_Script: {fileID: 11500000, guid: 6d3592f79930d48e2aa9a2694369f1d7, type: 3}
+  m_Name: BoxBlur
   m_EditorClassIdentifier: 
   active: 1
   filterMode:
@@ -18,13 +18,13 @@ MonoBehaviour:
     m_Value: 1
   blurCount:
     m_OverrideState: 1
-    m_Value: 3
+    m_Value: 6
   downSample:
     m_OverrideState: 1
-    m_Value: 2
+    m_Value: 3
   indensity:
     m_OverrideState: 1
-    m_Value: 1.05
+    m_Value: 0.41
 --- !u!114 &-3640053722625769961
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -39,11 +39,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   threshold:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0.9
   intensity:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 2.43
   scatter:
     m_OverrideState: 0
     m_Value: 0.7
@@ -78,5 +78,5 @@ MonoBehaviour:
   m_Name: Post-process Volume Profile
   m_EditorClassIdentifier: 
   components:
-  - {fileID: -6821996675934696793}
   - {fileID: -3640053722625769961}
+  - {fileID: -4066766497225193151}
