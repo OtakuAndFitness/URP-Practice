@@ -42,6 +42,7 @@ namespace UnityEngine.Rendering.Universal
         {
             public Shader gaussianBlur;
             public Shader boxBlur;
+            public Shader kawaseBlur;
         }
 
         public CustomShaders customShaders;

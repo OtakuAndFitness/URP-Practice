@@ -15,6 +15,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         private GaussianBlur m_GaussianBlur;
         private BoxBlur m_BoxBlur;
+        private KawaseBlur m_KawaseBlur;
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
         
@@ -51,6 +52,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             var stack = VolumeManager.instance.stack;
             m_GaussianBlur = stack.GetComponent<GaussianBlur>();
             m_BoxBlur = stack.GetComponent<BoxBlur>();
+            m_KawaseBlur = stack.GetComponent<KawaseBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -67,11 +69,44 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
             if (m_BoxBlur.IsActive() && !cameraData.isSceneViewCamera)
             {
-                //可以重复使用高斯模糊方法
                 SetupBoxBlur(cmd, ref renderingData, m_Materials.boxBlur);
+            }
+
+            if (m_KawaseBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupKawaseBlur(cmd, ref renderingData, m_Materials.kawaseBlur);
             }
             
         }
+
+        #region KawaseBlur
+
+        private void SetupKawaseBlur(CommandBuffer cmd, ref RenderingData renderingData, Material kawaseBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.width = opaqueDesc.width >> m_KawaseBlur.downSample.value;
+            opaqueDesc.height = opaqueDesc.height >> m_KawaseBlur.downSample.value;
+            opaqueDesc.depthBufferBits = 0;
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_KawaseBlur.filterMode.value);
+            cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, m_KawaseBlur.filterMode.value);
+            bool needSwitch = true;
+            
+            cmd.BeginSample("KawaseBlur");
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            for (int i = 0; i < m_KawaseBlur.blurCount.value; i++) {
+                kawaseBlur.SetFloat("_Offset", i / m_KawaseBlur.downSample.value + m_KawaseBlur.indensity.value);
+                cmd.Blit(needSwitch ? m_TemporaryColorTexture01.Identifier() : m_TemporaryColorTexture02.Identifier(), needSwitch ? m_TemporaryColorTexture02.Identifier() : m_TemporaryColorTexture01.Identifier(),kawaseBlur);
+                needSwitch = !needSwitch;
+            }
+            kawaseBlur.SetFloat("_Offset", m_KawaseBlur.blurCount.value / m_KawaseBlur.downSample.value + m_KawaseBlur.indensity.value);
+            cmd.Blit(needSwitch ? m_TemporaryColorTexture01.Identifier() : m_TemporaryColorTexture02.Identifier(), m_ColorAttachment);
+            // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
+            cmd.EndSample("KawaseBlur");
+        }
+
+        #endregion
+        
 
         #region BoxBlur
 

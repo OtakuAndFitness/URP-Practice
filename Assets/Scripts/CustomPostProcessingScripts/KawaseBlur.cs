@@ -7,14 +7,14 @@ using UnityEngine.Rendering.Universal;
 
 namespace UnityEngine.Rendering.Universal
 {
-    [Serializable,VolumeComponentMenu("Custom-post-processing/BoxBlur")]
-    public class BoxBlur : VolumeComponent,IPostProcessComponent
+    [Serializable,VolumeComponentMenu("Custom-post-processing/KawaseBlur")]
+    public class KawaseBlur : VolumeComponent, IPostProcessComponent
     {
-        public BoxFilerModeParameter filterMode = new BoxFilerModeParameter(FilterMode.Bilinear);
+        public KawaseFilerModeParameter filterMode = new KawaseFilerModeParameter(FilterMode.Bilinear);
         public ClampedIntParameter blurCount = new ClampedIntParameter(1, 1, 10);
         public ClampedIntParameter downSample = new ClampedIntParameter(1, 1, 6);
         public ClampedFloatParameter indensity = new ClampedFloatParameter(0f, 0, 3);
-        
+
         public bool IsActive()
         {
             return active && indensity.value != 0;
@@ -27,6 +27,7 @@ namespace UnityEngine.Rendering.Universal
     }
     
     [Serializable]
-    public sealed class BoxFilerModeParameter : VolumeParameter<FilterMode> { public BoxFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+    public sealed class KawaseFilerModeParameter : VolumeParameter<FilterMode> { public KawaseFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+
 }
 

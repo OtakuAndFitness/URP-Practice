@@ -3,10 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="f1820f00-036d-41c2-aae9-2a96dc091b43" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.URP-Practice/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.URP-Practice/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/Shaders/CustomPostProcessingShaders/GaussianBlur.shader" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/Shaders/CustomPostProcessingShaders/GaussianBlur.shader" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene/Post-process Volume Profile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene/Post-process Volume Profile.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/BoxBlur.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/BoxBlur.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/GaussianBlur.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/GaussianBlur.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/URPData/CustomPostProcessingData.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/URPData/CustomPostProcessingData.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/URPData/RenderFeatures/CustomPostProcessingPassFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/URPData/RenderFeatures/CustomPostProcessingPassFeature.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -20,6 +22,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/BoxBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/GaussianBlur.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/KawaseBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -78,7 +81,7 @@
       <option name="presentableId" value="Default" />
       <updated>1654573935152</updated>
       <workItem from="1654573963948" duration="3513000" />
-      <workItem from="1654941998152" duration="18566000" />
+      <workItem from="1654941998152" duration="21794000" />
     </task>
     <servers />
   </component>
