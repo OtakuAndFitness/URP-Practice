@@ -7,11 +7,11 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
     class CustomPostProcessingPass : ScriptableRenderPass
     {
         private RenderTargetIdentifier m_ColorAttachment;
-        private RenderTargetIdentifier m_CameraDepthAttachment;
-        private RenderTargetHandle m_Destination;
+        // private RenderTargetIdentifier m_CameraDepthAttachment;
+        // private RenderTargetHandle m_Destination;
         
-        const string k_RenderPostProcessingTag = "Render AdditionalPostProcessing Effects";
-        const string k_RenderFinalPostProcessingTag = "Render Final AdditionalPostProcessing Pass";
+        // const string k_RenderPostProcessingTag = "Render AdditionalPostProcessing Effects";
+        const string k_RenderCustomPostProcessingTag = "Render Custom PostProcessing Pass";
 
         private GaussianBlur m_GaussianBlur;
         private MaterialLibrary m_Materials;
@@ -19,15 +19,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         
         RenderTargetHandle m_TemporaryColorTexture01;
         RenderTargetHandle m_TemporaryColorTexture02;
-        RenderTargetHandle m_TemporaryColorTexture03;
+        // RenderTargetHandle m_TemporaryColorTexture03;
 
         public CustomPostProcessingPass(CustomPostProcessingData data)
         {
-            m_TemporaryColorTexture01.Init("m_TemporaryColorTexture01");
-            m_TemporaryColorTexture02.Init("m_TemporaryColorTexture02");
-            m_TemporaryColorTexture03.Init("m_TemporaryColorTexture03");
             m_Data = data;
             m_Materials = new MaterialLibrary(m_Data);
+            
+            //for gaussian blur
+            m_TemporaryColorTexture01.Init("m_TemporaryColorTexture01");
+            m_TemporaryColorTexture02.Init("m_TemporaryColorTexture02");
+            // m_TemporaryColorTexture03.Init("m_TemporaryColorTexture03");
         }
         
         // This method is called before executing the render pass.
@@ -47,7 +49,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         {
             var stack = VolumeManager.instance.stack;
             m_GaussianBlur = stack.GetComponent<GaussianBlur>();
-            var cmd = CommandBufferPool.Get(k_RenderFinalPostProcessingTag);
+            var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
@@ -71,17 +73,21 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             opaqueDesc.depthBufferBits = 0;
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_GaussianBlur.filterMode.value);
             cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, m_GaussianBlur.filterMode.value);
-            cmd.GetTemporaryRT(m_TemporaryColorTexture03.id, opaqueDesc, m_GaussianBlur.filterMode.value);
+            // cmd.GetTemporaryRT(m_TemporaryColorTexture03.id, opaqueDesc, m_GaussianBlur.filterMode.value);
             cmd.BeginSample("GaussianBlur");
-            cmd.Blit(this.m_ColorAttachment, m_TemporaryColorTexture03.Identifier());
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             for (int i = 0; i < m_GaussianBlur.blurCount.value; i++) {
+                //y-direction
                 gaussianBlur.SetVector("_Offset", new Vector4(0, m_GaussianBlur.indensity.value, 0, 0));
-                cmd.Blit(m_TemporaryColorTexture03.Identifier(), m_TemporaryColorTexture01.Identifier(), gaussianBlur);
-                gaussianBlur.SetVector("_Offset", new Vector4(m_GaussianBlur.indensity.value, 0, 0, 0));
                 cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_TemporaryColorTexture02.Identifier(), gaussianBlur);
-                cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture03.Identifier());
+                //x-direction
+                gaussianBlur.SetVector("_Offset", new Vector4(m_GaussianBlur.indensity.value, 0, 0, 0));
+                cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture01.Identifier(), gaussianBlur);
+                
+                // cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture03.Identifier());
             }
-            cmd.Blit(m_TemporaryColorTexture03.Identifier(), m_ColorAttachment);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment);
+            // cmd.Blit(m_ColorAttachment, m_Destination.Identifier());
             cmd.EndSample("GaussianBlur");
         }
 
@@ -90,12 +96,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         {
         }
 
-        public void Setup(RenderPassEvent @event, RenderTargetIdentifier cameraColorTarget, RenderTargetIdentifier cameraDepth, RenderTargetHandle dest)
+        public void Setup(RenderPassEvent @event, RenderTargetIdentifier cameraColorTarget)
         {
             renderPassEvent = @event;
             m_ColorAttachment = cameraColorTarget;
-            m_CameraDepthAttachment = cameraDepth;
-            m_Destination = dest;
+            // m_CameraDepthAttachment = cameraDepth;
+            // m_Destination = dest;
             // m_Materials = new MaterialLibrary(data);
         }
     }
@@ -124,10 +130,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         }
         
         var cameraColorTarget = renderer.cameraColorTarget;
-        var cameraDepth = renderer.cameraDepthTarget;
-        var dest = RenderTargetHandle.CameraTarget;
+        // var cameraDepth = renderer.cameraDepthTarget;
+        // var dest = RenderTargetHandle.CameraTarget;
 
-        m_ScriptablePass.Setup(evt, cameraColorTarget, cameraDepth, dest);
+        m_ScriptablePass.Setup(evt, cameraColorTarget);
         renderer.EnqueuePass(m_ScriptablePass);
     }
 }
