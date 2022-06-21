@@ -7,7 +7,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace UnityEngine.Rendering.Universal
 {
-    [Serializable,VolumeComponentMenu("Custom-post-processing/KawaseBlur")]
+    [Serializable,VolumeComponentMenu("Custom-post-processing/Blur/KawaseBlur")]
     public class KawaseBlur : VolumeComponent, IPostProcessComponent
     {
         public KawaseFilerModeParameter filterMode = new KawaseFilerModeParameter(FilterMode.Bilinear);

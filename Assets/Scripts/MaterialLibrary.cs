@@ -10,12 +10,14 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material gaussianBlur;
         public readonly Material boxBlur;
         public readonly Material kawaseBlur;
+        public readonly Material dualKawaseBlur;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
             gaussianBlur = Load(data.customShaders.gaussianBlur);
             boxBlur = Load(data.customShaders.boxBlur);
             kawaseBlur = Load(data.customShaders.kawaseBlur);
+            dualKawaseBlur = Load(data.customShaders.dualKawaseBlur);
 
         }
 
@@ -37,6 +39,9 @@ namespace UnityEngine.Rendering.Universal
         internal void Cleanup()
         {
             CoreUtils.Destroy(gaussianBlur);
+            CoreUtils.Destroy(boxBlur);
+            CoreUtils.Destroy(kawaseBlur);
+            CoreUtils.Destroy(dualKawaseBlur);
         }
     }
 }

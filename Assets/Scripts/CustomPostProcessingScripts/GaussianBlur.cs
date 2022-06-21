@@ -7,7 +7,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace UnityEngine.Rendering.Universal
 {
-    [Serializable,VolumeComponentMenu("Custom-post-processing/GaussianBlur")]
+    [Serializable,VolumeComponentMenu("Custom-post-processing/Blur/GaussianBlur")]
     public class GaussianBlur : VolumeComponent,IPostProcessComponent
     {
         public GaussianFilerModeParameter filterMode = new GaussianFilerModeParameter(FilterMode.Bilinear);

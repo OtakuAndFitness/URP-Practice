@@ -16,11 +16,21 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private GaussianBlur m_GaussianBlur;
         private BoxBlur m_BoxBlur;
         private KawaseBlur m_KawaseBlur;
+        private DualKawaseBlur m_DualKawaseBlur;
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
         
         RenderTargetHandle m_TemporaryColorTexture01;
         RenderTargetHandle m_TemporaryColorTexture02;
+
+        private Level[] m_Pyramid;
+        const int k_MaxPyramidSize = 16;
+        
+        struct Level
+        {
+            internal int down;
+            internal int up;
+        }
         // RenderTargetHandle m_TemporaryColorTexture03;
 
         public CustomPostProcessingPass(CustomPostProcessingData data)
@@ -31,6 +41,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             //for blur
             m_TemporaryColorTexture01.Init("m_TemporaryColorTexture01");
             m_TemporaryColorTexture02.Init("m_TemporaryColorTexture02");
+            
+            m_Pyramid = new Level[k_MaxPyramidSize];
+
+            for (int i = 0; i < k_MaxPyramidSize; i++)
+            {
+                m_Pyramid[i] = new Level
+                {
+                    down = Shader.PropertyToID("_BlurMipDown" + i),
+                    up = Shader.PropertyToID("_BlurMipUp" + i)
+                };
+            }
             // m_TemporaryColorTexture03.Init("m_TemporaryColorTexture03");
         }
         
@@ -53,6 +74,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_GaussianBlur = stack.GetComponent<GaussianBlur>();
             m_BoxBlur = stack.GetComponent<BoxBlur>();
             m_KawaseBlur = stack.GetComponent<KawaseBlur>();
+            m_DualKawaseBlur = stack.GetComponent<DualKawaseBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -76,8 +98,64 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupKawaseBlur(cmd, ref renderingData, m_Materials.kawaseBlur);
             }
+
+            if (m_DualKawaseBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupDualKawaseBlur(cmd, ref renderingData, m_Materials.dualKawaseBlur);
+            }
             
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region DualKawaseBlur
+
+        private void SetupDualKawaseBlur(CommandBuffer cmd, ref RenderingData renderingData, Material dualKawaseBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            // opaqueDesc.width = opaqueDesc.width >> m_DualKawaseBlur.downSample.value;
+            // opaqueDesc.height = opaqueDesc.height >> m_DualKawaseBlur.downSample.value;
+            int width = opaqueDesc.width >> m_DualKawaseBlur.downSample.value;
+            int height = opaqueDesc.height >> m_DualKawaseBlur.downSample.value;
+            // opaqueDesc.depthBufferBits = 0;
+            // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_DualKawaseBlur.filterMode.value);
+            // cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, m_DualKawaseBlur.filterMode.value);
+            cmd.BeginSample("DualKawaseBlur");
+            dualKawaseBlur.SetFloat("_Offset", m_DualKawaseBlur.indensity.value);
+            RenderTargetIdentifier lastDown = m_ColorAttachment;
+            for (int i = 0; i < m_DualKawaseBlur.blurCount.value; i++)
+            {
+                int mipDown = m_Pyramid[i].down;
+                int mipUp = m_Pyramid[i].up;
+                cmd.GetTemporaryRT(mipDown, width, height, 0, m_DualKawaseBlur.filterMode.value);
+                cmd.GetTemporaryRT(mipUp, width, height, 0, m_DualKawaseBlur.filterMode.value);
+                cmd.Blit(lastDown, mipDown, dualKawaseBlur,0);
+            
+                lastDown = mipDown;
+                width = Mathf.Max(width / 2, 1);
+                height = Mathf.Max(height / 2, 1);
+            }
+            
+            int lastUp = m_Pyramid[m_DualKawaseBlur.blurCount.value - 1].down;
+            for (int i = m_DualKawaseBlur.blurCount.value - 2; i >= 0; i--)
+            {
+                int minUp = m_Pyramid[i].up;
+                cmd.Blit(lastUp,minUp,dualKawaseBlur,1);
+                lastUp = minUp;
+            }
+            cmd.Blit(lastUp,m_ColorAttachment,dualKawaseBlur,1);
+            for (int i = 0; i < m_DualKawaseBlur.blurCount.value; i++)
+            {
+                if (m_Pyramid[i].down != lastUp)
+                    cmd.ReleaseTemporaryRT(m_Pyramid[i].down);
+                if (m_Pyramid[i].up != lastUp)
+                    cmd.ReleaseTemporaryRT(m_Pyramid[i].up);
+            }
+            cmd.EndSample("DualKawaseBlur");
+
+        }
+
+        #endregion
 
         #region KawaseBlur
 
@@ -166,6 +244,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         // Cleanup any allocated resources that were created during the execution of this render pass.
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
+            
         }
 
         public void Setup(RenderPassEvent @event, RenderTargetIdentifier cameraColorTarget)
@@ -204,7 +283,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         var cameraColorTarget = renderer.cameraColorTarget;
         // var cameraDepth = renderer.cameraDepthTarget;
         // var dest = RenderTargetHandle.CameraTarget;
-
+        
         m_ScriptablePass.Setup(evt, cameraColorTarget);
         renderer.EnqueuePass(m_ScriptablePass);
     }
