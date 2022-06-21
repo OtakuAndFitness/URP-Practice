@@ -42,8 +42,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_TemporaryColorTexture01.Init("m_TemporaryColorTexture01");
             m_TemporaryColorTexture02.Init("m_TemporaryColorTexture02");
             
+            //for dual blur
             m_Pyramid = new Level[k_MaxPyramidSize];
-
             for (int i = 0; i < k_MaxPyramidSize; i++)
             {
                 m_Pyramid[i] = new Level

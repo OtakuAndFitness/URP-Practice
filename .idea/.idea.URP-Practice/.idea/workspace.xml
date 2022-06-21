@@ -2,11 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f1820f00-036d-41c2-aae9-2a96dc091b43" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.URP-Practice/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.URP-Practice/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene/Post-process Volume Profile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene/Post-process Volume Profile.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/URPData/CustomPostProcessingData.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/URPData/CustomPostProcessingData.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/URPData/RenderFeatures/CustomPostProcessingPassFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/URPData/RenderFeatures/CustomPostProcessingPassFeature.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
