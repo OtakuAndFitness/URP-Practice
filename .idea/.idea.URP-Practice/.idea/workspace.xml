@@ -2,6 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f1820f00-036d-41c2-aae9-2a96dc091b43" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.URP-Practice/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.URP-Practice/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene/Post-process Volume Profile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene/Post-process Volume Profile.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/URPData/CustomPostProcessingData.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/URPData/CustomPostProcessingData.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/URPData/RenderFeatures/CustomPostProcessingPassFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/URPData/RenderFeatures/CustomPostProcessingPassFeature.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -17,6 +22,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5ab83d38fef34c16a800d18605509a5e811000/9c/04b9a9a0/ProjectWindowUtil.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/dafed2d51d694b248f56d66f23356b0b157800/c0/a9a96fb4/CommandBuffer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/BokehBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/BoxBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/DualKawaseBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/GaussianBlur.cs" root0="FORCE_HIGHLIGHTING" />

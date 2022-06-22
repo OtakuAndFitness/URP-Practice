@@ -17,6 +17,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private BoxBlur m_BoxBlur;
         private KawaseBlur m_KawaseBlur;
         private DualKawaseBlur m_DualKawaseBlur;
+        private BokehBlur m_BokehBlur;
+        
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
         
@@ -25,6 +27,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         private Level[] m_Pyramid;
         const int k_MaxPyramidSize = 16;
+
+        private Vector4 mGoldenRot;
         
         struct Level
         {
@@ -52,6 +56,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                     up = Shader.PropertyToID("_BlurMipUp" + i)
                 };
             }
+
+            mGoldenRot = new Vector4();
+            // Precompute rotations
+            float c = Mathf.Cos(2.39996323f);
+            float s = Mathf.Sin(2.39996323f);
+            mGoldenRot.Set(c, s, -s, c);
             // m_TemporaryColorTexture03.Init("m_TemporaryColorTexture03");
         }
         
@@ -75,6 +85,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_BoxBlur = stack.GetComponent<BoxBlur>();
             m_KawaseBlur = stack.GetComponent<KawaseBlur>();
             m_DualKawaseBlur = stack.GetComponent<DualKawaseBlur>();
+            m_BokehBlur = stack.GetComponent<BokehBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -103,10 +114,37 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupDualKawaseBlur(cmd, ref renderingData, m_Materials.dualKawaseBlur);
             }
+
+            if (m_BokehBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupBokehBlur(cmd, ref renderingData, m_Materials.bokehBlur);
+            }
             
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region BokehBlur
+
+        private void SetupBokehBlur(CommandBuffer cmd, ref RenderingData renderingData, Material bokehBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.width = opaqueDesc.width >> m_BokehBlur.downSample.value;
+            opaqueDesc.height = opaqueDesc.height >> m_BokehBlur.downSample.value;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_BokehBlur.filterMode.value);
+            
+            cmd.BeginSample("BokehBlur");
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            bokehBlur.SetVector("_GoldenRot", mGoldenRot);
+            bokehBlur.SetVector("_Offset", new Vector4(m_BokehBlur.blurCount.value, m_BokehBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, bokehBlur);
+            cmd.EndSample("BokehBlur");
+
+        }
+        
+        #endregion
 
         #region DualKawaseBlur
 

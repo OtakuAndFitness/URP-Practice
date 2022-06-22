@@ -11,6 +11,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material boxBlur;
         public readonly Material kawaseBlur;
         public readonly Material dualKawaseBlur;
+        public readonly Material bokehBlur;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -18,7 +19,7 @@ namespace UnityEngine.Rendering.Universal
             boxBlur = Load(data.customShaders.boxBlur);
             kawaseBlur = Load(data.customShaders.kawaseBlur);
             dualKawaseBlur = Load(data.customShaders.dualKawaseBlur);
-
+            bokehBlur = Load(data.customShaders.bokehBlur);
         }
 
         Material Load(Shader shader)
@@ -42,6 +43,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(boxBlur);
             CoreUtils.Destroy(kawaseBlur);
             CoreUtils.Destroy(dualKawaseBlur);
+            CoreUtils.Destroy(bokehBlur);
         }
     }
 }

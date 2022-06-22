@@ -44,6 +44,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader boxBlur;
             public Shader kawaseBlur;
             public Shader dualKawaseBlur;
+            public Shader bokehBlur;
         }
 
         public CustomShaders customShaders;
