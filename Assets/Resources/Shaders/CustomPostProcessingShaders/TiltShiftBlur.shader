@@ -1,4 +1,4 @@
-Shader "Custom/Unlit"
+Shader "Custom/PostProcessing/TiltShiftBlur"
 {
     Properties
     {
@@ -16,7 +16,7 @@ Shader "Custom/Unlit"
 
         Pass
         {
-            Tags {"LightMode" = "UniversalForward"}
+//            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
 	        #pragma vertex vert
@@ -45,7 +45,7 @@ Shader "Custom/Unlit"
             SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_TexelSize;
+                // float4 _MainTex_TexelSize;
                 // float _Offset;
                 // float4 _BaseMap_ST;
                 // half4 _BaseColor;

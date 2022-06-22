@@ -16,7 +16,7 @@ Shader "Custom/PostProcessing/GaussianBlur"
         
         Pass
         {
-            Tags {"LightMode" = "UniversalForward"}
+//            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
 	        #pragma vertex vert

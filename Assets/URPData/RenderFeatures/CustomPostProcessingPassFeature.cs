@@ -19,6 +19,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private DualKawaseBlur m_DualKawaseBlur;
         private BokehBlur m_BokehBlur;
         private TiltShiftBlur m_TiltShiftBlur;
+        private IrisBlur m_IrisBlur;
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -88,6 +89,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_DualKawaseBlur = stack.GetComponent<DualKawaseBlur>();
             m_BokehBlur = stack.GetComponent<BokehBlur>();
             m_TiltShiftBlur = stack.GetComponent<TiltShiftBlur>();
+            m_IrisBlur = stack.GetComponent<IrisBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -126,10 +128,34 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupTiltShiftBlur(cmd, ref renderingData, m_Materials.tiltShiftBlur);
             }
+
+            if (m_IrisBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupIrisBlur(cmd, ref renderingData, m_Materials.irisBlur);
+            }
             
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region IrisBlur
+
+        private void SetupIrisBlur(CommandBuffer cmd, ref RenderingData renderingData, Material irisBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_IrisBlur.filterMode.value);
+            cmd.BeginSample("IrisBlur");
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            irisBlur.SetVector("_GoldenRot", mGoldenRot);
+            irisBlur.SetVector("_Gradient", new Vector3(m_IrisBlur.centerOffsetX.value, m_IrisBlur.centerOffsetY.value, m_IrisBlur.areaSize.value * 0.1f));
+            irisBlur.SetVector("_Params", new Vector4(m_IrisBlur.blurCount.value, m_IrisBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, irisBlur);
+            cmd.EndSample("IrisBlur");
+        }
+
+        #endregion
+        
 
         #region TiltShiftBlur
 

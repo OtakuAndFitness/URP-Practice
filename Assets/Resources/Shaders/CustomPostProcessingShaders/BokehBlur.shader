@@ -14,7 +14,7 @@ Shader "Custom/PostProcessing/BokehBlur"
 
         Pass
         {
-            Tags {"LightMode" = "UniversalForward"}
+//            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
 	        #pragma vertex vert

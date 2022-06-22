@@ -19,3 +19,4 @@ MonoBehaviour:
     dualKawaseBlur: {fileID: 4800000, guid: 5f353561ec7ca447b9820ab126f34840, type: 3}
     bokehBlur: {fileID: 4800000, guid: 29b73c02b240842c6a586840fa975c08, type: 3}
     tiltShfitBlur: {fileID: 4800000, guid: c86202f35d30f4823b98805529231b16, type: 3}
+    irisBlur: {fileID: 4800000, guid: 35611a79d6b0e4580afe218cc67dc4f0, type: 3}

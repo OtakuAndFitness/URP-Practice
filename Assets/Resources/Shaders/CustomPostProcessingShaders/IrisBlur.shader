@@ -1,18 +1,14 @@
-Shader "Custom/PostProcessing/BoxBlur"
+Shader "Custom/PostProcessing/IrisBlur"
 {
     Properties
     {
-        _Offset("Offset", vector) = (1,1,1,1)
         _MainTex("Main Tex", 2D) = "white"{}
+
     }
 
     SubShader
     {
         Tags {"RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
-        
-        ZTest Always
-        Cull Off
-        Zwrite Off
 
         Pass
         {
@@ -45,10 +41,36 @@ Shader "Custom/PostProcessing/BoxBlur"
             SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
-                // float4 _MainTex_ST;
-                float4 _MainTex_TexelSize;
-                half4 _Offset;
+                uniform half3 _Gradient;
+	            uniform half4 _GoldenRot;
+	            uniform half4 _Params;
             CBUFFER_END
+
+            float IrisMask(float2 uv)
+	        {
+		        float2 center = uv * 2.0 - 1.0 + _Gradient.xy; // [0,1] -> [-1,1] 
+		        return dot(center, center) * _Gradient.z;
+	        }
+
+            half4 IrisBlur(Varyings i)
+			{
+				half2x2 rot = half2x2(_GoldenRot);
+				half4 accumulator = 0.0;
+				half4 divisor = 0.0;
+				
+				half r = 1.0;
+				half2 angle = half2(0.0, _Params.y * saturate(IrisMask(i.uv)));
+				
+				for (int j = 0; j < _Params.x; j ++)
+				{
+					r += 1.0 / r;
+					angle = mul(rot, angle);
+					half4 bokeh = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, float2(i.uv + _Params.zw * (r - 1.0) * angle));
+					accumulator += bokeh * bokeh;
+					divisor += bokeh;
+				}
+				return accumulator / divisor;
+			}
 
             Varyings vert(Attributes IN)
             {
@@ -70,17 +92,8 @@ Shader "Custom/PostProcessing/BoxBlur"
                 UNITY_SETUP_INSTANCE_ID(IN);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
                 
-		        // half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                _Offset *= _MainTex_TexelSize.xyxy;
-                float4 d = _Offset.xyxy * float4(-1.0, -1.0, 1.0, 1.0);
-		
-		        half4 s = 0;
-		        s = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + d.xy) * 0.25h;  // 1 MUL
-		        s += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + d.zy) * 0.25h; // 1 MAD
-		        s += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + d.xw) * 0.25h; // 1 MAD
-		        s += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv + d.zw) * 0.25h; // 1 MAD
-                
-                return s;
+		        // half4 col = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv) * _BaseColor;
+                return IrisBlur(IN);
             }
             ENDHLSL
         }
