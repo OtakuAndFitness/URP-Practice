@@ -1,19 +1,19 @@
-Shader "Custom/PostProcessing/GaussianBlur"
+Shader "Custom/Unlit"
 {
     Properties
     {
         _MainTex("Main Tex", 2D) = "white"{}
-        _Offset("Offset", vector) = (1,1,1,1)
+//        _Offset("Offset", Float) = 1
     }
 
     SubShader
     {
         Tags {"RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
-
+        
         ZTest Always
         Cull Off
         Zwrite Off
-        
+
         Pass
         {
             Tags {"LightMode" = "UniversalForward"}
@@ -37,9 +37,6 @@ Shader "Custom/PostProcessing/GaussianBlur"
             {
                 float2 uv : TEXCOORD0;
                 float4 positionHCS : SV_POSITION;
-                float4 uv01 : TEXCOORD1;
-                float4 uv23 : TEXCOORD2;
-                float4 uv45 : TEXCOORD3;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
                 UNITY_VERTEX_OUTPUT_STEREO
             };
@@ -48,10 +45,41 @@ Shader "Custom/PostProcessing/GaussianBlur"
             SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
-                // float4 _MainTex_ST;
                 float4 _MainTex_TexelSize;
-                half4 _Offset;
+                // float _Offset;
+                // float4 _BaseMap_ST;
+                // half4 _BaseColor;
+                uniform half3 _Gradient;
+	            uniform half4 _GoldenRot;
+	            // uniform half4 _Distortion;
+	            uniform half4 _Params;
             CBUFFER_END
+
+            float TiltShiftMask(float2 uv)
+	        {
+		        float centerY = uv.y * 2.0 - 1.0 + _Gradient.x; // [0,1] -> [-1,1]
+		        return pow(abs(centerY * _Gradient.y), _Gradient.z);
+	        }
+
+            half4 TiltShiftBlur(Varyings IN)
+			{
+				half2x2 rot = half2x2(_GoldenRot);
+				half4 accumulator = 0.0;
+				half4 divisor = 0.0;
+				
+				half r = 1.0;
+				half2 angle = half2(0.0, _Params.y * saturate(TiltShiftMask(IN.uv)));
+				
+				for (int j = 0; j < _Params.x; j ++)
+				{
+					r += 1.0 / r;
+					angle = mul(rot, angle);
+					half4 bokeh = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, float2(IN.uv + _Params.zw * (r - 1.0) * angle));
+					accumulator += bokeh * bokeh;
+					divisor += bokeh;
+				}
+				return accumulator / divisor;
+			}
 
             Varyings vert(Attributes IN)
             {
@@ -64,10 +92,6 @@ Shader "Custom/PostProcessing/GaussianBlur"
                 VertexPositionInputs vertexInput = GetVertexPositionInputs(IN.positionOS.xyz);
                 OUT.positionHCS = vertexInput.positionCS;
                 OUT.uv = IN.uv;
-                _Offset *= _MainTex_TexelSize.xyxy;
-                OUT.uv01 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1);
-	    	    OUT.uv23 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1) * 2.0;
-	    	    OUT.uv45 = IN.uv.xyxy + _Offset.xyxy * float4(1, 1, -1, -1) * 6.0;
                 
                 return OUT;
             }
@@ -76,25 +100,10 @@ Shader "Custom/PostProcessing/GaussianBlur"
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
-
-                half4 color = half4(0,0,0,0);
-                color = 0.4 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv);
-	    	    color += 0.15 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv01.xy);
-	    	    color += 0.15 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv01.zw);
-	    	    color += 0.10 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv23.xy);
-	    	    color += 0.10 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv23.zw);
-	    	    color += 0.05 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv45.xy);
-	    	    color += 0.05 * SAMPLE_TEXTURE2D(_MainTex,sampler_MainTex, IN.uv45.zw);
-                // color = 0.4 * LOAD_TEXTURE2D_X(_MainTex, UnityStereoTransformScreenSpaceTex(IN.uv));
-	    	    // color += 0.15 * LOAD_TEXTURE2D(_MainTex, saturate(IN.uv01.xy));
-	    	    // color += 0.15 * LOAD_TEXTURE2D(_MainTex, saturate(IN.uv01.zw));
-	    	    // color += 0.10 * LOAD_TEXTURE2D(_MainTex, saturate(IN.uv23.xy));
-	    	    // color += 0.10 * LOAD_TEXTURE2D(_MainTex, saturate(IN.uv23.zw));
-	    	    // color += 0.05 * LOAD_TEXTURE2D(_MainTex, saturate(IN.uv45.xy));
-	    	    // color += 0.05 * LOAD_TEXTURE2D(_MainTex, saturate(IN.uv45.zw));
-                return color;
+                
+		        // half4 col = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv) * _BaseColor;
+                return TiltShiftBlur(IN);
             }
-
             ENDHLSL
         }
     }

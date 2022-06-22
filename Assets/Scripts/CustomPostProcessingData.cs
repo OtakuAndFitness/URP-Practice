@@ -45,6 +45,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader kawaseBlur;
             public Shader dualKawaseBlur;
             public Shader bokehBlur;
+            public Shader tiltShfitBlur;
         }
 
         public CustomShaders customShaders;

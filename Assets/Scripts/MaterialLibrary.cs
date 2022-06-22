@@ -12,6 +12,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material kawaseBlur;
         public readonly Material dualKawaseBlur;
         public readonly Material bokehBlur;
+        public readonly Material tiltShiftBlur;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -20,6 +21,7 @@ namespace UnityEngine.Rendering.Universal
             kawaseBlur = Load(data.customShaders.kawaseBlur);
             dualKawaseBlur = Load(data.customShaders.dualKawaseBlur);
             bokehBlur = Load(data.customShaders.bokehBlur);
+            tiltShiftBlur = Load(data.customShaders.tiltShfitBlur);
         }
 
         Material Load(Shader shader)
@@ -44,6 +46,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(kawaseBlur);
             CoreUtils.Destroy(dualKawaseBlur);
             CoreUtils.Destroy(bokehBlur);
+            CoreUtils.Destroy(tiltShiftBlur);
         }
     }
 }

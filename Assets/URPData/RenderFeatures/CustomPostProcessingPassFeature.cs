@@ -18,6 +18,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private KawaseBlur m_KawaseBlur;
         private DualKawaseBlur m_DualKawaseBlur;
         private BokehBlur m_BokehBlur;
+        private TiltShiftBlur m_TiltShiftBlur;
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -86,6 +87,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_KawaseBlur = stack.GetComponent<KawaseBlur>();
             m_DualKawaseBlur = stack.GetComponent<DualKawaseBlur>();
             m_BokehBlur = stack.GetComponent<BokehBlur>();
+            m_TiltShiftBlur = stack.GetComponent<TiltShiftBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -119,10 +121,34 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupBokehBlur(cmd, ref renderingData, m_Materials.bokehBlur);
             }
+
+            if (m_TiltShiftBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupTiltShiftBlur(cmd, ref renderingData, m_Materials.tiltShiftBlur);
+            }
             
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region TiltShiftBlur
+
+        private void SetupTiltShiftBlur(CommandBuffer cmd, ref RenderingData renderingData, Material tiltShiftBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_TiltShiftBlur.filterMode.value);
+            cmd.BeginSample("TiltShiftBlur");
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            tiltShiftBlur.SetVector("_GoldenRot", mGoldenRot);
+            tiltShiftBlur.SetVector("_Gradient", new Vector3(m_TiltShiftBlur.centerOffset.value, m_TiltShiftBlur.areaSize.value, m_TiltShiftBlur.areaSmooth.value));
+            tiltShiftBlur.SetVector("_Params", new Vector4(m_TiltShiftBlur.blurCount.value, m_TiltShiftBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tiltShiftBlur);
+            cmd.EndSample("TiltShiftBlur");
+        }
+
+        #endregion
+        
 
         #region BokehBlur
 

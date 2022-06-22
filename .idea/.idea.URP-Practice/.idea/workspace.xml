@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f1820f00-036d-41c2-aae9-2a96dc091b43" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.URP-Practice/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.URP-Practice/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/SampleScene/Post-process Volume Profile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/SampleScene/Post-process Volume Profile.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/URPData/CustomPostProcessingData.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/URPData/CustomPostProcessingData.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/URPData/RenderFeatures/CustomPostProcessingPassFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/URPData/RenderFeatures/CustomPostProcessingPassFeature.cs" afterDir="false" />
-    </list>
+    <list default="true" id="f1820f00-036d-41c2-aae9-2a96dc091b43" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -27,6 +20,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/DualKawaseBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/GaussianBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/KawaseBlur.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/TiltShiftBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.core@12.1.7/Runtime/Volume/VolumeComponent.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
@@ -66,10 +60,10 @@
       </option>
       <method v="2" />
     </configuration>
-    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" ignored-value-for-modified-check="25682">
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="25682" />
+      <option name="pid" />
       <option name="projectPathOnTarget" />
       <option name="selectedOptions">
         <list />
