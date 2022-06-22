@@ -14,6 +14,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material bokehBlur;
         public readonly Material tiltShiftBlur;
         public readonly Material irisBlur;
+        public readonly Material grainyBlur;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -24,6 +25,7 @@ namespace UnityEngine.Rendering.Universal
             bokehBlur = Load(data.customShaders.bokehBlur);
             tiltShiftBlur = Load(data.customShaders.tiltShfitBlur);
             irisBlur = Load(data.customShaders.irisBlur);
+            grainyBlur = Load(data.customShaders.grainyBlur);
         }
 
         Material Load(Shader shader)
@@ -50,6 +52,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(bokehBlur);
             CoreUtils.Destroy(tiltShiftBlur);
             CoreUtils.Destroy(irisBlur);
+            CoreUtils.Destroy(grainyBlur);
         }
     }
 }

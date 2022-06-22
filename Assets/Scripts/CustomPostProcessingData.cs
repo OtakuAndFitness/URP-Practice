@@ -47,6 +47,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader bokehBlur;
             public Shader tiltShfitBlur;
             public Shader irisBlur;
+            public Shader grainyBlur;
         }
 
         public CustomShaders customShaders;

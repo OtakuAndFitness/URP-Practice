@@ -20,6 +20,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private BokehBlur m_BokehBlur;
         private TiltShiftBlur m_TiltShiftBlur;
         private IrisBlur m_IrisBlur;
+        private GrainyBlur m_GrainyBlur;
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -90,6 +91,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_BokehBlur = stack.GetComponent<BokehBlur>();
             m_TiltShiftBlur = stack.GetComponent<TiltShiftBlur>();
             m_IrisBlur = stack.GetComponent<IrisBlur>();
+            m_GrainyBlur = stack.GetComponent<GrainyBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -133,10 +135,37 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupIrisBlur(cmd, ref renderingData, m_Materials.irisBlur);
             }
+
+            if (m_GrainyBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupGrainyBlur(cmd, ref renderingData, m_Materials.grainyBlur);
+            }
             
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region GrainyBlur
+
+        private void SetupGrainyBlur(CommandBuffer cmd, ref RenderingData renderingData, Material grainyBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.width = opaqueDesc.width >> m_GrainyBlur.downSample.value;
+            opaqueDesc.height = opaqueDesc.height >> m_GrainyBlur.downSample.value;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_GrainyBlur.filterMode.value);
+            
+            cmd.BeginSample("GrainyBlur");
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            grainyBlur.SetVector("_Params", new Vector2(m_GrainyBlur.indensity.value / opaqueDesc.height, m_GrainyBlur.blurCount.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, grainyBlur);
+            cmd.EndSample("GrainyBlur");
+        }
+
+        #endregion
+
+        
 
         #region IrisBlur
 

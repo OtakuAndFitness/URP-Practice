@@ -1,15 +1,14 @@
-Shader "Custom/PostProcessing/IrisBlur"
+Shader "Custom/PostProcessing/GrainyBlur"
 {
     Properties
     {
         _MainTex("Main Tex", 2D) = "white"{}
-
     }
 
     SubShader
     {
         Tags {"RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
-		
+
     	Cull Off ZWrite Off ZTest Always
 
         Pass
@@ -43,35 +42,32 @@ Shader "Custom/PostProcessing/IrisBlur"
             SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
-                uniform half3 _Gradient;
-	            uniform half4 _GoldenRot;
-	            uniform half4 _Params;
+                // float4 _MainTex_ST;
+                // half4 _BaseColor;
+                uniform half2 _Params;	
             CBUFFER_END
 
-            float IrisMask(float2 uv)
+            float Rand(float2 n)
 	        {
-		        float2 center = uv * 2.0 - 1.0 + _Gradient.xy; // [0,1] -> [-1,1] 
-		        return dot(center, center) * _Gradient.z;
+		        return sin(dot(n, half2(1233.224, 1743.335)));
 	        }
 
-            half4 IrisBlur(Varyings i)
+            half4 GrainyBlur(Varyings i)
 			{
-				half2x2 rot = half2x2(_GoldenRot);
-				half4 accumulator = 0.0;
-				half4 divisor = 0.0;
+				half2 randomOffset = float2(0.0, 0.0);
+				half4 finalColor = half4(0.0, 0.0, 0.0, 0.0);
+				float random = Rand(i.uv);
 				
-				half r = 1.0;
-				half2 angle = half2(0.0, _Params.y * saturate(IrisMask(i.uv)));
-				
-				for (int j = 0; j < _Params.x; j ++)
+				for (int k = 0; k < int(_Params.y); k ++)
 				{
-					r += 1.0 / r;
-					angle = mul(rot, angle);
-					half4 bokeh = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, float2(i.uv + _Params.zw * (r - 1.0) * angle));
-					accumulator += bokeh * bokeh;
-					divisor += bokeh;
+					random = frac(43758.5453 * random + 0.61432);;
+					randomOffset.x = (random - 0.5) * 2.0;
+					random = frac(43758.5453 * random + 0.61432);
+					randomOffset.y = (random - 0.5) * 2.0;
+					
+					finalColor += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, half2(i.uv + randomOffset * _Params.x));
 				}
-				return accumulator / divisor;
+				return finalColor / _Params.y;
 			}
 
             Varyings vert(Attributes IN)
@@ -95,7 +91,7 @@ Shader "Custom/PostProcessing/IrisBlur"
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
                 
 		        // half4 col = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv) * _BaseColor;
-                return IrisBlur(IN);
+                return GrainyBlur(IN);
             }
             ENDHLSL
         }
