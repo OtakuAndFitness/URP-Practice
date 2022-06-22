@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-9036271845182026949
+--- !u!114 &-5141873533287963564
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9,25 +9,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5bfaa4f0f82ce042a9c7d896b586f78, type: 3}
-  m_Name: RadialBlur
+  m_Script: {fileID: 11500000, guid: 66b7bc8977d89ed498e2df6b0b5db451, type: 3}
+  m_Name: DirectionalBlur
   m_EditorClassIdentifier: 
   active: 1
-  qualityLevel:
-    m_OverrideState: 1
-    m_Value: 4
   filterMode:
     m_OverrideState: 1
     m_Value: 1
-  RadialCenterX:
+  angle:
     m_OverrideState: 1
-    m_Value: 0.471
-  RadialCenterY:
+    m_Value: 0.91
+  blurCount:
     m_OverrideState: 1
-    m_Value: 0.389
+    m_Value: 18
+  downSample:
+    m_OverrideState: 1
+    m_Value: 3
   indensity:
     m_OverrideState: 1
-    m_Value: 0.87
+    m_Value: 1.48
 --- !u!114 &-3640053722625769961
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -82,4 +82,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   components:
   - {fileID: -3640053722625769961}
-  - {fileID: -9036271845182026949}
+  - {fileID: -5141873533287963564}

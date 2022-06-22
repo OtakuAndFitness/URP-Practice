@@ -22,6 +22,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private IrisBlur m_IrisBlur;
         private GrainyBlur m_GrainyBlur;
         private RadialBlur m_RadialBlur;
+        private DirectionalBlur m_DirectionalBlur;
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -94,6 +95,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_IrisBlur = stack.GetComponent<IrisBlur>();
             m_GrainyBlur = stack.GetComponent<GrainyBlur>();
             m_RadialBlur = stack.GetComponent<RadialBlur>();
+            m_DirectionalBlur = stack.GetComponent<DirectionalBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -147,10 +149,38 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupRadialBlur(cmd, ref renderingData, m_Materials.radialBlur);
             }
+
+            if (m_DirectionalBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupDirectionalBlur(cmd, ref renderingData, m_Materials.directionalBlur);
+            }
             
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region DirectionalBlur
+
+        private void SetupDirectionalBlur(CommandBuffer cmd, ref RenderingData renderingData, Material directionalBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.width = opaqueDesc.width >> m_DirectionalBlur.downSample.value;
+            opaqueDesc.height = opaqueDesc.height >> m_DirectionalBlur.downSample.value;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_DirectionalBlur.filterMode.value);
+            
+            cmd.BeginSample("RadialBlur");
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            float sinVal = (Mathf.Sin(m_DirectionalBlur.angle.value) * m_DirectionalBlur.indensity.value * 0.05f) / m_DirectionalBlur.blurCount.value;
+            float cosVal = (Mathf.Cos(m_DirectionalBlur.angle.value) * m_DirectionalBlur.indensity.value * 0.05f) / m_DirectionalBlur.blurCount.value;  
+            directionalBlur.SetVector("_Params", new Vector3(m_DirectionalBlur.blurCount.value, sinVal, cosVal));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, directionalBlur);
+            cmd.EndSample("RadialBlur");
+        }
+
+        #endregion
+        
 
         #region RadialBlur
 

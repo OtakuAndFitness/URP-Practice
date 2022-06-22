@@ -13,6 +13,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/BoxBlur.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/DirectionalBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/GaussianBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/KawaseBlur.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/RadialBlur.cs" root0="FORCE_HIGHLIGHTING" />
@@ -77,7 +78,7 @@
       <workItem from="1654573963948" duration="3513000" />
       <workItem from="1654941998152" duration="21794000" />
       <workItem from="1655619045070" duration="345000" />
-      <workItem from="1655901961765" duration="2549000" />
+      <workItem from="1655901961765" duration="3466000" />
     </task>
     <servers />
   </component>

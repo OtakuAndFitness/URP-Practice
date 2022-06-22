@@ -16,6 +16,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material irisBlur;
         public readonly Material grainyBlur;
         public readonly Material radialBlur;
+        public readonly Material directionalBlur;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -28,6 +29,7 @@ namespace UnityEngine.Rendering.Universal
             irisBlur = Load(data.customShaders.irisBlur);
             grainyBlur = Load(data.customShaders.grainyBlur);
             radialBlur = Load(data.customShaders.radialBlur);
+            directionalBlur = Load(data.customShaders.directionalBlur);
         }
 
         Material Load(Shader shader)
@@ -56,6 +58,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(irisBlur);
             CoreUtils.Destroy(grainyBlur);
             CoreUtils.Destroy(radialBlur);
+            CoreUtils.Destroy(directionalBlur);
         }
     }
 }

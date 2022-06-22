@@ -49,6 +49,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader irisBlur;
             public Shader grainyBlur;
             public Shader radialBlur;
+            public Shader directionalBlur;
         }
 
         public CustomShaders customShaders;

@@ -22,3 +22,4 @@ MonoBehaviour:
     irisBlur: {fileID: 4800000, guid: 35611a79d6b0e4580afe218cc67dc4f0, type: 3}
     grainyBlur: {fileID: 4800000, guid: 8caefa2aab57c4b1cb41e65c318f393c, type: 3}
     radialBlur: {fileID: 4800000, guid: a2d8e47f741b1df4fa4b1f02e325f040, type: 3}
+    directionalBlur: {fileID: 4800000, guid: 08533419947c97b418bfb70dbe61c189, type: 3}
