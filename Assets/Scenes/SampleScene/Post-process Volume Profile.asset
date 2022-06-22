@@ -54,17 +54,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   filterMode:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   blurCount:
-    m_OverrideState: 0
-    m_Value: 1
+    m_OverrideState: 1
+    m_Value: 2
   downSample:
-    m_OverrideState: 0
-    m_Value: 1
+    m_OverrideState: 1
+    m_Value: 2
   indensity:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 0.94
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
