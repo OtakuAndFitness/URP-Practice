@@ -4,11 +4,13 @@
 /Temp
 /UserSettings
 .vsconfig
+.DS_Store
 Assembly-CSharp.csproj
 Assembly-CSharp-Editor.csproj
 URP-Practice.sln
 /.vs
 /.vscode
+/.idea
 Packages/packages-lock.json
 ProjectSettings/QualitySettings.asset
 *.csproj
