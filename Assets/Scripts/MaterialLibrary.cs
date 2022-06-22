@@ -15,6 +15,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material tiltShiftBlur;
         public readonly Material irisBlur;
         public readonly Material grainyBlur;
+        public readonly Material radialBlur;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -26,6 +27,7 @@ namespace UnityEngine.Rendering.Universal
             tiltShiftBlur = Load(data.customShaders.tiltShfitBlur);
             irisBlur = Load(data.customShaders.irisBlur);
             grainyBlur = Load(data.customShaders.grainyBlur);
+            radialBlur = Load(data.customShaders.radialBlur);
         }
 
         Material Load(Shader shader)
@@ -53,6 +55,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(tiltShiftBlur);
             CoreUtils.Destroy(irisBlur);
             CoreUtils.Destroy(grainyBlur);
+            CoreUtils.Destroy(radialBlur);
         }
     }
 }

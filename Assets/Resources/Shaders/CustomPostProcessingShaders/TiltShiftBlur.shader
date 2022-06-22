@@ -4,6 +4,10 @@ Shader "Custom/PostProcessing/TiltShiftBlur"
     {
         _MainTex("Main Tex", 2D) = "white"{}
 //        _Offset("Offset", Float) = 1
+		_Params("Params", Vector) = (1,1,1,1)
+    	_Gradient("Gradient", Vector) = (1,1,1,1)
+    	_GoldenRot("GoldenRot", Vector) = (1,1,1,1)
+
     }
 
     SubShader
@@ -49,10 +53,10 @@ Shader "Custom/PostProcessing/TiltShiftBlur"
                 // float _Offset;
                 // float4 _BaseMap_ST;
                 // half4 _BaseColor;
-                uniform half3 _Gradient;
-	            uniform half4 _GoldenRot;
+                half3 _Gradient;
+	            half4 _GoldenRot;
 	            // uniform half4 _Distortion;
-	            uniform half4 _Params;
+	            half4 _Params;
             CBUFFER_END
 
             float TiltShiftMask(float2 uv)

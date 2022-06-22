@@ -3,6 +3,7 @@ Shader "Custom/PostProcessing/GrainyBlur"
     Properties
     {
         _MainTex("Main Tex", 2D) = "white"{}
+    	_Params("Params", Vector) = (1,1,1,1)
     }
 
     SubShader
@@ -44,7 +45,7 @@ Shader "Custom/PostProcessing/GrainyBlur"
             CBUFFER_START(UnityPerMaterial)
                 // float4 _MainTex_ST;
                 // half4 _BaseColor;
-                uniform half2 _Params;	
+                half2 _Params;	
             CBUFFER_END
 
             float Rand(float2 n)

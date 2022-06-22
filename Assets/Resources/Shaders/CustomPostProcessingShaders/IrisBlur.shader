@@ -3,7 +3,9 @@ Shader "Custom/PostProcessing/IrisBlur"
     Properties
     {
         _MainTex("Main Tex", 2D) = "white"{}
-
+		_Params("Params", Vector) = (1,1,1,1)
+    	_Gradient("Gradient", Vector) = (1,1,1,1)
+    	_GoldenRot("GoldenRot", Vector) = (1,1,1,1)
     }
 
     SubShader
@@ -43,9 +45,9 @@ Shader "Custom/PostProcessing/IrisBlur"
             SAMPLER(sampler_MainTex);
 
             CBUFFER_START(UnityPerMaterial)
-                uniform half3 _Gradient;
-	            uniform half4 _GoldenRot;
-	            uniform half4 _Params;
+				half3 _Gradient;
+				half4 _GoldenRot;
+				half4 _Params;
             CBUFFER_END
 
             float IrisMask(float2 uv)

@@ -21,6 +21,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private TiltShiftBlur m_TiltShiftBlur;
         private IrisBlur m_IrisBlur;
         private GrainyBlur m_GrainyBlur;
+        private RadialBlur m_RadialBlur;
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -92,6 +93,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_TiltShiftBlur = stack.GetComponent<TiltShiftBlur>();
             m_IrisBlur = stack.GetComponent<IrisBlur>();
             m_GrainyBlur = stack.GetComponent<GrainyBlur>();
+            m_RadialBlur = stack.GetComponent<RadialBlur>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -140,11 +142,36 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupGrainyBlur(cmd, ref renderingData, m_Materials.grainyBlur);
             }
+
+            if (m_RadialBlur.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupRadialBlur(cmd, ref renderingData, m_Materials.radialBlur);
+            }
             
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
 
+        #region RadialBlur
+
+        private void SetupRadialBlur(CommandBuffer cmd, ref RenderingData renderingData, Material radialBlur)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_RadialBlur.filterMode.value);
+            
+            cmd.BeginSample("RadialBlur");
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            radialBlur.SetVector("_Params", new Vector3(m_RadialBlur.indensity.value * 0.02f, m_RadialBlur.RadialCenterX.value, m_RadialBlur.RadialCenterY.value));
+            int pass = (int)m_RadialBlur.qualityLevel.value;
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, radialBlur, pass);
+            cmd.EndSample("RadialBlur");
+
+        }
+
+        #endregion
+        
         #region GrainyBlur
 
         private void SetupGrainyBlur(CommandBuffer cmd, ref RenderingData renderingData, Material grainyBlur)
@@ -164,9 +191,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         }
 
         #endregion
-
         
-
         #region IrisBlur
 
         private void SetupIrisBlur(CommandBuffer cmd, ref RenderingData renderingData, Material irisBlur)
@@ -185,7 +210,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #endregion
         
-
         #region TiltShiftBlur
 
         private void SetupTiltShiftBlur(CommandBuffer cmd, ref RenderingData renderingData, Material tiltShiftBlur)
@@ -204,7 +228,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #endregion
         
-
         #region BokehBlur
 
         private void SetupBokehBlur(CommandBuffer cmd, ref RenderingData renderingData, Material bokehBlur)
@@ -304,7 +327,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #endregion
         
-
         #region BoxBlur
 
         private void SetupBoxBlur(CommandBuffer cmd, ref RenderingData renderingData, Material boxBlur)
@@ -329,7 +351,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #endregion
         
-
         #region GaussianBlur
 
         private void SetupGaussianBlur(CommandBuffer cmd, ref RenderingData renderingData, Material gaussianBlur)

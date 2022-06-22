@@ -4,6 +4,7 @@ Shader "Custom/PostProcessing/BokehBlur"
     {
         _MainTex("Main Tex", 2D) = "white"{}
         _Offset("Offset", Vector) = (1,1,1,1)
+    	_GoldenRot("GoldenRot", Vector) = (1,1,1,1)
     }
 
     SubShader
