@@ -37,7 +37,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         //glitch
         private RGBSplit m_RGBSplit;
         private ImageBlock m_ImageBlock;
+        private LineBlock m_LineBlock;
         private float TimeX = 1.0f;
+        private float randomFrequency;
+        private int frameCount = 0;
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -108,6 +111,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             //glitch
             m_RGBSplit = stack.GetComponent<RGBSplit>();
             m_ImageBlock = stack.GetComponent<ImageBlock>();
+            m_LineBlock = stack.GetComponent<LineBlock>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -176,10 +180,67 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupImageBlock(cmd, ref renderingData, m_Materials.imageBlock);
             }
+
+            if (m_LineBlock.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupLineBlock(cmd, ref renderingData, m_Materials.lineBlock);
+            }
             
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region LineBlock
+
+        private void SetupLineBlock(CommandBuffer cmd, ref RenderingData renderingData, Material lineBlock)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("LineBlock");
+            UpdateFrequency(lineBlock);
+            TimeX += Time.deltaTime;
+            if (TimeX > 100)
+            {
+                TimeX = 0;
+            }
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_LineBlock.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            lineBlock.SetVector("_Params", new Vector3(
+                m_LineBlock.IntervalType.value == IntervalType.Random ? randomFrequency : m_LineBlock.Frequency.value,
+                TimeX * m_LineBlock.Speed.value * 0.2f , m_LineBlock.Amount.value));
+            lineBlock.SetVector("_Params2", new Vector3(m_LineBlock.Offset.value, 1 / m_LineBlock.LinesWidth.value, m_LineBlock.Alpha.value));
+            int pass = (int)m_LineBlock.BlockDirection.value;
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, lineBlock,pass);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("LineBlock");
+        }
+
+        private void UpdateFrequency(Material lineBlock)
+        {
+            if (m_LineBlock.IntervalType.value == IntervalType.Random)
+            {
+                if (frameCount > m_LineBlock.Frequency.value)
+                {
+
+                    frameCount = 0;
+                    randomFrequency = UnityEngine.Random.Range(0, m_LineBlock.Frequency.value);
+                }
+                frameCount++;
+            }
+
+            if (m_LineBlock.IntervalType.value == IntervalType.Infinite)
+            {
+                lineBlock.EnableKeyword("USING_FREQUENCY_INFINITE");
+            }
+            else
+            {
+                lineBlock.DisableKeyword("USING_FREQUENCY_INFINITE");
+            }
+        }
+
+        #endregion
+        
 
         #region ImageBlock
 
@@ -188,13 +249,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.depthBufferBits = 0;
 
+            cmd.BeginSample("ImageBlock");
             TimeX += Time.deltaTime;
             if (TimeX > 100)
             {
                 TimeX = 0;
             }
-            
-            cmd.BeginSample("ImageBlock");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_ImageBlock.filterMode.value);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             imageBlock.SetVector("_Params", new Vector3(TimeX * m_ImageBlock.Speed.value, m_ImageBlock.Amount.value, m_ImageBlock.Fade.value));
@@ -215,13 +275,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.depthBufferBits = 0;
 
+            cmd.BeginSample("RGBSplit");
             TimeX += Time.deltaTime;
             if (TimeX > 100)
             {
                 TimeX = 0;
             }
-            
-            cmd.BeginSample("RGBSplit");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_RGBSplit.filterMode.value);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             rgbSplit.SetVector("_Params", new Vector4(m_RGBSplit.Fading.value, m_RGBSplit.Amount.value, m_RGBSplit.Speed.value, m_RGBSplit.CenterFading.value));

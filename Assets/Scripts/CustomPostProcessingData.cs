@@ -55,6 +55,7 @@ namespace UnityEngine.Rendering.Universal
             //glitch
             public Shader rgbSplit;
             public Shader imageBlock;
+            public Shader lineBlock;
         }
 
         public CustomShaders customShaders;

@@ -36,14 +36,7 @@ namespace UnityEngine.Rendering.Universal
             return false;
         }
     }
-    
-    public enum DirectionEX
-    {
-        Horizontal = 0,
-        Vertical = 1,
-        Horizontal_Vertical =2,
-    }
-    
+
     [Serializable]
     public sealed class GlitchRGBSplitFilerModeParameter : VolumeParameter<FilterMode> { public GlitchRGBSplitFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 

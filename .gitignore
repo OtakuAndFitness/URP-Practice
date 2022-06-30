@@ -14,3 +14,4 @@ URP-Practice.sln
 Packages/packages-lock.json
 ProjectSettings/QualitySettings.asset
 *.csproj
+.idea/.idea.URP-Practice/.idea/workspace.xml
