@@ -13,6 +13,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         // const string k_RenderPostProcessingTag = "Render AdditionalPostProcessing Effects";
         const string k_RenderCustomPostProcessingTag = "Render Custom PostProcessing Pass";
 
+        //blur
         private GaussianBlur m_GaussianBlur;
         private BoxBlur m_BoxBlur;
         private KawaseBlur m_KawaseBlur;
@@ -23,23 +24,25 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private GrainyBlur m_GrainyBlur;
         private RadialBlur m_RadialBlur;
         private DirectionalBlur m_DirectionalBlur;
+        private Level[] m_Pyramid;
+        const int k_MaxPyramidSize = 16;
+        private Vector4 mGoldenRot;
+        struct Level
+        {
+            internal int down;
+            internal int up;
+        }
+        
+        //glitch
+        private RGBSplit m_RGBSplit;
+        private float TimeX = 1.0f;
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
         
         RenderTargetHandle m_TemporaryColorTexture01;
         RenderTargetHandle m_TemporaryColorTexture02;
-
-        private Level[] m_Pyramid;
-        const int k_MaxPyramidSize = 16;
-
-        private Vector4 mGoldenRot;
         
-        struct Level
-        {
-            internal int down;
-            internal int up;
-        }
         // RenderTargetHandle m_TemporaryColorTexture03;
 
         public CustomPostProcessingPass(CustomPostProcessingData data)
@@ -86,6 +89,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             var stack = VolumeManager.instance.stack;
+            //blur
             m_GaussianBlur = stack.GetComponent<GaussianBlur>();
             m_BoxBlur = stack.GetComponent<BoxBlur>();
             m_KawaseBlur = stack.GetComponent<KawaseBlur>();
@@ -96,6 +100,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_GrainyBlur = stack.GetComponent<GrainyBlur>();
             m_RadialBlur = stack.GetComponent<RadialBlur>();
             m_DirectionalBlur = stack.GetComponent<DirectionalBlur>();
+            //glitch
+            m_RGBSplit = stack.GetComponent<RGBSplit>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -154,11 +160,43 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupDirectionalBlur(cmd, ref renderingData, m_Materials.directionalBlur);
             }
+
+            if (m_RGBSplit.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupRGBSplit(cmd, ref renderingData, m_Materials.rgbSplit);
+            }
             
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
 
+        #region RGBSplit
+
+        private void SetupRGBSplit(CommandBuffer cmd, ref RenderingData renderingData, Material rgbSplit)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+
+            TimeX += Time.deltaTime;
+            if (TimeX > 100)
+            {
+                TimeX = 0;
+            }
+            
+            cmd.BeginSample("RGBSplit");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_RGBSplit.filterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            rgbSplit.SetVector("_Params", new Vector4(m_RGBSplit.Fading.value, m_RGBSplit.Amount.value, m_RGBSplit.Speed.value, m_RGBSplit.CenterFading.value));
+            rgbSplit.SetVector("_Params2", new Vector3(TimeX, m_RGBSplit.AmountR.value, m_RGBSplit.AmountB.value));
+            int pass = (int)m_RGBSplit.SplitDirection.value;
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rgbSplit,pass);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("RGBSplit");
+        }
+
+
+        #endregion
+        
         #region DirectionalBlur
 
         private void SetupDirectionalBlur(CommandBuffer cmd, ref RenderingData renderingData, Material directionalBlur)

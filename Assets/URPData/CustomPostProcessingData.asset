@@ -23,3 +23,4 @@ MonoBehaviour:
     grainyBlur: {fileID: 4800000, guid: 8caefa2aab57c4b1cb41e65c318f393c, type: 3}
     radialBlur: {fileID: 4800000, guid: a2d8e47f741b1df4fa4b1f02e325f040, type: 3}
     directionalBlur: {fileID: 4800000, guid: 08533419947c97b418bfb70dbe61c189, type: 3}
+    rgbSplit: {fileID: 4800000, guid: 5d86447b315884c11a8c4eb1dfdec36f, type: 3}

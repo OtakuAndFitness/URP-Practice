@@ -8,26 +8,8 @@ Shader "Custom/PostProcessing/RadialBlur"
     
     HLSLINCLUDE
     
-		#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+		#include "../CustomPPHeader.hlsl"
     
-        struct Attributes
-        {
-            float4 positionOS : POSITION;
-            float2 uv : TEXCOORD0;
-            UNITY_VERTEX_INPUT_INSTANCE_ID
-        };
-
-        struct Varyings
-        {
-            float2 uv : TEXCOORD0;
-            float4 positionHCS : SV_POSITION;
-            UNITY_VERTEX_INPUT_INSTANCE_ID
-            UNITY_VERTEX_OUTPUT_STEREO
-        };
-
-        TEXTURE2D(_MainTex);
-        SAMPLER(sampler_MainTex);
-
         CBUFFER_START(UnityPerMaterial)
             // float4 _MainTex_TexelSize;
             // float _Offset;
@@ -397,21 +379,7 @@ Shader "Custom/PostProcessing/RadialBlur"
 			
 			return  color;
 		}
-
-        Varyings vert(Attributes IN)
-        {
-            Varyings OUT = (Varyings)0;
-            
-            UNITY_SETUP_INSTANCE_ID(IN);
-            UNITY_TRANSFER_INSTANCE_ID(IN, OUT);
-            UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
-            
-            VertexPositionInputs vertexInput = GetVertexPositionInputs(IN.positionOS.xyz);
-            OUT.positionHCS = vertexInput.positionCS;
-            OUT.uv = IN.uv;
-            
-            return OUT;
-        }
+    
     ENDHLSL
 
     SubShader
@@ -423,7 +391,7 @@ Shader "Custom/PostProcessing/RadialBlur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vert
+	        #pragma vertex vertDefault
             #pragma fragment Frag_4Tap
             #pragma multi_compile_instancing
             
@@ -435,7 +403,7 @@ Shader "Custom/PostProcessing/RadialBlur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vert
+	        #pragma vertex vertDefault
             #pragma fragment Frag_6Tap
             #pragma multi_compile_instancing
             
@@ -447,7 +415,7 @@ Shader "Custom/PostProcessing/RadialBlur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vert
+	        #pragma vertex vertDefault
             #pragma fragment Frag_8Tap
             #pragma multi_compile_instancing
             
@@ -459,7 +427,7 @@ Shader "Custom/PostProcessing/RadialBlur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vert
+	        #pragma vertex vertDefault
             #pragma fragment Frag_10Tap
             #pragma multi_compile_instancing
             
@@ -471,7 +439,7 @@ Shader "Custom/PostProcessing/RadialBlur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vert
+	        #pragma vertex vertDefault
             #pragma fragment Frag_12Tap
             #pragma multi_compile_instancing
             
@@ -483,7 +451,7 @@ Shader "Custom/PostProcessing/RadialBlur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vert
+	        #pragma vertex vertDefault
             #pragma fragment Frag_20Tap
             #pragma multi_compile_instancing
             
@@ -495,7 +463,7 @@ Shader "Custom/PostProcessing/RadialBlur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vert
+	        #pragma vertex vertDefault
             #pragma fragment Frag_30Tap
             #pragma multi_compile_instancing
             

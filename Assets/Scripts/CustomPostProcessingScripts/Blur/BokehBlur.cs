@@ -17,7 +17,7 @@ namespace UnityEngine.Rendering.Universal
     
         public bool IsActive()
         {
-            return active && indensity != 0;
+            return active && indensity.value != 0;
         }
 
         public bool IsTileCompatible()

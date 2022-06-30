@@ -142,7 +142,7 @@ MonoBehaviour:
     blitMaterialPassIndex: 0
     setInverseViewMatrix: 0
     requireDepthNormals: 0
-    srcType: 2
+    srcType: 0
     srcTextureId: _CameraColorTexture
     srcTextureObject: {fileID: 0}
     dstType: 0

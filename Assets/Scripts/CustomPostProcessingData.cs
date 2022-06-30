@@ -40,6 +40,7 @@ namespace UnityEngine.Rendering.Universal
         [Serializable]
         public sealed class CustomShaders
         {
+            //blur
             public Shader gaussianBlur;
             public Shader boxBlur;
             public Shader kawaseBlur;
@@ -50,6 +51,9 @@ namespace UnityEngine.Rendering.Universal
             public Shader grainyBlur;
             public Shader radialBlur;
             public Shader directionalBlur;
+            
+            //glitch
+            public Shader rgbSplit;
         }
 
         public CustomShaders customShaders;

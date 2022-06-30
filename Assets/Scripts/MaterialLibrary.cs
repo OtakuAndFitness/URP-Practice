@@ -7,6 +7,7 @@ namespace UnityEngine.Rendering.Universal
 {
     public class MaterialLibrary
     {
+        //blur
         public readonly Material gaussianBlur;
         public readonly Material boxBlur;
         public readonly Material kawaseBlur;
@@ -18,8 +19,12 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material radialBlur;
         public readonly Material directionalBlur;
         
+        //glitch
+        public readonly Material rgbSplit;
+        
         public MaterialLibrary(CustomPostProcessingData data)
         {
+            //blur
             gaussianBlur = Load(data.customShaders.gaussianBlur);
             boxBlur = Load(data.customShaders.boxBlur);
             kawaseBlur = Load(data.customShaders.kawaseBlur);
@@ -30,6 +35,9 @@ namespace UnityEngine.Rendering.Universal
             grainyBlur = Load(data.customShaders.grainyBlur);
             radialBlur = Load(data.customShaders.radialBlur);
             directionalBlur = Load(data.customShaders.directionalBlur);
+            
+            //glitch
+            rgbSplit = Load(data.customShaders.rgbSplit);
         }
 
         Material Load(Shader shader)
@@ -49,6 +57,7 @@ namespace UnityEngine.Rendering.Universal
         
         internal void Cleanup()
         {
+            //blur
             CoreUtils.Destroy(gaussianBlur);
             CoreUtils.Destroy(boxBlur);
             CoreUtils.Destroy(kawaseBlur);
@@ -59,6 +68,9 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(grainyBlur);
             CoreUtils.Destroy(radialBlur);
             CoreUtils.Destroy(directionalBlur);
+            
+            //glitch
+            CoreUtils.Destroy(rgbSplit);
         }
     }
 }
