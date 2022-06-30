@@ -14,7 +14,7 @@ Shader "Custom/PostProcessing/Glitch/RGBSplit"
 
     CBUFFER_START(UnityPerMaterial)
         half4 _Params;
-		half4 _Params2;
+		half3 _Params2;
     CBUFFER_END
 
     #define _Fading _Params.x

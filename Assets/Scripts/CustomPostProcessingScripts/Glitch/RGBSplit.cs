@@ -11,6 +11,7 @@ namespace UnityEngine.Rendering.Universal
     public class RGBSplit : VolumeComponent, IPostProcessComponent
     {
         public GlitchRGBSplitDirectionParameter SplitDirection = new GlitchRGBSplitDirectionParameter(DirectionEX.Horizontal);
+        
         public GlitchRGBSplitFilerModeParameter filterMode = new GlitchRGBSplitFilerModeParameter(FilterMode.Bilinear);
 
         public ClampedFloatParameter Fading = new ClampedFloatParameter(1, 0, 1);

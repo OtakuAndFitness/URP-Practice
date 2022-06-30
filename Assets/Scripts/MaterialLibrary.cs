@@ -21,6 +21,7 @@ namespace UnityEngine.Rendering.Universal
         
         //glitch
         public readonly Material rgbSplit;
+        public readonly Material imageBlock;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -38,6 +39,7 @@ namespace UnityEngine.Rendering.Universal
             
             //glitch
             rgbSplit = Load(data.customShaders.rgbSplit);
+            imageBlock = Load(data.customShaders.imageBlock);
         }
 
         Material Load(Shader shader)
@@ -71,6 +73,7 @@ namespace UnityEngine.Rendering.Universal
             
             //glitch
             CoreUtils.Destroy(rgbSplit);
+            CoreUtils.Destroy(imageBlock);
         }
     }
 }

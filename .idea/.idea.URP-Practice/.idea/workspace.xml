@@ -17,8 +17,10 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/dafed2d51d694b248f56d66f23356b0b157800/c0/a9a96fb4/CommandBuffer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Resources/Shaders/CustomPostProcessingShaders/CustomPPHeader.hlsl" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingData.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/Glitch/ImageBlock.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/CustomPostProcessingScripts/Glitch/RGBSplit.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/MaterialLibrary.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.collab-proxy@1.15.18/Tests/Editor/Collaborate/Scenario/AsyncToCoroutine.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.core@12.1.7/Runtime/Volume/VolumeComponent.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -81,7 +83,7 @@
       <workItem from="1655619045070" duration="345000" />
       <workItem from="1655901961765" duration="3466000" />
       <workItem from="1656570225311" duration="352000" />
-      <workItem from="1656570650014" duration="4828000" />
+      <workItem from="1656570650014" duration="8040000" />
     </task>
     <servers />
   </component>

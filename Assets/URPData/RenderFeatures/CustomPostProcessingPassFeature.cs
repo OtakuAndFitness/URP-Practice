@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -35,6 +36,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         
         //glitch
         private RGBSplit m_RGBSplit;
+        private ImageBlock m_ImageBlock;
         private float TimeX = 1.0f;
         
         private MaterialLibrary m_Materials;
@@ -73,6 +75,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             // m_TemporaryColorTexture03.Init("m_TemporaryColorTexture03");
         }
         
+        public void Cleanup() => m_Materials.Cleanup();
+
+        
         // This method is called before executing the render pass.
         // It can be used to configure render targets and their clear state. Also to create temporary render target textures.
         // When empty this render pass will render to the active camera render target.
@@ -102,6 +107,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_DirectionalBlur = stack.GetComponent<DirectionalBlur>();
             //glitch
             m_RGBSplit = stack.GetComponent<RGBSplit>();
+            m_ImageBlock = stack.GetComponent<ImageBlock>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -165,10 +171,42 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupRGBSplit(cmd, ref renderingData, m_Materials.rgbSplit);
             }
+
+            if (m_ImageBlock.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupImageBlock(cmd, ref renderingData, m_Materials.imageBlock);
+            }
             
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region ImageBlock
+
+        private void SetupImageBlock(CommandBuffer cmd, ref RenderingData renderingData, Material imageBlock)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+
+            TimeX += Time.deltaTime;
+            if (TimeX > 100)
+            {
+                TimeX = 0;
+            }
+            
+            cmd.BeginSample("ImageBlock");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_ImageBlock.filterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            imageBlock.SetVector("_Params", new Vector3(TimeX * m_ImageBlock.Speed.value, m_ImageBlock.Amount.value, m_ImageBlock.Fade.value));
+            imageBlock.SetVector("_Params2", new Vector4(m_ImageBlock.BlockLayer1_U.value, m_ImageBlock.BlockLayer1_V.value, m_ImageBlock.BlockLayer2_U.value, m_ImageBlock.BlockLayer2_V.value));
+            imageBlock.SetVector("_Params3", new Vector3(m_ImageBlock.RGBSplitIndensity.value, m_ImageBlock.BlockLayer1_Indensity.value, m_ImageBlock.BlockLayer2_Indensity.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, imageBlock);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("ImageBlock");
+        }
+
+        #endregion
+        
 
         #region RGBSplit
 
@@ -507,6 +545,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         
         m_ScriptablePass.Setup(evt, cameraColorTarget);
         renderer.EnqueuePass(m_ScriptablePass);
+    }
+
+
+    protected override void Dispose(bool disposing)
+    {
+        // base.Dispose(disposing);
+        m_ScriptablePass.Cleanup();
     }
 }
 

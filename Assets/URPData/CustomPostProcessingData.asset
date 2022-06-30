@@ -24,3 +24,4 @@ MonoBehaviour:
     radialBlur: {fileID: 4800000, guid: a2d8e47f741b1df4fa4b1f02e325f040, type: 3}
     directionalBlur: {fileID: 4800000, guid: 08533419947c97b418bfb70dbe61c189, type: 3}
     rgbSplit: {fileID: 4800000, guid: 5d86447b315884c11a8c4eb1dfdec36f, type: 3}
+    imageBlock: {fileID: 4800000, guid: 7028a7ace36ab4cd7a5620a0a2cf3c65, type: 3}
