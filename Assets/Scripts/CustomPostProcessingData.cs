@@ -57,6 +57,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader imageBlock;
             public Shader lineBlock;
             public Shader tileJitter;
+            public Shader scanLineJitter;
         }
 
         public CustomShaders customShaders;

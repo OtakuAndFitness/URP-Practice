@@ -24,6 +24,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material imageBlock;
         public readonly Material lineBlock;
         public readonly Material tileJitter;
+        public readonly Material scanLineJitter;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -44,6 +45,7 @@ namespace UnityEngine.Rendering.Universal
             imageBlock = Load(data.customShaders.imageBlock);
             lineBlock = Load(data.customShaders.lineBlock);
             tileJitter = Load(data.customShaders.tileJitter);
+            scanLineJitter = Load(data.customShaders.scanLineJitter);
         }
 
         Material Load(Shader shader)
@@ -79,6 +81,8 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(rgbSplit);
             CoreUtils.Destroy(imageBlock);
             CoreUtils.Destroy(lineBlock);
+            CoreUtils.Destroy(tileJitter);
+            CoreUtils.Destroy(scanLineJitter);
         }
     }
 }

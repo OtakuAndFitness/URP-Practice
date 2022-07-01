@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class CreateURPUnlitShader
 {
-    private static string templatePath = "Assets/Editor/UnlitShader.txt";
+    private static string templatePath = "Assets/Editor/UnlitShaderTemplate.txt";
 
     [MenuItem("Assets/Create/Shader/CustomUnlit")]
     static void CreateCustomShader()

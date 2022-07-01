@@ -39,6 +39,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private ImageBlock m_ImageBlock;
         private LineBlock m_LineBlock;
         private TileJitter m_TileJitter;
+        private ScanLineJitter m_ScanLineJitter;
         private float TimeX = 1.0f;
         private float randomFrequency;
         private int frameCount = 0;
@@ -114,6 +115,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_ImageBlock = stack.GetComponent<ImageBlock>();
             m_LineBlock = stack.GetComponent<LineBlock>();
             m_TileJitter = stack.GetComponent<TileJitter>();
+            m_ScanLineJitter = stack.GetComponent<ScanLineJitter>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -192,10 +194,54 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupTileJitter(cmd, ref renderingData, m_Materials.tileJitter);
             }
+
+            if (m_ScanLineJitter.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupScanLineJitter(cmd, ref renderingData, m_Materials.scanLineJitter);
+            }
             
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region ScanLineJitter
+
+        private void SetupScanLineJitter(CommandBuffer cmd, ref RenderingData renderingData, Material scanLineJitter)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("ScanLineJitter");
+            UpdateFrequencySLJ(scanLineJitter);
+            float displacement = 0.005f + Mathf.Pow(m_ScanLineJitter.JitterIndensity.value, 3) * 0.1f;
+            float threshold = Mathf.Clamp01(1.0f - m_ScanLineJitter.JitterIndensity.value * 1.2f);
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_ScanLineJitter.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            scanLineJitter.SetVector("_Params", new Vector3(displacement, threshold, m_ScanLineJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_ScanLineJitter.Frequency.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scanLineJitter, (int)m_ScanLineJitter.JitterDirection.value);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("ScanLineJitter");
+        }
+
+        private void UpdateFrequencySLJ(Material scanLineJitter)
+        {
+            if (m_ScanLineJitter.IntervalType.value == IntervalType.Random)
+            {
+                randomFrequency = UnityEngine.Random.Range(0, m_ScanLineJitter.Frequency.value);
+            }
+
+            if (m_ScanLineJitter.IntervalType.value == IntervalType.Infinite)
+            {
+                scanLineJitter.EnableKeyword("USING_FREQUENCY_INFINITE");
+            }
+            else
+            {
+                scanLineJitter.DisableKeyword("USING_FREQUENCY_INFINITE");
+            }
+        }
+
+        #endregion
+        
 
         #region TileJitter
 
@@ -214,7 +260,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 tileJitter.DisableKeyword("JITTER_DIRECTION_HORIZONTAL");
             }
-            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_LineBlock.FilterMode.value);
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_TileJitter.FilterMode.value);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             tileJitter.SetVector("_Params", new Vector4(m_TileJitter.SplittingNumber.value, m_TileJitter.Amount.value , m_TileJitter.Speed.value * 100f, m_TileJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_TileJitter.Frequency.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tileJitter, m_TileJitter.SplittingDirection.value == Direction.Horizontal ? 0 : 1);
