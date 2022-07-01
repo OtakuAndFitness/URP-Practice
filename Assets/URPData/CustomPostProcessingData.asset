@@ -29,3 +29,4 @@ MonoBehaviour:
     tileJitter: {fileID: 4800000, guid: 6db49fd21acc143e49950a0e3443c28e, type: 3}
     scanLineJitter: {fileID: 4800000, guid: af1966d1ed1e44bdea8791ddad3f05cc, type: 3}
     digitalStripe: {fileID: 4800000, guid: 7f1c13c14202047c0a95eb3eb08395c6, type: 3}
+    analogNoise: {fileID: 4800000, guid: 5b5682146a2a54bda8109d7ab5be39fe, type: 3}

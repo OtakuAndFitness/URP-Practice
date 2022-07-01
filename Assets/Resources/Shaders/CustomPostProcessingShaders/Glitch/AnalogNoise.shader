@@ -1,0 +1,78 @@
+Shader "Custom/PostProcessing/Glitch/TileJitter"
+{
+    Properties
+    {
+        _MainTex("Main Tex", 2D) = "white"{}
+        _Params("_Params", vector) = (1,1,1,1)
+//        _Params2("_Params2", vector) = (1,1,1,1)
+//        _Params3("_Params3", vector) = (1,1,1,1)
+    }
+    
+    HLSLINCLUDE
+        #include "../CustomPPHeader.hlsl"
+
+//    	#pragma shader_feature JITTER_DIRECTION_HORIZONTAL
+//		#pragma shader_feature USING_FREQUENCY_INFINITE
+
+        CBUFFER_START(UnityPerMaterial)
+            half4 _Params;
+		    // half4 _Params2;
+            // half3 _Params3;
+        CBUFFER_END
+
+        #define _Speed _Params.x
+		#define _Fading _Params.y
+		#define _LuminanceJitterThreshold _Params.z
+		#define _TimeX _Params.w
+
+
+        float randomNoise(float2 c)
+		{
+			return frac(sin(dot(c.xy, float2(12.9898, 78.233))) * 43758.5453);
+		}
+
+		half4 Frag(Varyings i): SV_Target
+		{
+
+			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 noiseColor = sceneColor;
+
+			half luminance = dot(noiseColor.rgb, half3(0.22, 0.707, 0.071));
+			if (randomNoise(float2(_TimeX * _Speed, _TimeX * _Speed)) > _LuminanceJitterThreshold)
+			{
+				noiseColor = float4(luminance, luminance, luminance, luminance);
+			}
+
+			float noiseX = randomNoise(_TimeX * _Speed + i.uv / float2(-213, 5.53));
+			float noiseY = randomNoise(_TimeX * _Speed - i.uv / float2(213, -5.53));
+			float noiseZ = randomNoise(_TimeX * _Speed + i.uv / float2(213, 5.53));
+
+			noiseColor.rgb += 0.25 * float3(noiseX,noiseY,noiseZ) - 0.125;
+
+			noiseColor = lerp(sceneColor, noiseColor, _Fading);
+			
+			return noiseColor;
+		}
+    ENDHLSL
+
+    SubShader
+    {
+        Tags {"RenderType" = "Opaque" "RenderPipeline" = "UniversalRenderPipeline"}
+        
+        Cull Off ZWrite Off ZTest Always
+
+        Pass
+        {
+//            Tags {"LightMode" = "UniversalForward"}
+
+            HLSLPROGRAM
+	        #pragma vertex vertDefault
+            #pragma fragment Frag
+            #pragma multi_compile_instancing
+
+            
+            ENDHLSL
+        }
+
+    }
+}

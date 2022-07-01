@@ -41,6 +41,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private TileJitter m_TileJitter;
         private ScanLineJitter m_ScanLineJitter;
         private DigitalStripe m_DigitalStripe;
+        private AnalogNoise m_AnalogNoise;
         private float TimeX = 1.0f;
         private float randomFrequency;
         private int frameCount = 0;
@@ -121,6 +122,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_TileJitter = stack.GetComponent<TileJitter>();
             m_ScanLineJitter = stack.GetComponent<ScanLineJitter>();
             m_DigitalStripe = stack.GetComponent<DigitalStripe>();
+            m_AnalogNoise = stack.GetComponent<AnalogNoise>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -209,9 +211,38 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupDigitalStripe(cmd, ref renderingData, m_Materials.digitalStripe);
             }
+
+            if (m_AnalogNoise.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupAnalogNoise(cmd, ref renderingData, m_Materials.analogNoise);
+            }
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region AnalogNoise
+
+        private void SetupAnalogNoise(CommandBuffer cmd, ref RenderingData renderingData, Material analogNoise)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("AnalogNoise");
+            TimeX += Time.deltaTime;
+            if (TimeX > 100)
+            {
+                TimeX = 0;
+            }
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_AnalogNoise.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            analogNoise.SetVector("_Params", new Vector4(m_AnalogNoise.NoiseSpeed.value, m_AnalogNoise.NoiseFading.value, m_AnalogNoise.LuminanceJitterThreshold.value, TimeX));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, analogNoise);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("AnalogNoise");
+        }
+
+        #endregion
+        
 
 
         #region DigitalStripe
