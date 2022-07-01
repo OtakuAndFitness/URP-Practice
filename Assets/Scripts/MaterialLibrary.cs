@@ -23,6 +23,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material rgbSplit;
         public readonly Material imageBlock;
         public readonly Material lineBlock;
+        public readonly Material tileJitter;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -42,6 +43,7 @@ namespace UnityEngine.Rendering.Universal
             rgbSplit = Load(data.customShaders.rgbSplit);
             imageBlock = Load(data.customShaders.imageBlock);
             lineBlock = Load(data.customShaders.lineBlock);
+            tileJitter = Load(data.customShaders.tileJitter);
         }
 
         Material Load(Shader shader)

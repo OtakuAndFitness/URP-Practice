@@ -7,33 +7,31 @@ using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal
 {
-    [VolumeComponentEditor(typeof(LineBlock))]
-    public class LineBlockEditor : VolumeComponentEditor
+    [VolumeComponentEditor(typeof(TileJitter))]
+    public class TileJitterEditor : VolumeComponentEditor
     {
         private SerializedDataParameter m_FilterMode;
-        private SerializedDataParameter m_BlockDirection;
+        private SerializedDataParameter m_JitterDirection;
         private SerializedDataParameter m_IntervalType;
         private SerializedDataParameter m_Frequency;
+        private SerializedDataParameter m_SplittingDirection;
+        private SerializedDataParameter m_SplittingNumber;
         private SerializedDataParameter m_Amount;
-        private SerializedDataParameter m_LinesWidth;
         private SerializedDataParameter m_Speed;
-        private SerializedDataParameter m_Offset;
-        private SerializedDataParameter m_Alpha;
 
 
         public override void OnEnable()
         {
-            var o = new PropertyFetcher<LineBlock>(serializedObject);
+            var o = new PropertyFetcher<TileJitter>(serializedObject);
             
             m_FilterMode = Unpack(o.Find(x => x.FilterMode));
-            m_BlockDirection = Unpack(o.Find(x => x.BlockDirection));
+            m_JitterDirection = Unpack(o.Find(x => x.JitterDirection));
             m_IntervalType = Unpack(o.Find(x => x.IntervalType));
             m_Frequency = Unpack(o.Find(x => x.Frequency));
             m_Amount = Unpack(o.Find(x => x.Amount));
-            m_LinesWidth = Unpack(o.Find(x => x.LinesWidth));
+            m_SplittingDirection = Unpack(o.Find(x => x.SplittingDirection));
             m_Speed = Unpack(o.Find(x => x.Speed));
-            m_Offset = Unpack(o.Find(x => x.Offset));
-            m_Alpha = Unpack(o.Find(x => x.Alpha));
+            m_SplittingNumber = Unpack(o.Find(x => x.SplittingNumber));
 
         }
 
@@ -41,20 +39,19 @@ namespace UnityEditor.Rendering.Universal
         {            
             
             PropertyField(m_FilterMode);
-            DrawHeader("Block Direction");
-            PropertyField(m_BlockDirection);
+            DrawHeader("Splitting Property");
+            PropertyField(m_SplittingDirection);
+            PropertyField(m_SplittingNumber);
             DrawHeader("Interval Frequency");
             PropertyField(m_IntervalType);
             if (m_IntervalType.value.intValue != (int)IntervalType.Infinite)
             {
                 PropertyField(m_Frequency);
             }
-            DrawHeader("Core Property");
+            DrawHeader("Jitter Property");
+            PropertyField(m_JitterDirection);
             PropertyField(m_Amount);
-            PropertyField(m_LinesWidth);
             PropertyField(m_Speed);
-            PropertyField(m_Offset);
-            PropertyField(m_Alpha);
             
         }
     }

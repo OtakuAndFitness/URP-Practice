@@ -26,3 +26,4 @@ MonoBehaviour:
     rgbSplit: {fileID: 4800000, guid: 5d86447b315884c11a8c4eb1dfdec36f, type: 3}
     imageBlock: {fileID: 4800000, guid: 7028a7ace36ab4cd7a5620a0a2cf3c65, type: 3}
     lineBlock: {fileID: 4800000, guid: c20990fe9833ae64ca997aa811884251, type: 3}
+    tileJitter: {fileID: 4800000, guid: 6db49fd21acc143e49950a0e3443c28e, type: 3}

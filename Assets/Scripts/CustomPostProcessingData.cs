@@ -56,6 +56,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader rgbSplit;
             public Shader imageBlock;
             public Shader lineBlock;
+            public Shader tileJitter;
         }
 
         public CustomShaders customShaders;

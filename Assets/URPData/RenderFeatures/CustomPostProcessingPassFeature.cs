@@ -38,6 +38,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private RGBSplit m_RGBSplit;
         private ImageBlock m_ImageBlock;
         private LineBlock m_LineBlock;
+        private TileJitter m_TileJitter;
         private float TimeX = 1.0f;
         private float randomFrequency;
         private int frameCount = 0;
@@ -112,6 +113,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_RGBSplit = stack.GetComponent<RGBSplit>();
             m_ImageBlock = stack.GetComponent<ImageBlock>();
             m_LineBlock = stack.GetComponent<LineBlock>();
+            m_TileJitter = stack.GetComponent<TileJitter>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -185,10 +187,60 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupLineBlock(cmd, ref renderingData, m_Materials.lineBlock);
             }
+
+            if (m_TileJitter.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupTileJitter(cmd, ref renderingData, m_Materials.tileJitter);
+            }
             
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region TileJitter
+
+        private void SetupTileJitter(CommandBuffer cmd, ref RenderingData renderingData, Material tileJitter)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("TileJitter");
+            UpdateFrequencyTJ(tileJitter);
+            if (m_TileJitter.JitterDirection.value == Direction.Horizontal)
+            {
+                tileJitter.EnableKeyword("JITTER_DIRECTION_HORIZONTAL");
+            }
+            else
+            {
+                tileJitter.DisableKeyword("JITTER_DIRECTION_HORIZONTAL");
+            }
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_LineBlock.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            tileJitter.SetVector("_Params", new Vector4(m_TileJitter.SplittingNumber.value, m_TileJitter.Amount.value , m_TileJitter.Speed.value * 100f, m_TileJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_TileJitter.Frequency.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tileJitter, m_TileJitter.SplittingDirection.value == Direction.Horizontal ? 0 : 1);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("TileJitter");
+        }
+
+        private void UpdateFrequencyTJ(Material tileJitter)
+        {
+            if (m_TileJitter.IntervalType.value == IntervalType.Random)
+            {
+                randomFrequency = UnityEngine.Random.Range(0, m_TileJitter.Frequency.value);
+            }
+
+            if (m_TileJitter.IntervalType.value == IntervalType.Infinite)
+            {
+                tileJitter.EnableKeyword("USING_FREQUENCY_INFINITE");
+            }
+            else
+            {
+                tileJitter.DisableKeyword("USING_FREQUENCY_INFINITE");
+            }
+        }
+
+        #endregion
+        
 
         #region LineBlock
 
