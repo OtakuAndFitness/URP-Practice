@@ -40,9 +40,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private LineBlock m_LineBlock;
         private TileJitter m_TileJitter;
         private ScanLineJitter m_ScanLineJitter;
+        private DigitalStripe m_DigitalStripe;
         private float TimeX = 1.0f;
         private float randomFrequency;
         private int frameCount = 0;
+        Texture2D _noiseTexture;
+        RenderTexture _trashFrame1;
+        RenderTexture _trashFrame2;
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -116,6 +120,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_LineBlock = stack.GetComponent<LineBlock>();
             m_TileJitter = stack.GetComponent<TileJitter>();
             m_ScanLineJitter = stack.GetComponent<ScanLineJitter>();
+            m_DigitalStripe = stack.GetComponent<DigitalStripe>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -199,10 +204,86 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupScanLineJitter(cmd, ref renderingData, m_Materials.scanLineJitter);
             }
-            
+
+            if (m_DigitalStripe.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupDigitalStripe(cmd, ref renderingData, m_Materials.digitalStripe);
+            }
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+
+        #region DigitalStripe
+
+        private void SetupDigitalStripe(CommandBuffer cmd, ref RenderingData renderingData, Material digitalStripe)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("DigitalStripe");
+            UpdateFrequencyDS(m_DigitalStripe.frequency.value, m_DigitalStripe.noiseTextureWidth.value, m_DigitalStripe.noiseTextureHeight.value, m_DigitalStripe.stripeLength.value);
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_DigitalStripe.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            digitalStripe.SetFloat("_Indensity", m_DigitalStripe.indensity.value);
+            if (_noiseTexture != null)
+            {
+                digitalStripe.SetTexture("_NoiseTex", _noiseTexture);
+            }
+            if (m_DigitalStripe.needStripColorAdjust.value)
+            {
+                digitalStripe.EnableKeyword("NEED_TRASH_FRAME");
+                digitalStripe.SetColor("_StripColorAdjustColor", m_DigitalStripe.stripColorAdjustColor.value);
+                digitalStripe.SetFloat("_StripColorAdjustIndensity", m_DigitalStripe.stripColorAdjustIndensity.value);
+            }
+            else
+            {
+                digitalStripe.DisableKeyword("NEED_TRASH_FRAME");
+            }
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, digitalStripe);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("DigitalStripe");
+        }
+
+        private void UpdateFrequencyDS(int frame, int noiseTextureWidth, int noiseTextureHeight, float stripLength)
+        {
+            int frameCount = Time.frameCount;
+            if (frameCount % frame != 0)
+            {
+                return;
+            }
+
+            _noiseTexture = new Texture2D(noiseTextureWidth, noiseTextureHeight, TextureFormat.ARGB32, false);
+            _noiseTexture.wrapMode = TextureWrapMode.Clamp;
+            _noiseTexture.filterMode = FilterMode.Point;
+
+            _trashFrame1 = new RenderTexture(Screen.width, Screen.height, 0);
+            _trashFrame2 = new RenderTexture(Screen.width, Screen.height, 0);
+            _trashFrame1.hideFlags = HideFlags.DontSave;
+            _trashFrame2.hideFlags = HideFlags.DontSave;
+
+            Color color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+
+            for (int y = 0; y < _noiseTexture.height; y++)
+            {
+                for (int x = 0; x < _noiseTexture.width; x++)
+                {
+                    //随机值若大于给定strip随机阈值，重新随机颜色
+                    if (UnityEngine.Random.value > stripLength)
+                    {
+                        color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
+                    }
+                    //设置贴图像素值
+                    _noiseTexture.SetPixel(x, y, color);
+                }
+            }
+
+            _noiseTexture.Apply();
+
+        }
+
+        #endregion
+        
 
         #region ScanLineJitter
 

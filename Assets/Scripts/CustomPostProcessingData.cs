@@ -58,6 +58,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader lineBlock;
             public Shader tileJitter;
             public Shader scanLineJitter;
+            public Shader digitalStripe;
         }
 
         public CustomShaders customShaders;

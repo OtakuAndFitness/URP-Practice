@@ -25,6 +25,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material lineBlock;
         public readonly Material tileJitter;
         public readonly Material scanLineJitter;
+        public readonly Material digitalStripe;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -46,6 +47,7 @@ namespace UnityEngine.Rendering.Universal
             lineBlock = Load(data.customShaders.lineBlock);
             tileJitter = Load(data.customShaders.tileJitter);
             scanLineJitter = Load(data.customShaders.scanLineJitter);
+            digitalStripe = Load(data.customShaders.digitalStripe);
         }
 
         Material Load(Shader shader)
@@ -83,6 +85,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(lineBlock);
             CoreUtils.Destroy(tileJitter);
             CoreUtils.Destroy(scanLineJitter);
+            CoreUtils.Destroy(digitalStripe);
         }
     }
 }
