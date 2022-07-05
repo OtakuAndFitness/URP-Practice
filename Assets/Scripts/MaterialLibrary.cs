@@ -29,6 +29,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material analogNoise;
         public readonly Material screenJump;
         public readonly Material screenShake;
+        public readonly Material waveJitter;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -54,6 +55,7 @@ namespace UnityEngine.Rendering.Universal
             analogNoise = Load(data.customShaders.analogNoise);
             screenJump = Load(data.customShaders.screenJump);
             screenShake = Load(data.customShaders.screenShake);
+            waveJitter = Load(data.customShaders.waveJitter);
         }
 
         Material Load(Shader shader)
@@ -94,6 +96,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(digitalStripe);
             CoreUtils.Destroy(screenJump);
             CoreUtils.Destroy(screenShake);
+            CoreUtils.Destroy(waveJitter);
         }
     }
 }

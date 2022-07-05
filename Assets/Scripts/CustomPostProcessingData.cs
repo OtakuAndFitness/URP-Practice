@@ -62,6 +62,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader analogNoise;
             public Shader screenJump;
             public Shader screenShake;
+            public Shader waveJitter;
         }
 
         public CustomShaders customShaders;

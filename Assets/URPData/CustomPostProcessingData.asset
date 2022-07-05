@@ -32,3 +32,4 @@ MonoBehaviour:
     analogNoise: {fileID: 4800000, guid: 5b5682146a2a54bda8109d7ab5be39fe, type: 3}
     screenJump: {fileID: 4800000, guid: 70e75cedefecd4e05b0ff5604cf00a34, type: 3}
     screenShake: {fileID: 4800000, guid: 163236073428a435093a741624f20d14, type: 3}
+    waveJitter: {fileID: 4800000, guid: 9b552ccda75374c3c990e0065f2c6001, type: 3}

@@ -44,6 +44,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private AnalogNoise m_AnalogNoise;
         private ScreenJump m_ScreenJump;
         private ScreenShake m_ScreenShake;
+        private WaveJitter m_WaveJitter;
         private float TimeX = 1.0f;
         private float randomFrequency;
         private int frameCount = 0;
@@ -129,6 +130,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_AnalogNoise = stack.GetComponent<AnalogNoise>();
             m_ScreenJump = stack.GetComponent<ScreenJump>();
             m_ScreenShake = stack.GetComponent<ScreenShake>();
+            m_WaveJitter = stack.GetComponent<WaveJitter>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -138,6 +140,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private void Render(CommandBuffer cmd, ref RenderingData renderingData)
         {
             ref var cameraData = ref renderingData.cameraData;
+
+            #region Blur
+
             if (m_GaussianBlur.IsActive() && !cameraData.isSceneViewCamera)
             {
                 SetupGaussianBlur(cmd, ref renderingData, m_Materials.gaussianBlur);
@@ -188,6 +193,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupDirectionalBlur(cmd, ref renderingData, m_Materials.directionalBlur);
             }
 
+            #endregion
+
+            #region Glitch
+
             if (m_RGBSplit.IsActive() && !cameraData.isSceneViewCamera)
             {
                 SetupRGBSplit(cmd, ref renderingData, m_Materials.rgbSplit);
@@ -232,9 +241,54 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupScreenShake(cmd, ref renderingData, m_Materials.screenShake);
             }
-            // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
+
+            if (m_WaveJitter.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupWaveJitter(cmd, ref renderingData, m_Materials.waveJitter);
+            }
+
+            #endregion
+            
         }
+
+
+        #region WaveJitter
+
+        private void SetupWaveJitter(CommandBuffer cmd, ref RenderingData renderingData, Material waveJitter)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("WaveJitter");
+            UpdateFrequencyWJ(waveJitter);
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_WaveJitter.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            waveJitter.SetVector("_Params", new Vector4(m_WaveJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_WaveJitter.Frequency.value, m_WaveJitter.RGBSplit.value , m_WaveJitter.Speed.value, m_WaveJitter.Amount.value));
+            waveJitter.SetVector("_Resolution", m_WaveJitter.CustomResolution.value ? m_WaveJitter.Resolution.value : new Vector2(opaqueDesc.width,opaqueDesc.height));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, waveJitter, (int)m_WaveJitter.JitterDirection.value);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("WaveJitter");
+        }
+
+        private void UpdateFrequencyWJ(Material waveJitter)
+        {
+            if (m_WaveJitter.IntervalType.value == IntervalType.Random)
+            {
+                randomFrequency = UnityEngine.Random.Range(0, m_WaveJitter.Frequency.value);
+            }
+
+            if (m_WaveJitter.IntervalType.value == IntervalType.Infinite)
+            {
+                waveJitter.EnableKeyword("USING_FREQUENCY_INFINITE");
+            }
+            else
+            {
+                waveJitter.DisableKeyword("USING_FREQUENCY_INFINITE");
+            }
+        }
+
+        #endregion
+        
 
         #region ScreenShake
 
