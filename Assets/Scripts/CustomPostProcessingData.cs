@@ -60,6 +60,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader scanLineJitter;
             public Shader digitalStripe;
             public Shader analogNoise;
+            public Shader screenJump;
         }
 
         public CustomShaders customShaders;

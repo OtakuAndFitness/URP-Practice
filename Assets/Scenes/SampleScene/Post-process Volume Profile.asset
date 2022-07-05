@@ -1,5 +1,27 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-3956404389280518846
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad5e0e7536e2a42f88728f066f061cf3, type: 3}
+  m_Name: ScreenJump
+  m_EditorClassIdentifier: 
+  active: 1
+  FilterMode:
+    m_OverrideState: 0
+    m_Value: 1
+  JitterDirection:
+    m_OverrideState: 0
+    m_Value: 0
+  ScreenJumpIndensity:
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &-3640053722625769961
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -54,3 +76,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   components:
   - {fileID: -3640053722625769961}
+  - {fileID: -3956404389280518846}

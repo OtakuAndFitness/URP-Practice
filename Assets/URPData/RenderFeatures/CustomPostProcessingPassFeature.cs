@@ -42,12 +42,15 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private ScanLineJitter m_ScanLineJitter;
         private DigitalStripe m_DigitalStripe;
         private AnalogNoise m_AnalogNoise;
+        private ScreenJump m_ScreenJump;
         private float TimeX = 1.0f;
         private float randomFrequency;
         private int frameCount = 0;
-        Texture2D _noiseTexture;
-        RenderTexture _trashFrame1;
-        RenderTexture _trashFrame2;
+        private Texture2D _noiseTexture;
+        private RenderTexture _trashFrame1;
+        private RenderTexture _trashFrame2;
+        private float ScreenJumpTime;
+
         
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -123,6 +126,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_ScanLineJitter = stack.GetComponent<ScanLineJitter>();
             m_DigitalStripe = stack.GetComponent<DigitalStripe>();
             m_AnalogNoise = stack.GetComponent<AnalogNoise>();
+            m_ScreenJump = stack.GetComponent<ScreenJump>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -216,9 +220,34 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupAnalogNoise(cmd, ref renderingData, m_Materials.analogNoise);
             }
+
+            if (m_ScreenJump.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupScreenJump(cmd, ref renderingData, m_Materials.screenJump);
+            }
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region ScreenJump
+
+        private void SetupScreenJump(CommandBuffer cmd, ref RenderingData renderingData, Material screenJump)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("ScreenJump");
+            ScreenJumpTime += Time.deltaTime * m_ScreenJump.ScreenJumpIndensity.value * 9.8f;
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_ScreenJump.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            screenJump.SetVector("_Params", new Vector2(m_ScreenJump.ScreenJumpIndensity.value, m_ScreenJump.isHorizontalReverse.value ? -ScreenJumpTime : ScreenJumpTime));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, screenJump, (int)m_ScreenJump.ScreenJumpDirection.value);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("ScreenJump");
+        }
+
+        #endregion
+        
 
         #region AnalogNoise
 
