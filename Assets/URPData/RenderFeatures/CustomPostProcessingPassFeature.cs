@@ -43,6 +43,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private DigitalStripe m_DigitalStripe;
         private AnalogNoise m_AnalogNoise;
         private ScreenJump m_ScreenJump;
+        private ScreenShake m_ScreenShake;
         private float TimeX = 1.0f;
         private float randomFrequency;
         private int frameCount = 0;
@@ -127,6 +128,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_DigitalStripe = stack.GetComponent<DigitalStripe>();
             m_AnalogNoise = stack.GetComponent<AnalogNoise>();
             m_ScreenJump = stack.GetComponent<ScreenJump>();
+            m_ScreenShake = stack.GetComponent<ScreenShake>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -225,9 +227,33 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupScreenJump(cmd, ref renderingData, m_Materials.screenJump);
             }
+
+            if (m_ScreenShake.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupScreenShake(cmd, ref renderingData, m_Materials.screenShake);
+            }
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
         }
+
+        #region ScreenShake
+
+        private void SetupScreenShake(CommandBuffer cmd, ref RenderingData renderingData, Material screenShake)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("ScreenShake");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_ScreenShake.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            screenShake.SetFloat("_ScreenShake", m_ScreenShake.ScreenShakeIndensity.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, screenShake, (int)m_ScreenShake.ScreenShakeDirection.value);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("ScreenShake");
+        }
+
+        #endregion
+        
 
         #region ScreenJump
 

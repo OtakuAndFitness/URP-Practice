@@ -31,3 +31,4 @@ MonoBehaviour:
     digitalStripe: {fileID: 4800000, guid: 7f1c13c14202047c0a95eb3eb08395c6, type: 3}
     analogNoise: {fileID: 4800000, guid: 5b5682146a2a54bda8109d7ab5be39fe, type: 3}
     screenJump: {fileID: 4800000, guid: 70e75cedefecd4e05b0ff5604cf00a34, type: 3}
+    screenShake: {fileID: 4800000, guid: 163236073428a435093a741624f20d14, type: 3}
