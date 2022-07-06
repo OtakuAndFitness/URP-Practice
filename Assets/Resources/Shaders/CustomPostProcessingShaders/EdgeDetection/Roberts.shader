@@ -11,10 +11,12 @@ Shader "Custom/PostProcessing/EdgeDetection/Roberts"
     HLSLINCLUDE
 
 		#include "../CustomPPHeader.hlsl"
-		
-	    half2 _Params;
-		half4 _EdgeColor;
-		half4 _BackgroundColor;
+
+		CBUFFER_START(UnityPerMaterial)
+		    half2 _Params;
+			half4 _EdgeColor;
+			half4 _BackgroundColor;
+		CBUFFER_END
 
 		#define _EdgeWidth _Params.x
 		#define _BackgroundFade _Params.y
