@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/IrisBlur"
+Shader "Custom/PostProcessing/Blur/IrisBlur"
 {
     Properties
     {

@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/RadialBlur"
+Shader "Custom/PostProcessing/Blur/RadialBlur"
 {
     Properties
     {

@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/TiltShiftBlur"
+Shader "Custom/PostProcessing/Blur/TiltShiftBlur"
 {
     Properties
     {

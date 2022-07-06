@@ -31,6 +31,9 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material screenShake;
         public readonly Material waveJitter;
         
+        //Edge Detection
+        public readonly Material roberts;
+        
         public MaterialLibrary(CustomPostProcessingData data)
         {
             //blur
@@ -56,6 +59,9 @@ namespace UnityEngine.Rendering.Universal
             screenJump = Load(data.customShaders.screenJump);
             screenShake = Load(data.customShaders.screenShake);
             waveJitter = Load(data.customShaders.waveJitter);
+            
+            //Edge Detection
+            roberts = Load(data.customShaders.roberts);
         }
 
         Material Load(Shader shader)

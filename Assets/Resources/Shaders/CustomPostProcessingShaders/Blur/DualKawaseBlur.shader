@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/DualKawaseBlur"
+Shader "Custom/PostProcessing/Blur/DualKawaseBlur"
 {
     Properties
     {

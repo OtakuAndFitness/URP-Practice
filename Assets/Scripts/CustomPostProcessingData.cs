@@ -63,6 +63,9 @@ namespace UnityEngine.Rendering.Universal
             public Shader screenJump;
             public Shader screenShake;
             public Shader waveJitter;
+            
+            //Edge Detection
+            public Shader roberts;
         }
 
         public CustomShaders customShaders;

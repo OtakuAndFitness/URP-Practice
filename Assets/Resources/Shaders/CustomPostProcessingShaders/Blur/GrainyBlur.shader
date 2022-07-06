@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/GrainyBlur"
+Shader "Custom/PostProcessing/Blur/GrainyBlur"
 {
     Properties
     {

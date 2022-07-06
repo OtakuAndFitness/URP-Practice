@@ -52,8 +52,11 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private RenderTexture _trashFrame1;
         private RenderTexture _trashFrame2;
         private float ScreenJumpTime;
-
         
+        //Edge Dectection
+        private Roberts m_Roberts;
+
+
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
         
@@ -131,6 +134,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_ScreenJump = stack.GetComponent<ScreenJump>();
             m_ScreenShake = stack.GetComponent<ScreenShake>();
             m_WaveJitter = stack.GetComponent<WaveJitter>();
+            //EdgeDetection
+            m_Roberts = stack.GetComponent<Roberts>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -248,9 +253,38 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
 
             #endregion
+
+            #region EdgeDetection
+
+            if (m_Roberts.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupRoberts(cmd, ref renderingData, m_Materials.roberts);
+            }
+
+            #endregion
             
         }
 
+        #region Roberts
+
+        private void SetupRoberts(CommandBuffer cmd, ref RenderingData renderingData, Material roberts)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Roberts");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_Roberts.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            roberts.SetVector("_Params", new Vector2(m_Roberts.edgeWidth.value, m_Roberts.backgroundFade.value));
+            roberts.SetColor("_EdgeColor", m_Roberts.edgeColor.value);
+            roberts.SetColor("_BackgroundColor", m_Roberts.backgroundColor.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, roberts);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Roberts");
+        }
+
+        #endregion
+        
 
         #region WaveJitter
 

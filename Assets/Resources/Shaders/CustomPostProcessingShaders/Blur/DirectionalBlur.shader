@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/DirectionalBlur"
+Shader "Custom/PostProcessing/Blur/DirectionalBlur"
 {
     Properties
     {
