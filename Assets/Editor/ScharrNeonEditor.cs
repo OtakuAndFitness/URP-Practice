@@ -7,8 +7,8 @@ using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal
 {
-    [VolumeComponentEditor(typeof(RobertsNeon))]
-    public class RobertsNeonEditor : VolumeComponentEditor
+    [VolumeComponentEditor(typeof(ScharrNeon))]
+    public class ScharrNeonEditor : VolumeComponentEditor
     {
         private SerializedDataParameter m_FilterMode;
         private SerializedDataParameter m_edgeWidth;
@@ -20,7 +20,7 @@ namespace UnityEditor.Rendering.Universal
 
         public override void OnEnable()
         {
-            var o = new PropertyFetcher<RobertsNeon>(serializedObject);
+            var o = new PropertyFetcher<ScharrNeon>(serializedObject);
             
             m_FilterMode = Unpack(o.Find(x => x.FilterMode));
             m_edgeWidth = Unpack(o.Find(x => x.edgeWidth));

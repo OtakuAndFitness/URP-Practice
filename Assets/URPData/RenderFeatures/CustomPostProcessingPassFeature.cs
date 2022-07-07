@@ -57,6 +57,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private Roberts m_Roberts;
         private RobertsNeon m_RobertsNeon;
         private Scharr m_Scharr;
+        private ScharrNeon m_ScharrNeon;
 
 
         private MaterialLibrary m_Materials;
@@ -140,6 +141,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_Roberts = stack.GetComponent<Roberts>();
             m_RobertsNeon = stack.GetComponent<RobertsNeon>();
             m_Scharr = stack.GetComponent<Scharr>();
+            m_ScharrNeon = stack.GetComponent<ScharrNeon>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -275,9 +277,34 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupScharr(cmd, ref renderingData, m_Materials.scharr);
             }
 
+            if (m_ScharrNeon.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupScharrNeon(cmd, ref renderingData, m_Materials.scharrNeon);
+            }
+
             #endregion
             
         }
+
+        #region ScharrNeon
+
+        private void SetupScharrNeon(CommandBuffer cmd, ref RenderingData renderingData, Material scharrNeon)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("ScharrNeon");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_ScharrNeon.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            scharrNeon.SetVector("_Params", new Vector4(m_ScharrNeon.edgeWidth.value, m_ScharrNeon.edgeNeonFade.value, m_ScharrNeon.brightness.value, m_ScharrNeon.backgroundFade.value));
+            scharrNeon.SetColor("_BackgroundColor", m_ScharrNeon.backgroundColor.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scharrNeon);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("ScharrNeon");
+        }
+
+        #endregion
+        
 
         private void SetupScharr(CommandBuffer cmd, ref RenderingData renderingData, Material scharr)
         {
@@ -305,7 +332,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("RobertsNeon");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_RobertsNeon.FilterMode.value);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            robertsNeon.SetVector("_Params", new Vector4(m_RobertsNeon.edgeWidth.value, m_RobertsNeon.edgeNeonFade.value, m_RobertsNeon.brigtness.value, m_RobertsNeon.backgroundFade.value));
+            robertsNeon.SetVector("_Params", new Vector4(m_RobertsNeon.edgeWidth.value, m_RobertsNeon.edgeNeonFade.value, m_RobertsNeon.brightness.value, m_RobertsNeon.backgroundFade.value));
             robertsNeon.SetColor("_BackgroundColor", m_RobertsNeon.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, robertsNeon);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);

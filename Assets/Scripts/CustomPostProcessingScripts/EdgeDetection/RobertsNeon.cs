@@ -16,7 +16,7 @@ namespace UnityEngine.Rendering.Universal
         
         public ClampedFloatParameter backgroundFade = new ClampedFloatParameter(0, 0, 1);
 
-        public ClampedFloatParameter brigtness = new ClampedFloatParameter(1,0.2f,2);
+        public ClampedFloatParameter brightness = new ClampedFloatParameter(1,0.2f,2);
 
         public ColorParameter backgroundColor = new ColorParameter(Color.white, true, true, true);
 

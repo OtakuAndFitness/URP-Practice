@@ -35,6 +35,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material roberts;
         public readonly Material robertsNeon;
         public readonly Material scharr;
+        public readonly Material scharrNeon;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -66,6 +67,7 @@ namespace UnityEngine.Rendering.Universal
             roberts = Load(data.customShaders.roberts);
             robertsNeon = Load(data.customShaders.robertsNeon);
             scharr = Load(data.customShaders.scharr);
+            scharrNeon = Load(data.customShaders.scharrNeon);
         }
 
         Material Load(Shader shader)
@@ -112,6 +114,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(roberts);
             CoreUtils.Destroy(robertsNeon);
             CoreUtils.Destroy(scharr);
+            CoreUtils.Destroy(scharrNeon);
         }
     }
 }
