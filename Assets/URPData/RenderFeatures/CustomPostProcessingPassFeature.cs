@@ -58,6 +58,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private RobertsNeon m_RobertsNeon;
         private Scharr m_Scharr;
         private ScharrNeon m_ScharrNeon;
+        private Sobel m_Sobel;
 
 
         private MaterialLibrary m_Materials;
@@ -142,6 +143,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_RobertsNeon = stack.GetComponent<RobertsNeon>();
             m_Scharr = stack.GetComponent<Scharr>();
             m_ScharrNeon = stack.GetComponent<ScharrNeon>();
+            m_Sobel = stack.GetComponent<Sobel>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -282,9 +284,35 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupScharrNeon(cmd, ref renderingData, m_Materials.scharrNeon);
             }
 
+            if (m_Sobel.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupSobel(cmd, ref renderingData, m_Materials.sobel);
+            }
+
             #endregion
             
         }
+
+        #region Sobel
+
+        private void SetupSobel(CommandBuffer cmd, ref RenderingData renderingData, Material sobel)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Sobel");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_Sobel.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            sobel.SetVector("_Params", new Vector2(m_Sobel.edgeWidth.value, m_Sobel.backgroundFade.value));
+            sobel.SetColor("_EdgeColor", m_Sobel.edgeColor.value);
+            sobel.SetColor("_BackgroundColor", m_Sobel.backgroundColor.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, sobel);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Sobel");
+        }
+
+        #endregion
+        
 
         #region ScharrNeon
 

@@ -69,6 +69,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader robertsNeon;
             public Shader scharr;
             public Shader scharrNeon;
+            public Shader sobel;
         }
 
         public CustomShaders customShaders;
