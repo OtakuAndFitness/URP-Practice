@@ -55,6 +55,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         
         //Edge Dectection
         private Roberts m_Roberts;
+        private RobertsNeon m_RobertsNeon;
 
 
         private MaterialLibrary m_Materials;
@@ -136,6 +137,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_WaveJitter = stack.GetComponent<WaveJitter>();
             //EdgeDetection
             m_Roberts = stack.GetComponent<Roberts>();
+            m_RobertsNeon = stack.GetComponent<RobertsNeon>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -261,9 +263,34 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupRoberts(cmd, ref renderingData, m_Materials.roberts);
             }
 
+            if (m_RobertsNeon.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupRobertsNeon(cmd, ref renderingData, m_Materials.robertsNeon);
+            }
+
             #endregion
             
         }
+
+        #region RobertsNeon
+
+        private void SetupRobertsNeon(CommandBuffer cmd, ref RenderingData renderingData, Material robertsNeon)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("RobertsNeon");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_RobertsNeon.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            robertsNeon.SetVector("_Params", new Vector4(m_RobertsNeon.edgeWidth.value, m_RobertsNeon.edgeNeonFade.value, m_RobertsNeon.brigtness.value, m_RobertsNeon.backgroundFade.value));
+            robertsNeon.SetColor("_BackgroundColor", m_RobertsNeon.backgroundColor.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, robertsNeon);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("RobertsNeon");
+        }
+
+        #endregion
+        
 
         #region Roberts
 

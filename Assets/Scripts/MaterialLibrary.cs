@@ -33,6 +33,7 @@ namespace UnityEngine.Rendering.Universal
         
         //Edge Detection
         public readonly Material roberts;
+        public readonly Material robertsNeon;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -62,6 +63,7 @@ namespace UnityEngine.Rendering.Universal
             
             //Edge Detection
             roberts = Load(data.customShaders.roberts);
+            robertsNeon = Load(data.customShaders.robertsNeon);
         }
 
         Material Load(Shader shader)
@@ -103,6 +105,10 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(screenJump);
             CoreUtils.Destroy(screenShake);
             CoreUtils.Destroy(waveJitter);
+            
+            //Edge Detection
+            CoreUtils.Destroy(roberts);
+            CoreUtils.Destroy(robertsNeon);
         }
     }
 }
