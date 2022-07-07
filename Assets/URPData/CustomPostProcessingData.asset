@@ -38,3 +38,4 @@ MonoBehaviour:
     scharr: {fileID: 4800000, guid: b749c69b1440c4606aaf8d3c0e7c9135, type: 3}
     scharrNeon: {fileID: 4800000, guid: 9c1fc5c22ca344dc5a37beb9f9d4d6b0, type: 3}
     sobel: {fileID: 4800000, guid: 6eea16e506fd043ce82fd85141db03ce, type: 3}
+    sobelNeon: {fileID: 4800000, guid: 4b84d235935c14abe8f9f4ca15917ef6, type: 3}

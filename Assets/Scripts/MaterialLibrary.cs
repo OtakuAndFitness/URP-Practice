@@ -37,6 +37,7 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material scharr;
         public readonly Material scharrNeon;
         public readonly Material sobel;
+        public readonly Material sobelNeon;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -70,6 +71,7 @@ namespace UnityEngine.Rendering.Universal
             scharr = Load(data.customShaders.scharr);
             scharrNeon = Load(data.customShaders.scharrNeon);
             sobel = Load(data.customShaders.sobel);
+            sobelNeon = Load(data.customShaders.sobelNeon);
         }
 
         Material Load(Shader shader)
@@ -118,6 +120,7 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(scharr);
             CoreUtils.Destroy(scharrNeon);
             CoreUtils.Destroy(sobel);
+            CoreUtils.Destroy(sobelNeon);
         }
     }
 }
