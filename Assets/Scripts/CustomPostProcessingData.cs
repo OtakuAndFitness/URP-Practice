@@ -67,6 +67,7 @@ namespace UnityEngine.Rendering.Universal
             //Edge Detection
             public Shader roberts;
             public Shader robertsNeon;
+            public Shader scharr;
         }
 
         public CustomShaders customShaders;

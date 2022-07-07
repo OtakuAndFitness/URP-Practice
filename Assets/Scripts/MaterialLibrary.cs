@@ -34,6 +34,7 @@ namespace UnityEngine.Rendering.Universal
         //Edge Detection
         public readonly Material roberts;
         public readonly Material robertsNeon;
+        public readonly Material scharr;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -64,6 +65,7 @@ namespace UnityEngine.Rendering.Universal
             //Edge Detection
             roberts = Load(data.customShaders.roberts);
             robertsNeon = Load(data.customShaders.robertsNeon);
+            scharr = Load(data.customShaders.scharr);
         }
 
         Material Load(Shader shader)
@@ -109,6 +111,7 @@ namespace UnityEngine.Rendering.Universal
             //Edge Detection
             CoreUtils.Destroy(roberts);
             CoreUtils.Destroy(robertsNeon);
+            CoreUtils.Destroy(scharr);
         }
     }
 }

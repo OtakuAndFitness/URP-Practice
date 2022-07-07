@@ -56,6 +56,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         //Edge Dectection
         private Roberts m_Roberts;
         private RobertsNeon m_RobertsNeon;
+        private Scharr m_Scharr;
 
 
         private MaterialLibrary m_Materials;
@@ -138,6 +139,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             //EdgeDetection
             m_Roberts = stack.GetComponent<Roberts>();
             m_RobertsNeon = stack.GetComponent<RobertsNeon>();
+            m_Scharr = stack.GetComponent<Scharr>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -268,8 +270,29 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupRobertsNeon(cmd, ref renderingData, m_Materials.robertsNeon);
             }
 
+            if (m_Scharr.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupScharr(cmd, ref renderingData, m_Materials.scharr);
+            }
+
             #endregion
             
+        }
+
+        private void SetupScharr(CommandBuffer cmd, ref RenderingData renderingData, Material scharr)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Scharr");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, m_Scharr.FilterMode.value);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            scharr.SetVector("_Params", new Vector2(m_Scharr.edgeWidth.value, m_Scharr.backgroundFade.value));
+            scharr.SetColor("_EdgeColor", m_Scharr.edgeColor.value);
+            scharr.SetColor("_BackgroundColor", m_Scharr.backgroundColor.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scharr);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Scharr");
         }
 
         #region RobertsNeon
