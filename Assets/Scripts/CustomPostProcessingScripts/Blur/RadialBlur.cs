@@ -11,7 +11,7 @@ namespace UnityEngine.Rendering.Universal
     public class RadialBlur : VolumeComponent, IPostProcessComponent
     {
         public RadialBlurQualityParameter qualityLevel = new RadialBlurQualityParameter(RadialBlurQuality.RadialBlur_8Tap_Balance);
-        public RadialFilerModeParameter filterMode = new RadialFilerModeParameter(FilterMode.Bilinear);
+        // public RadialFilerModeParameter filterMode = new RadialFilerModeParameter(FilterMode.Bilinear);
         public ClampedFloatParameter RadialCenterX = new ClampedFloatParameter(0f, 0, 1);
         public ClampedFloatParameter RadialCenterY = new ClampedFloatParameter(0f, 0, 1);
         public ClampedFloatParameter indensity = new ClampedFloatParameter(0f, 0, 3);
@@ -27,8 +27,8 @@ namespace UnityEngine.Rendering.Universal
         }
     }
     
-    [Serializable]
-    public sealed class RadialFilerModeParameter : VolumeParameter<FilterMode> { public RadialFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+    // [Serializable]
+    // public sealed class RadialFilerModeParameter : VolumeParameter<FilterMode> { public RadialFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
     
     [Serializable]
     public sealed class RadialBlurQualityParameter : VolumeParameter<RadialBlurQuality> { public RadialBlurQualityParameter(RadialBlurQuality value, bool overrideState = false) : base(value, overrideState) { } }

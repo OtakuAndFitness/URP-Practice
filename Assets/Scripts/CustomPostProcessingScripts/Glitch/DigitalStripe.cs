@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/Glitch/DigitalStripe")]
     public class DigitalStripe : VolumeComponent, IPostProcessComponent
     {
-        public DigitalStripeFilerModeParameter FilterMode = new DigitalStripeFilerModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public DigitalStripeFilerModeParameter FilterMode = new DigitalStripeFilerModeParameter(UnityEngine.FilterMode.Bilinear);
 
         public ClampedFloatParameter indensity = new ClampedFloatParameter(0, 0, 1);
 
@@ -38,8 +38,8 @@ namespace UnityEngine.Rendering.Universal
         }
         
 
-        [Serializable]
-        public sealed class DigitalStripeFilerModeParameter : VolumeParameter<FilterMode> { public DigitalStripeFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class DigitalStripeFilerModeParameter : VolumeParameter<FilterMode> { public DigitalStripeFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

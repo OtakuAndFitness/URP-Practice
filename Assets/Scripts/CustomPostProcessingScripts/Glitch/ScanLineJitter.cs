@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/Glitch/ScanLineJitter")]
     public class ScanLineJitter : VolumeComponent, IPostProcessComponent
     {
-        public ScanLineJitterFilerModeParameter FilterMode = new ScanLineJitterFilerModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public ScanLineJitterFilerModeParameter FilterMode = new ScanLineJitterFilerModeParameter(UnityEngine.FilterMode.Bilinear);
 
         public DirectionParameter JitterDirection = new DirectionParameter(Direction.Horizontal);
 
@@ -32,8 +32,8 @@ namespace UnityEngine.Rendering.Universal
         [Serializable]
         public sealed class DirectionParameter : VolumeParameter<Direction> { public DirectionParameter(Direction value, bool overrideState = false) : base(value, overrideState) { } }
 
-        [Serializable]
-        public sealed class ScanLineJitterFilerModeParameter : VolumeParameter<FilterMode> { public ScanLineJitterFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class ScanLineJitterFilerModeParameter : VolumeParameter<FilterMode> { public ScanLineJitterFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
         [Serializable]
         public sealed class IntervalTypeParameter : VolumeParameter<IntervalType>{ public IntervalTypeParameter(IntervalType value, bool overrideState = false) : base(value, overrideState) { } }

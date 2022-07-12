@@ -71,6 +71,17 @@ namespace UnityEngine.Rendering.Universal
             public Shader scharrNeon;
             public Shader sobel;
             public Shader sobelNeon;
+            
+            //Pixelise
+            public Shader circle;
+            public Shader diamond;
+            public Shader hexagon;
+            public Shader hexagonGrid;
+            public Shader leaf;
+            public Shader led;
+            public Shader quad;
+            public Shader sector;
+            public Shader triangle;
         }
 
         public CustomShaders customShaders;

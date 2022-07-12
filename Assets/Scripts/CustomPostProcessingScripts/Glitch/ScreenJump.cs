@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/Glitch/ScreenJump")]
     public class ScreenJump : VolumeComponent, IPostProcessComponent
     {
-        public ScreenJumpFilerModeParameter FilterMode = new ScreenJumpFilerModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public ScreenJumpFilerModeParameter FilterMode = new ScreenJumpFilerModeParameter(UnityEngine.FilterMode.Bilinear);
 
         public ScreenJumpDirectionParameter ScreenJumpDirection = new ScreenJumpDirectionParameter(Direction.Horizontal);
 
@@ -30,8 +30,8 @@ namespace UnityEngine.Rendering.Universal
         [Serializable]
         public sealed class ScreenJumpDirectionParameter : VolumeParameter<Direction> { public ScreenJumpDirectionParameter(Direction value, bool overrideState = false) : base(value, overrideState) { } }
 
-        [Serializable]
-        public sealed class ScreenJumpFilerModeParameter : VolumeParameter<FilterMode> { public ScreenJumpFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class ScreenJumpFilerModeParameter : VolumeParameter<FilterMode> { public ScreenJumpFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

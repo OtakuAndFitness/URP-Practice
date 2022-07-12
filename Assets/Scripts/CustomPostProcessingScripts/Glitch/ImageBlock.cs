@@ -10,7 +10,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/Glitch/ImageBlock")]
     public class ImageBlock : VolumeComponent, IPostProcessComponent
     {
-        public GlitchImageBlockFilerModeParameter filterMode = new GlitchImageBlockFilerModeParameter(FilterMode.Bilinear);
+        // public GlitchImageBlockFilerModeParameter filterMode = new GlitchImageBlockFilerModeParameter(FilterMode.Bilinear);
 
         public ClampedFloatParameter Fade = new ClampedFloatParameter(1, 0, 1);
 
@@ -43,8 +43,8 @@ namespace UnityEngine.Rendering.Universal
             return false;
         }
         
-        [Serializable]
-        public sealed class GlitchImageBlockFilerModeParameter : VolumeParameter<FilterMode> { public GlitchImageBlockFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class GlitchImageBlockFilerModeParameter : VolumeParameter<FilterMode> { public GlitchImageBlockFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

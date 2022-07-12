@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/EdgeDetection/SobelNeon")]
     public class SobelNeon : VolumeComponent, IPostProcessComponent
     {
-        public SobelNeonFilterModeParameter FilterMode = new SobelNeonFilterModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public SobelNeonFilterModeParameter FilterMode = new SobelNeonFilterModeParameter(UnityEngine.FilterMode.Bilinear);
         
         public ClampedFloatParameter edgeWidth = new ClampedFloatParameter(0, 0, 5);
         
@@ -32,8 +32,8 @@ namespace UnityEngine.Rendering.Universal
         }
         
 
-        [Serializable]
-        public sealed class SobelNeonFilterModeParameter : VolumeParameter<FilterMode> { public SobelNeonFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class SobelNeonFilterModeParameter : VolumeParameter<FilterMode> { public SobelNeonFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

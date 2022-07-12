@@ -39,3 +39,12 @@ MonoBehaviour:
     scharrNeon: {fileID: 4800000, guid: 9c1fc5c22ca344dc5a37beb9f9d4d6b0, type: 3}
     sobel: {fileID: 4800000, guid: 6eea16e506fd043ce82fd85141db03ce, type: 3}
     sobelNeon: {fileID: 4800000, guid: 4b84d235935c14abe8f9f4ca15917ef6, type: 3}
+    circle: {fileID: 4800000, guid: c799f76ca39894ae3aef48e3804394e0, type: 3}
+    diamond: {fileID: 4800000, guid: 9a724e92a052d4982b511f10479809c1, type: 3}
+    hexagon: {fileID: 4800000, guid: 148f5066151154a0baecf65566b078b6, type: 3}
+    hexagonGrid: {fileID: 4800000, guid: a265a4f4299114cf496b7bcf8665b72c, type: 3}
+    leaf: {fileID: 4800000, guid: fdf6dc24c65ab48b7bc5d6b80d255974, type: 3}
+    led: {fileID: 4800000, guid: 9e523b892fa454a3793a68547bbec287, type: 3}
+    quad: {fileID: 4800000, guid: b91962d03691c4516a6587794f2500e6, type: 3}
+    sector: {fileID: 4800000, guid: 7648cc5148c414affb1b3c70bdecd8fe, type: 3}
+    triangle: {fileID: 4800000, guid: 1dcdffa3bb56f4054a3536e70793bd26, type: 3}

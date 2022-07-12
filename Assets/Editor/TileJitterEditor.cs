@@ -10,7 +10,7 @@ namespace UnityEditor.Rendering.Universal
     [VolumeComponentEditor(typeof(TileJitter))]
     public class TileJitterEditor : VolumeComponentEditor
     {
-        private SerializedDataParameter m_FilterMode;
+        // private SerializedDataParameter m_FilterMode;
         private SerializedDataParameter m_JitterDirection;
         private SerializedDataParameter m_IntervalType;
         private SerializedDataParameter m_Frequency;
@@ -24,7 +24,7 @@ namespace UnityEditor.Rendering.Universal
         {
             var o = new PropertyFetcher<TileJitter>(serializedObject);
             
-            m_FilterMode = Unpack(o.Find(x => x.FilterMode));
+            // m_FilterMode = Unpack(o.Find(x => x.FilterMode));
             m_JitterDirection = Unpack(o.Find(x => x.JitterDirection));
             m_IntervalType = Unpack(o.Find(x => x.IntervalType));
             m_Frequency = Unpack(o.Find(x => x.Frequency));
@@ -38,7 +38,7 @@ namespace UnityEditor.Rendering.Universal
         public override void OnInspectorGUI()
         {            
             
-            PropertyField(m_FilterMode);
+            // PropertyField(m_FilterMode);
             DrawHeader("Splitting Property");
             PropertyField(m_SplittingDirection);
             PropertyField(m_SplittingNumber);

@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/EdgeDetection/ScharrNeon")]
     public class ScharrNeon : VolumeComponent, IPostProcessComponent
     {
-        public ScharrNeonFilterModeParameter FilterMode = new ScharrNeonFilterModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public ScharrNeonFilterModeParameter FilterMode = new ScharrNeonFilterModeParameter(UnityEngine.FilterMode.Bilinear);
         
         public ClampedFloatParameter edgeWidth = new ClampedFloatParameter(0, 0, 5);
         
@@ -32,8 +32,8 @@ namespace UnityEngine.Rendering.Universal
         }
         
 
-        [Serializable]
-        public sealed class ScharrNeonFilterModeParameter : VolumeParameter<FilterMode> { public ScharrNeonFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class ScharrNeonFilterModeParameter : VolumeParameter<FilterMode> { public ScharrNeonFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

@@ -12,7 +12,7 @@ namespace UnityEngine.Rendering.Universal
     {
         public GlitchRGBSplitDirectionParameter SplitDirection = new GlitchRGBSplitDirectionParameter(DirectionEX.Horizontal);
         
-        public GlitchRGBSplitFilerModeParameter filterMode = new GlitchRGBSplitFilerModeParameter(FilterMode.Bilinear);
+        // public GlitchRGBSplitFilerModeParameter filterMode = new GlitchRGBSplitFilerModeParameter(FilterMode.Bilinear);
 
         public ClampedFloatParameter Fading = new ClampedFloatParameter(1, 0, 1);
 
@@ -37,8 +37,8 @@ namespace UnityEngine.Rendering.Universal
         }
     }
 
-    [Serializable]
-    public sealed class GlitchRGBSplitFilerModeParameter : VolumeParameter<FilterMode> { public GlitchRGBSplitFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+    // [Serializable]
+    // public sealed class GlitchRGBSplitFilerModeParameter : VolumeParameter<FilterMode> { public GlitchRGBSplitFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     
     [Serializable]

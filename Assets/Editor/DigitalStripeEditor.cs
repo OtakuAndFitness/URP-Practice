@@ -10,7 +10,7 @@ namespace UnityEditor.Rendering.Universal
     [VolumeComponentEditor(typeof(DigitalStripe))]
     public class DigitalStripeEditor : VolumeComponentEditor
     {
-        private SerializedDataParameter m_FilterMode;
+        // private SerializedDataParameter m_FilterMode;
         private SerializedDataParameter m_Indensity;
         private SerializedDataParameter m_Frequency;
         private SerializedDataParameter m_StripeLength;
@@ -25,7 +25,7 @@ namespace UnityEditor.Rendering.Universal
         {
             var o = new PropertyFetcher<DigitalStripe>(serializedObject);
             
-            m_FilterMode = Unpack(o.Find(x => x.FilterMode));
+            // m_FilterMode = Unpack(o.Find(x => x.FilterMode));
             m_Indensity = Unpack(o.Find(x => x.indensity));
             m_StripeLength = Unpack(o.Find(x => x.stripeLength));
             m_Frequency = Unpack(o.Find(x => x.frequency));
@@ -40,7 +40,7 @@ namespace UnityEditor.Rendering.Universal
         public override void OnInspectorGUI()
         {            
             
-            PropertyField(m_FilterMode);
+            // PropertyField(m_FilterMode);
             DrawHeader("Core Property");
             PropertyField(m_Indensity);
             PropertyField(m_Frequency);

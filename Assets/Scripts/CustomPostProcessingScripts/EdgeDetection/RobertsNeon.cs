@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/EdgeDetection/RobertsNeon")]
     public class RobertsNeon : VolumeComponent, IPostProcessComponent
     {
-        public RobertsNeonFilterModeParameter FilterMode = new RobertsNeonFilterModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public RobertsNeonFilterModeParameter FilterMode = new RobertsNeonFilterModeParameter(UnityEngine.FilterMode.Bilinear);
         
         public ClampedFloatParameter edgeWidth = new ClampedFloatParameter(0, 0, 5);
         
@@ -32,8 +32,8 @@ namespace UnityEngine.Rendering.Universal
         }
         
 
-        [Serializable]
-        public sealed class RobertsNeonFilterModeParameter : VolumeParameter<FilterMode> { public RobertsNeonFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class RobertsNeonFilterModeParameter : VolumeParameter<FilterMode> { public RobertsNeonFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

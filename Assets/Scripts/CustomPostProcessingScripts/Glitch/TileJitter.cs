@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/Glitch/TileJitter")]
     public class TileJitter : VolumeComponent, IPostProcessComponent
     {
-        public TileJitterFilerModeParameter FilterMode = new TileJitterFilerModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public TileJitterFilerModeParameter FilterMode = new TileJitterFilerModeParameter(UnityEngine.FilterMode.Bilinear);
 
         public DirectionParameter JitterDirection = new DirectionParameter(Direction.Horizontal);
 
@@ -37,8 +37,8 @@ namespace UnityEngine.Rendering.Universal
         [Serializable]
         public sealed class DirectionParameter : VolumeParameter<Direction> { public DirectionParameter(Direction value, bool overrideState = false) : base(value, overrideState) { } }
 
-        [Serializable]
-        public sealed class TileJitterFilerModeParameter : VolumeParameter<FilterMode> { public TileJitterFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class TileJitterFilerModeParameter : VolumeParameter<FilterMode> { public TileJitterFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
         [Serializable]
         public sealed class IntervalTypeParameter : VolumeParameter<IntervalType>{ public IntervalTypeParameter(IntervalType value, bool overrideState = false) : base(value, overrideState) { } }

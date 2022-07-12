@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/EdgeDetection/Scharr")]
     public class Scharr : VolumeComponent, IPostProcessComponent
     {
-        public ScharrFilterModeParameter FilterMode = new ScharrFilterModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public ScharrFilterModeParameter FilterMode = new ScharrFilterModeParameter(UnityEngine.FilterMode.Bilinear);
         
         public ClampedFloatParameter edgeWidth = new ClampedFloatParameter(0, 0, 5);
         
@@ -30,8 +30,8 @@ namespace UnityEngine.Rendering.Universal
         }
         
 
-        [Serializable]
-        public sealed class ScharrFilterModeParameter : VolumeParameter<FilterMode> { public ScharrFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class ScharrFilterModeParameter : VolumeParameter<FilterMode> { public ScharrFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/Glitch/ScreenShake")]
     public class ScreenShake : VolumeComponent, IPostProcessComponent
     {
-        public ScreenShakeFilerModeParameter FilterMode = new ScreenShakeFilerModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public ScreenShakeFilerModeParameter FilterMode = new ScreenShakeFilerModeParameter(UnityEngine.FilterMode.Bilinear);
 
         public ScreenShakeDirectionParameter ScreenShakeDirection = new ScreenShakeDirectionParameter(Direction.Horizontal);
 
@@ -30,8 +30,8 @@ namespace UnityEngine.Rendering.Universal
         [Serializable]
         public sealed class ScreenShakeDirectionParameter : VolumeParameter<Direction> { public ScreenShakeDirectionParameter(Direction value, bool overrideState = false) : base(value, overrideState) { } }
 
-        [Serializable]
-        public sealed class ScreenShakeFilerModeParameter : VolumeParameter<FilterMode> { public ScreenShakeFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class ScreenShakeFilerModeParameter : VolumeParameter<FilterMode> { public ScreenShakeFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

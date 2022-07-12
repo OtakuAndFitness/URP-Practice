@@ -10,7 +10,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/Blur/DirectionalBlur")]
     public class DirectionalBlur : VolumeComponent, IPostProcessComponent
     {
-        public DirectionalFilerModeParameter filterMode = new DirectionalFilerModeParameter(FilterMode.Bilinear);
+        // public DirectionalFilerModeParameter filterMode = new DirectionalFilerModeParameter(FilterMode.Bilinear);
         public ClampedFloatParameter angle = new ClampedFloatParameter(0.5f, 0, 6);
         public ClampedIntParameter blurCount = new ClampedIntParameter(1, 1, 30);
         public ClampedIntParameter downSample = new ClampedIntParameter(1, 1, 4);
@@ -27,8 +27,8 @@ namespace UnityEngine.Rendering.Universal
         }
     }
     
-    [Serializable]
-    public sealed class DirectionalFilerModeParameter : VolumeParameter<FilterMode> { public DirectionalFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+    // [Serializable]
+    // public sealed class DirectionalFilerModeParameter : VolumeParameter<FilterMode> { public DirectionalFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
 
 }

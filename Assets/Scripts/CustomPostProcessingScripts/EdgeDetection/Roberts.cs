@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/EdgeDetection/Roberts")]
     public class Roberts : VolumeComponent, IPostProcessComponent
     {
-        public RobertsFilterModeParameter FilterMode = new RobertsFilterModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public RobertsFilterModeParameter FilterMode = new RobertsFilterModeParameter(UnityEngine.FilterMode.Bilinear);
         
         public ClampedFloatParameter edgeWidth = new ClampedFloatParameter(0, 0, 5);
         
@@ -30,8 +30,8 @@ namespace UnityEngine.Rendering.Universal
         }
         
 
-        [Serializable]
-        public sealed class RobertsFilterModeParameter : VolumeParameter<FilterMode> { public RobertsFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class RobertsFilterModeParameter : VolumeParameter<FilterMode> { public RobertsFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

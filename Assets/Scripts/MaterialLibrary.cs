@@ -39,6 +39,17 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material sobel;
         public readonly Material sobelNeon;
         
+        //Pixelise
+        public readonly Material circle;
+        public readonly Material diamond;
+        public readonly Material hexagon;
+        public readonly Material hexagonGrid;
+        public readonly Material leaf;
+        public readonly Material led;
+        public readonly Material quad;
+        public readonly Material sector;
+        public readonly Material triangle;
+        
         public MaterialLibrary(CustomPostProcessingData data)
         {
             //blur
@@ -72,6 +83,17 @@ namespace UnityEngine.Rendering.Universal
             scharrNeon = Load(data.customShaders.scharrNeon);
             sobel = Load(data.customShaders.sobel);
             sobelNeon = Load(data.customShaders.sobelNeon);
+            
+            //Pixelise
+            circle = Load(data.customShaders.circle);
+            diamond = Load(data.customShaders.diamond);
+            hexagon = Load(data.customShaders.hexagon);
+            hexagonGrid = Load(data.customShaders.hexagonGrid);
+            leaf = Load(data.customShaders.leaf);
+            led = Load(data.customShaders.led);
+            quad = Load(data.customShaders.quad);
+            sector = Load(data.customShaders.sector);
+            triangle = Load(data.customShaders.triangle);
         }
 
         Material Load(Shader shader)
@@ -121,6 +143,19 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(scharrNeon);
             CoreUtils.Destroy(sobel);
             CoreUtils.Destroy(sobelNeon);
+            
+            //Pixelise
+            CoreUtils.Destroy(circle);
+            CoreUtils.Destroy(diamond);
+            CoreUtils.Destroy(hexagon);
+            CoreUtils.Destroy(hexagonGrid);
+            CoreUtils.Destroy(leaf);
+            CoreUtils.Destroy(led);
+            CoreUtils.Destroy(quad);
+            CoreUtils.Destroy(sector);
+            CoreUtils.Destroy(triangle);
+
+
         }
     }
 }

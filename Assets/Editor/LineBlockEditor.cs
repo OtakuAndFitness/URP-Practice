@@ -10,7 +10,7 @@ namespace UnityEditor.Rendering.Universal
     [VolumeComponentEditor(typeof(LineBlock))]
     public class LineBlockEditor : VolumeComponentEditor
     {
-        private SerializedDataParameter m_FilterMode;
+        // private SerializedDataParameter m_FilterMode;
         private SerializedDataParameter m_BlockDirection;
         private SerializedDataParameter m_IntervalType;
         private SerializedDataParameter m_Frequency;
@@ -25,7 +25,7 @@ namespace UnityEditor.Rendering.Universal
         {
             var o = new PropertyFetcher<LineBlock>(serializedObject);
             
-            m_FilterMode = Unpack(o.Find(x => x.FilterMode));
+            // m_FilterMode = Unpack(o.Find(x => x.FilterMode));
             m_BlockDirection = Unpack(o.Find(x => x.BlockDirection));
             m_IntervalType = Unpack(o.Find(x => x.IntervalType));
             m_Frequency = Unpack(o.Find(x => x.Frequency));
@@ -40,7 +40,7 @@ namespace UnityEditor.Rendering.Universal
         public override void OnInspectorGUI()
         {            
             
-            PropertyField(m_FilterMode);
+            // PropertyField(m_FilterMode);
             DrawHeader("Block Direction");
             PropertyField(m_BlockDirection);
             DrawHeader("Interval Frequency");

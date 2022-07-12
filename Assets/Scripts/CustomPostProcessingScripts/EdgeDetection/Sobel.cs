@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/EdgeDetection/Sobel")]
     public class Sobel : VolumeComponent, IPostProcessComponent
     {
-        public SobelFilterModeParameter FilterMode = new SobelFilterModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public SobelFilterModeParameter FilterMode = new SobelFilterModeParameter(UnityEngine.FilterMode.Bilinear);
         
         public ClampedFloatParameter edgeWidth = new ClampedFloatParameter(0, 0, 5);
         
@@ -30,8 +30,8 @@ namespace UnityEngine.Rendering.Universal
         }
         
 
-        [Serializable]
-        public sealed class SobelFilterModeParameter : VolumeParameter<FilterMode> { public SobelFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class SobelFilterModeParameter : VolumeParameter<FilterMode> { public SobelFilterModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
     }
 }

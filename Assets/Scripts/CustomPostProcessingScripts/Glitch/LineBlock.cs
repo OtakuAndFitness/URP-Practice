@@ -8,7 +8,7 @@ namespace UnityEngine.Rendering.Universal
     [Serializable,VolumeComponentMenu("Custom-post-processing/Glitch/LineBlock")]
     public class LineBlock : VolumeComponent, IPostProcessComponent
     {
-        public LineBlockFilerModeParameter FilterMode = new LineBlockFilerModeParameter(UnityEngine.FilterMode.Bilinear);
+        // public LineBlockFilerModeParameter FilterMode = new LineBlockFilerModeParameter(UnityEngine.FilterMode.Bilinear);
 
         public DirectionParameter BlockDirection = new DirectionParameter(Direction.Horizontal);
 
@@ -40,8 +40,8 @@ namespace UnityEngine.Rendering.Universal
         [Serializable]
         public sealed class DirectionParameter : VolumeParameter<Direction> { public DirectionParameter(Direction value, bool overrideState = false) : base(value, overrideState) { } }
 
-        [Serializable]
-        public sealed class LineBlockFilerModeParameter : VolumeParameter<FilterMode> { public LineBlockFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
+        // [Serializable]
+        // public sealed class LineBlockFilerModeParameter : VolumeParameter<FilterMode> { public LineBlockFilerModeParameter(FilterMode value, bool overrideState = false) : base(value, overrideState) { } }
 
         [Serializable]
         public sealed class IntervalTypeParameter : VolumeParameter<IntervalType>{ public IntervalTypeParameter(IntervalType value, bool overrideState = false) : base(value, overrideState) { } }
