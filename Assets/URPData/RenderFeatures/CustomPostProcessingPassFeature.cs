@@ -63,6 +63,14 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         
         //Pixelise
         private Circle m_Circle;
+        private Diamond m_Diamond;
+        private Hexagon m_Hexagon;
+        private HexagonGrid m_HexagonGrid;
+        private Leaf m_Leaf;
+        private Led m_Led;
+        private Quad m_Quad;
+        private Sector m_Sector;
+        private Triangle m_Triangle;
 
 
         private MaterialLibrary m_Materials;
@@ -151,6 +159,14 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_SobelNeon = stack.GetComponent<SobelNeon>();
             //Pixelise
             m_Circle = stack.GetComponent<Circle>();
+            m_Diamond = stack.GetComponent<Diamond>();
+            m_Hexagon = stack.GetComponent<Hexagon>();
+            m_HexagonGrid = stack.GetComponent<HexagonGrid>();
+            m_Leaf = stack.GetComponent<Leaf>();
+            m_Led = stack.GetComponent<Led>();
+            m_Quad = stack.GetComponent<Quad>();
+            m_Sector = stack.GetComponent<Sector>();
+            m_Triangle = stack.GetComponent<Triangle>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -309,10 +325,262 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 SetupCircle(cmd, ref renderingData, m_Materials.circle);
             }
+            
+            if (m_Diamond.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupDiamond(cmd, ref renderingData, m_Materials.diamond);
+            }
+            
+            if (m_Hexagon.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupHexagon(cmd, ref renderingData, m_Materials.hexagon);
+            }
+            
+            if (m_HexagonGrid.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupHexagonGrid(cmd, ref renderingData, m_Materials.hexagonGrid);
+            }
+            
+            if (m_Leaf.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupLeaf(cmd, ref renderingData, m_Materials.leaf);
+            }
+            
+            if (m_Led.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupLed(cmd, ref renderingData, m_Materials.led);
+            }
+            
+            if (m_Quad.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupQuad(cmd, ref renderingData, m_Materials.quad);
+            }
+            
+            if (m_Sector.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupSector(cmd, ref renderingData, m_Materials.sector);
+            }
+            
+            if (m_Triangle.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupTriangle(cmd, ref renderingData, m_Materials.triangle);
+            }
 
             #endregion
             
         }
+
+        #region Triangle
+
+        private void SetupTriangle(CommandBuffer cmd, ref RenderingData renderingData, Material triangle)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Triangle");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            float size = (1.01f - m_Triangle.pixelSize.value) * 5f;
+
+            float ratio = m_Triangle.pixelRatio.value;
+            if (m_Triangle.useAutoScreenRatio.value)
+            {
+                ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height);
+                if (ratio == 0)
+                {
+                    ratio = 1f;
+                }
+            }
+            triangle.SetVector("_Params", new Vector4(size, ratio, m_Triangle.pixelScaleX.value * 20, m_Triangle.pixelScaleY.value * 20));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, triangle);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Triangle");
+        }
+
+        #endregion
+        
+
+        #region Sector
+
+        private void SetupSector(CommandBuffer cmd, ref RenderingData renderingData, Material sector)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Sector");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            float size = (1.01f - m_Sector.pixelSize.value) * 300f;
+            Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / (float)opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Sector.circleRadius.value, 0f);
+            sector.SetVector("_Params", parameters);
+            sector.SetVector("_Params2", new Vector2(m_Sector.pixelIntervalX.value, m_Sector.pixelIntervalY.value));
+            sector.SetColor("_BackgroundColor", m_Sector.backgroundColor.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, sector);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Sector");
+        }
+
+        #endregion
+        
+
+        #region Quad
+
+        private void SetupQuad(CommandBuffer cmd, ref RenderingData renderingData, Material quad)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Quad");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            float size = (1.01f - m_Quad.pixelSize.value) * 200f;
+            quad.SetFloat("_PixelSize", size);
+            float ratio = m_Quad.pixelRatio.value;
+            if (m_Quad.useAutoScreenRatio.value)
+            {
+                ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height) ;
+                if (ratio==0)
+                {
+                    ratio = 1f;
+                }
+            }
+            quad.SetVector("_Params", new Vector4(size, ratio, m_Quad.pixelScaleX.value, m_Quad.pixelScaleY.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, quad);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Quad");
+        }
+
+
+        #endregion
+        
+        #region Led
+
+        private void SetupLed(CommandBuffer cmd, ref RenderingData renderingData, Material led)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Led");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            float size = (1.01f - m_Led.pixelSize.value) * 300f;
+
+            float ratio = m_Led.pixelRatio.value;
+            if (m_Led.useAutoScreenRatio.value)
+            {
+                ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height);
+                if (ratio == 0)
+                {
+                    ratio = 1f;
+                }
+            }
+            led.SetVector("_Params", new Vector3(size, ratio, m_Led.ledRadius.value));
+            led.SetColor("_BackgroundColor", m_Led.backgroundColor.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, led);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Led");
+        }
+
+        #endregion
+        
+
+        #region Leaf
+
+        private void SetupLeaf(CommandBuffer cmd, ref RenderingData renderingData, Material leaf)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Leaf");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            float size = (1.01f - m_Leaf.pixelSize.value) * 10f;
+
+            float ratio = m_Leaf.pixelRatio.value;
+            if (m_Leaf.useAutoScreenRatio.value)
+            {
+                ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height);
+                if (ratio == 0)
+                {
+                    ratio = 1f;
+                }
+            }
+            leaf.SetVector("_Params", new Vector4(size,ratio, m_Leaf.pixelScaleX.value * 20,m_Leaf.pixelScaleY.value * 20));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, leaf);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Leaf");
+        }
+
+        #endregion
+        
+
+        #region HexagonGrid
+
+        private void SetupHexagonGrid(CommandBuffer cmd, ref RenderingData renderingData, Material hexagonGrid)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("HexagonGrid");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            hexagonGrid.SetVector("_Params", new Vector2(m_HexagonGrid.pixelSize.value, m_HexagonGrid.gridWidth.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hexagonGrid);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("HexagonGrid");
+        }
+
+        #endregion
+        
+
+        #region Hexagon
+
+        private void SetupHexagon(CommandBuffer cmd, ref RenderingData renderingData, Material hexagon)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Hexagon");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            hexagon.SetFloat("_PixelSize", m_Hexagon.pixelSize.value);
+            float size = m_Hexagon.pixelSize.value * 0.2f;
+            float ratio = m_Hexagon.pixelRatio.value;
+            if (m_Hexagon.useAutoScreenRatio.value)
+            {
+                ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height);
+                if (ratio == 0)
+                {
+                    ratio = 1f;
+                }
+            }
+            hexagon.SetVector("_Params", new Vector4(size,ratio, m_Hexagon.pixelScaleX.value,m_Hexagon.pixelScaleY.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hexagon);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Hexagon");
+        }
+
+        #endregion
+        
+
+        #region Diamond
+
+        private void SetupDiamond(CommandBuffer cmd, ref RenderingData renderingData, Material diamond)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Diamond");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            diamond.SetFloat("_PixelSize", m_Diamond.pixelSize.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, diamond);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Diamond");
+        }
+
+        #endregion
+        
 
         #region Circle
 
@@ -325,7 +593,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             float size = (1.01f - m_Circle.pixelSize.value) * 300f;
-            Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Circle.circleRadius.value, 0f);
+            Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / (float)opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Circle.circleRadius.value, 0f);
             circle.SetVector("_Params", parameters);
             circle.SetVector("_Params2", new Vector2(m_Circle.pixelIntervalX.value, m_Circle.pixelIntervalY.value));
             circle.SetColor("_BackgroundColor", m_Circle.backgroundColor.value);
