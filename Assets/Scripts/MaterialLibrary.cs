@@ -52,6 +52,7 @@ namespace UnityEngine.Rendering.Universal
         
         //Vignette
         public readonly Material aurora;
+        public readonly Material rapidOldTV;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -100,6 +101,7 @@ namespace UnityEngine.Rendering.Universal
             
             //Vignette
             aurora = Load(data.customShaders.aurora);
+            rapidOldTV = Load(data.customShaders.rapidOldTV);
         }
 
         Material Load(Shader shader)
@@ -163,6 +165,7 @@ namespace UnityEngine.Rendering.Universal
             
             //Vignette
             CoreUtils.Destroy(aurora);
+            CoreUtils.Destroy(rapidOldTV);
 
 
         }

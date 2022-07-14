@@ -85,6 +85,7 @@ namespace UnityEngine.Rendering.Universal
             
             //Vignette
             public Shader aurora;
+            public Shader rapidOldTV;
         }
 
         public CustomShaders customShaders;
