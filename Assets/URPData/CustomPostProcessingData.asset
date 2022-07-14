@@ -48,3 +48,4 @@ MonoBehaviour:
     quad: {fileID: 4800000, guid: b91962d03691c4516a6587794f2500e6, type: 3}
     sector: {fileID: 4800000, guid: 7648cc5148c414affb1b3c70bdecd8fe, type: 3}
     triangle: {fileID: 4800000, guid: 1dcdffa3bb56f4054a3536e70793bd26, type: 3}
+    aurora: {fileID: 4800000, guid: a23e7c6892fd04fdeb6272cdf97794ec, type: 3}

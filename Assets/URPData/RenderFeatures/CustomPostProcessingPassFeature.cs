@@ -71,6 +71,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private Quad m_Quad;
         private Sector m_Sector;
         private Triangle m_Triangle;
+        
+        //Vignette
+        private Aurora m_Aurora;
 
 
         private MaterialLibrary m_Materials;
@@ -167,6 +170,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_Quad = stack.GetComponent<Quad>();
             m_Sector = stack.GetComponent<Sector>();
             m_Triangle = stack.GetComponent<Triangle>();
+            //Vignette
+            m_Aurora = stack.GetComponent<Aurora>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -367,8 +372,42 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
 
             #endregion
+
+            #region Vignette
+
+            if (m_Aurora.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupAurora(cmd, ref renderingData, m_Materials.aurora);
+            }
+
+            #endregion
             
         }
+
+        #region Aurora
+
+        private void SetupAurora(CommandBuffer cmd, ref RenderingData renderingData, Material aurora)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Aurora");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            TimeX += Time.deltaTime;
+            if (TimeX > 100)
+            {
+                TimeX = 0;
+            }
+            aurora.SetVector("_Params", new Vector4(m_Aurora.vignetteArea.value, m_Aurora.vignetteSmothness.value, m_Aurora.colorChange.value, TimeX));
+            aurora.SetVector("_Params2", new Vector4(m_Aurora.colorFactorR.value, m_Aurora.colorFactorG.value,m_Aurora.colorFactorB.value, m_Aurora.vignetteFading.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, aurora);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Aurora");
+        }
+
+        #endregion
+        
 
         #region Triangle
 

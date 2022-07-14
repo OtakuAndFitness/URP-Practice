@@ -82,6 +82,9 @@ namespace UnityEngine.Rendering.Universal
             public Shader quad;
             public Shader sector;
             public Shader triangle;
+            
+            //Vignette
+            public Shader aurora;
         }
 
         public CustomShaders customShaders;

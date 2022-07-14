@@ -50,6 +50,9 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material sector;
         public readonly Material triangle;
         
+        //Vignette
+        public readonly Material aurora;
+        
         public MaterialLibrary(CustomPostProcessingData data)
         {
             //blur
@@ -94,6 +97,9 @@ namespace UnityEngine.Rendering.Universal
             quad = Load(data.customShaders.quad);
             sector = Load(data.customShaders.sector);
             triangle = Load(data.customShaders.triangle);
+            
+            //Vignette
+            aurora = Load(data.customShaders.aurora);
         }
 
         Material Load(Shader shader)
@@ -154,6 +160,9 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(quad);
             CoreUtils.Destroy(sector);
             CoreUtils.Destroy(triangle);
+            
+            //Vignette
+            CoreUtils.Destroy(aurora);
 
 
         }
