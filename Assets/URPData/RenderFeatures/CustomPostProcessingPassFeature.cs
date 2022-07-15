@@ -93,6 +93,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private LensFilter m_LensFilter;
         private Saturation m_Saturation;
         private Technicolor m_Technicolor;
+        private ColorReplace m_ColorReplace;
 
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -207,6 +208,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_LensFilter = stack.GetComponent<LensFilter>();
             m_Saturation = stack.GetComponent<Saturation>();
             m_Technicolor = stack.GetComponent<Technicolor>();
+            m_ColorReplace = stack.GetComponent<ColorReplace>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -498,9 +500,49 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupTechnicolor(cmd, ref renderingData, m_Materials.technicolor);
             }
 
+            if (m_ColorReplace.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupColorReplace(cmd, ref renderingData, m_Materials.colorReplace);
+            }
+
             #endregion
             
         }
+
+        #region ColorReplace
+
+        private void SetupColorReplace(CommandBuffer cmd, ref RenderingData renderingData, Material colorReplace)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("ColorReplace");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            colorReplace.SetFloat("_Range", m_ColorReplace.Range.value);
+            colorReplace.SetFloat("_Fuzziness", m_ColorReplace.Fuzziness.value);
+            if (m_ColorReplace.colorType == ColorType.Original)
+            {
+                colorReplace.SetColor("_FromColor", m_ColorReplace.FromColor.value);
+                colorReplace.SetColor("_ToColor", m_ColorReplace.ToColor.value);
+            }
+            else
+            {
+                TimeX += (Time.deltaTime * m_ColorReplace.gridentSpeed.value);
+                if (TimeX > 100)
+                {
+                    TimeX = 0;
+                }
+                colorReplace.SetColor("_FromColor", m_ColorReplace.FromGradientColor.value.Evaluate(TimeX * 0.01f));
+                colorReplace.SetColor("_ToColor", m_ColorReplace.ToGradientColor.value.Evaluate(TimeX * 0.01f));
+            }
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, colorReplace);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("ColorReplace");
+        }
+
+        #endregion
+        
 
         #region Technicolor
 

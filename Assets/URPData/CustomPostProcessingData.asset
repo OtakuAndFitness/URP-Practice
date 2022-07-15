@@ -64,3 +64,4 @@ MonoBehaviour:
     lensFilter: {fileID: 4800000, guid: 1eaeb52996aea45f2be50f343ae5dde5, type: 3}
     saturation: {fileID: 4800000, guid: d167ce01e373b4493849df306f249971, type: 3}
     technicolor: {fileID: 4800000, guid: 12c192b1bc94f4aaa9aec1be213a3812, type: 3}
+    colorReplace: {fileID: 4800000, guid: 5016a23abea7240f1be8aaab3cce7ceb, type: 3}

@@ -104,6 +104,7 @@ namespace UnityEngine.Rendering.Universal
             public Shader lensFilter;
             public Shader saturation;
             public Shader technicolor;
+            public Shader colorReplace;
         }
 
         public CustomShaders customShaders;
