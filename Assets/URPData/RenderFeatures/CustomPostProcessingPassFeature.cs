@@ -90,6 +90,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private Hue m_Hue;
         private Tint m_Tint;
         private WhiteBalance m_WhiteBalance;
+        private LensFilter m_LensFilter;
+        private Saturation m_Saturation;
+        private Technicolor m_Technicolor;
 
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -201,6 +204,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_Hue = stack.GetComponent<Hue>();
             m_Tint = stack.GetComponent<Tint>();
             m_WhiteBalance = stack.GetComponent<WhiteBalance>();
+            m_LensFilter = stack.GetComponent<LensFilter>();
+            m_Saturation = stack.GetComponent<Saturation>();
+            m_Technicolor = stack.GetComponent<Technicolor>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -477,9 +483,84 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupWhiteBalance(cmd, ref renderingData, m_Materials.whiteBalance);
             }
 
+            if (m_LensFilter.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupLensFilter(cmd, ref renderingData, m_Materials.lensFilter);
+            }
+
+            if (m_Saturation.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupSaturation(cmd, ref renderingData, m_Materials.saturation);
+            }
+
+            if (m_Technicolor.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupTechnicolor(cmd, ref renderingData, m_Materials.technicolor);
+            }
+
             #endregion
             
         }
+
+        #region Technicolor
+
+        private void SetupTechnicolor(CommandBuffer cmd, ref RenderingData renderingData, Material technicolor)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Technicolor");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            technicolor.SetFloat("_Exposure", 8.01f - m_Technicolor.exposure.value);
+            technicolor.SetFloat("_Indensity", m_Technicolor.indensity.value);
+            technicolor.SetColor("_ColorBalance", Color.white - new Color(m_Technicolor.colorBalanceR.value, m_Technicolor.colorBalanceG.value, m_Technicolor.colorBalanceB.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, technicolor);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Technicolor");
+        }
+
+        #endregion
+        
+
+        #region Saturation
+
+        private void SetupSaturation(CommandBuffer cmd, ref RenderingData renderingData, Material saturation)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Saturation");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            saturation.SetFloat("_Saturation", m_Saturation.saturation.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, saturation);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Saturation");
+        }
+
+        #endregion
+        
+
+        #region LensFilter
+
+        private void SetupLensFilter(CommandBuffer cmd, ref RenderingData renderingData, Material lensFilter)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("LensFilter");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            lensFilter.SetFloat("_Indensity", m_LensFilter.Indensity.value);
+            lensFilter.SetColor("_LensColor", m_LensFilter.LensColor.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, lensFilter);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("LensFilter");
+        }
+
+        #endregion
+        
 
         #region WhiteBalance
 

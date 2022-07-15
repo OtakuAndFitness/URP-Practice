@@ -68,6 +68,9 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material hue;
         public readonly Material tint;
         public readonly Material whiteBalance;
+        public readonly Material lensFilter;
+        public readonly Material saturation;
+        public readonly Material technicolor;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -132,6 +135,9 @@ namespace UnityEngine.Rendering.Universal
             hue = Load(data.customShaders.hue);
             tint = Load(data.customShaders.tint);
             whiteBalance = Load(data.customShaders.whiteBalance);
+            lensFilter = Load(data.customShaders.lensFilter);
+            saturation = Load(data.customShaders.saturation);
+            technicolor = Load(data.customShaders.technicolor);
         }
 
         Material Load(Shader shader)
@@ -211,6 +217,9 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(hue);
             CoreUtils.Destroy(tint);
             CoreUtils.Destroy(whiteBalance);
+            CoreUtils.Destroy(lensFilter);
+            CoreUtils.Destroy(saturation);
+            CoreUtils.Destroy(technicolor);
 
         }
     }
