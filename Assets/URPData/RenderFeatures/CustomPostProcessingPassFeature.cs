@@ -533,8 +533,16 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 {
                     TimeX = 0;
                 }
-                colorReplace.SetColor("_FromColor", m_ColorReplace.FromGradientColor.value.Evaluate(TimeX * 0.01f));
-                colorReplace.SetColor("_ToColor", m_ColorReplace.ToGradientColor.value.Evaluate(TimeX * 0.01f));
+
+                if (m_ColorReplace.FromGradientColor.value != null)
+                {
+                    colorReplace.SetColor("_FromColor", m_ColorReplace.FromGradientColor.value.Evaluate(TimeX * 0.01f));
+                }
+
+                if (m_ColorReplace.ToGradientColor.value != null)
+                {
+                    colorReplace.SetColor("_ToColor", m_ColorReplace.ToGradientColor.value.Evaluate(TimeX * 0.01f));
+                }
             }
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, colorReplace);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
