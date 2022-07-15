@@ -75,6 +75,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         //Vignette
         private Aurora m_Aurora;
         private RapidOldTV m_RapidOldTV;
+        private RapidOldTVV2 m_RapidOldTVV2;
 
 
         private MaterialLibrary m_Materials;
@@ -174,6 +175,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             //Vignette
             m_Aurora = stack.GetComponent<Aurora>();
             m_RapidOldTV = stack.GetComponent<RapidOldTV>();
+            m_RapidOldTVV2 = stack.GetComponent<RapidOldTVV2>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -387,9 +389,37 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupRapidOldTV(cmd, ref renderingData, m_Materials.rapidOldTV);
             }
 
+            if (m_RapidOldTVV2.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupRapidOldTVV2(cmd, ref renderingData, m_Materials.rapidOldTVV2);
+            }
+
             #endregion
             
         }
+
+        #region RapidOldTVV2
+
+        private void SetupRapidOldTVV2(CommandBuffer cmd, ref RenderingData renderingData, Material rapidOldTvv2)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("RapidOldTVV2");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            rapidOldTvv2.SetVector("_Params", new Vector2(m_RapidOldTVV2.vignetteSize.value, m_RapidOldTVV2.sizeOffset.value));
+            if (m_RapidOldTVV2.vignetteType.value == VignetteType.ColorMode)
+            {
+                rapidOldTvv2.SetColor("_VignetteColor", m_RapidOldTVV2.vignetteColor.value);
+            }
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapidOldTvv2, (int)m_RapidOldTVV2.vignetteType.value);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("RapidOldTVV2");
+        }
+
+        #endregion
+        
 
         #region RapidOldTV
 

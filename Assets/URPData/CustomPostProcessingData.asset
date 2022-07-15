@@ -50,3 +50,4 @@ MonoBehaviour:
     triangle: {fileID: 4800000, guid: 1dcdffa3bb56f4054a3536e70793bd26, type: 3}
     aurora: {fileID: 4800000, guid: a23e7c6892fd04fdeb6272cdf97794ec, type: 3}
     rapidOldTV: {fileID: 4800000, guid: a115279832061460bb5efbd012b3de00, type: 3}
+    rapidOldTVV2: {fileID: 4800000, guid: 425377194f72443b1a6e3f47c0cc7ffb, type: 3}
