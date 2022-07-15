@@ -94,6 +94,13 @@ namespace UnityEngine.Rendering.Universal
             public Shader v1;
             public Shader v2;
             public Shader v3;
+            
+            //ColorAdjustment
+            public Shader bleachBypass;
+            public Shader brightness;
+            public Shader hue;
+            public Shader tint;
+            public Shader whiteBalance;
         }
 
         public CustomShaders customShaders;

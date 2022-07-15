@@ -62,6 +62,13 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material v2;
         public readonly Material v3;
         
+        //ColorAdjustment
+        public readonly Material bleachBypass;
+        public readonly Material brightness;
+        public readonly Material hue;
+        public readonly Material tint;
+        public readonly Material whiteBalance;
+        
         public MaterialLibrary(CustomPostProcessingData data)
         {
             //blur
@@ -118,6 +125,13 @@ namespace UnityEngine.Rendering.Universal
             v1 = Load(data.customShaders.v1);
             v2 = Load(data.customShaders.v2);
             v3 = Load(data.customShaders.v3);
+            
+            //ColorAdjustment
+            bleachBypass = Load(data.customShaders.bleachBypass);
+            brightness = Load(data.customShaders.brightness);
+            hue = Load(data.customShaders.hue);
+            tint = Load(data.customShaders.tint);
+            whiteBalance = Load(data.customShaders.whiteBalance);
         }
 
         Material Load(Shader shader)
@@ -190,6 +204,13 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(v1);
             CoreUtils.Destroy(v2);
             CoreUtils.Destroy(v3);
+            
+            //ColorAdjustment
+            CoreUtils.Destroy(bleachBypass);
+            CoreUtils.Destroy(brightness);
+            CoreUtils.Destroy(hue);
+            CoreUtils.Destroy(tint);
+            CoreUtils.Destroy(whiteBalance);
 
         }
     }

@@ -83,7 +83,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private V1 m_V1;
         private V2 m_V2;
         private V3 m_V3;
-
+        
+        //ColorAdjustment
+        private BleachBypass m_BleachBypass;
+        private Brightness m_Brightness;
+        private Hue m_Hue;
+        private Tint m_Tint;
+        private WhiteBalance m_WhiteBalance;
 
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -189,6 +195,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_V1 = stack.GetComponent<V1>();
             m_V2 = stack.GetComponent<V2>();
             m_V3 = stack.GetComponent<V3>();
+            //ColorAdjustment
+            m_BleachBypass = stack.GetComponent<BleachBypass>();
+            m_Brightness = stack.GetComponent<Brightness>();
+            m_Hue = stack.GetComponent<Hue>();
+            m_Tint = stack.GetComponent<Tint>();
+            m_WhiteBalance = stack.GetComponent<WhiteBalance>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -437,8 +449,134 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
 
             #endregion
+
+            #region BleachBypass
+
+            if (m_BleachBypass.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupBleachBypass(cmd, ref renderingData, m_Materials.bleachBypass);
+            }
+
+            if (m_Brightness.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupBrightness(cmd, ref renderingData, m_Materials.brightness);
+            }
+
+            if (m_Hue.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupHue(cmd, ref renderingData, m_Materials.hue);
+            }
+
+            if (m_Tint.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupTint(cmd, ref renderingData, m_Materials.tint);
+            }
+
+            if (m_WhiteBalance.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupWhiteBalance(cmd, ref renderingData, m_Materials.whiteBalance);
+            }
+
+            #endregion
             
         }
+
+        #region WhiteBalance
+
+        private void SetupWhiteBalance(CommandBuffer cmd, ref RenderingData renderingData, Material whiteBalance)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("WhiteBalance");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            whiteBalance.SetFloat("_Temperature", m_WhiteBalance.temperature.value);
+            whiteBalance.SetFloat("_Tint", m_WhiteBalance.tint.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, whiteBalance);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("WhiteBalance");
+        }
+
+        #endregion
+        
+
+        #region Tint
+
+        private void SetupTint(CommandBuffer cmd, ref RenderingData renderingData, Material tint)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Tint");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            tint.SetFloat("_Indensity", m_Tint.indensity.value);
+            tint.SetColor("_ColorTint", m_Tint.colorTint.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tint);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Tint");
+        }
+
+        #endregion
+        
+
+        #region Hue
+
+        private void SetupHue(CommandBuffer cmd, ref RenderingData renderingData, Material hue)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Hue");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            hue.SetFloat("_HueDegree", m_Hue.HueDegree.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hue);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Hue");
+        }
+
+        #endregion
+        
+
+        #region Brightness
+
+        private void SetupBrightness(CommandBuffer cmd, ref RenderingData renderingData, Material brightness)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Brightness");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            brightness.SetFloat("_Brightness", m_Brightness.brightness.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, brightness);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Brightness");
+        }
+
+        #endregion
+        
+
+        #region BleachBypass
+
+        private void SetupBleachBypass(CommandBuffer cmd, ref RenderingData renderingData, Material bleachBypass)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("BleachBypass");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            bleachBypass.SetFloat("_Indensity", m_BleachBypass.Indensity.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, bleachBypass);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("BleachBypass");
+        }
+
+        #endregion
+        
 
         #region Sharpen
         
