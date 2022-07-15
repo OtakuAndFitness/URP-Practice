@@ -51,3 +51,5 @@ MonoBehaviour:
     aurora: {fileID: 4800000, guid: a23e7c6892fd04fdeb6272cdf97794ec, type: 3}
     rapidOldTV: {fileID: 4800000, guid: a115279832061460bb5efbd012b3de00, type: 3}
     rapidOldTVV2: {fileID: 4800000, guid: 425377194f72443b1a6e3f47c0cc7ffb, type: 3}
+    rapid: {fileID: 4800000, guid: 71b9d7e187334440492db4d24b48a5c9, type: 3}
+    rapidV2: {fileID: 4800000, guid: 8df85e4bc48b445968f232ff8e5a5a92, type: 3}

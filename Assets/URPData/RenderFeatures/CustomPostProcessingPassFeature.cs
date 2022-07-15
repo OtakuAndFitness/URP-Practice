@@ -76,6 +76,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private Aurora m_Aurora;
         private RapidOldTV m_RapidOldTV;
         private RapidOldTVV2 m_RapidOldTVV2;
+        private Rapid m_Rapid;
+        private RapidV2 m_RapidV2;
 
 
         private MaterialLibrary m_Materials;
@@ -176,6 +178,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_Aurora = stack.GetComponent<Aurora>();
             m_RapidOldTV = stack.GetComponent<RapidOldTV>();
             m_RapidOldTVV2 = stack.GetComponent<RapidOldTVV2>();
+            m_Rapid = stack.GetComponent<Rapid>();
+            m_RapidV2 = stack.GetComponent<RapidV2>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -394,9 +398,65 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupRapidOldTVV2(cmd, ref renderingData, m_Materials.rapidOldTVV2);
             }
 
+            if (m_Rapid.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupRapid(cmd, ref renderingData, m_Materials.rapid);
+            }
+
+            if (m_RapidV2.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupRapidV2(cmd, ref renderingData, m_Materials.rapidV2);
+            }
+
             #endregion
             
         }
+
+        #region RapidV2
+
+        private void SetupRapidV2(CommandBuffer cmd, ref RenderingData renderingData, Material rapidV2)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Rapid");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            rapidV2.SetVector("_Params", new Vector4(m_RapidV2.vignetteIndensity.value, m_RapidV2.vignetteSharpness.value, m_RapidV2.vignetteCenter.value.x, m_RapidV2.vignetteCenter.value.y));
+            if (m_RapidV2.vignetteType.value == VignetteType.ColorMode)
+            {
+                rapidV2.SetColor("_VignetteColor", m_RapidV2.vignetteColor.value);
+            }
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapidV2, (int)m_RapidV2.vignetteType.value);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Rapid");
+        }
+
+        #endregion
+        
+
+        #region Rapid
+
+        private void SetupRapid(CommandBuffer cmd, ref RenderingData renderingData, Material rapid)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Rapid");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            rapid.SetVector("_Params", new Vector3(m_Rapid.vignetteIndensity.value, m_Rapid.vignetteCenter.value.x, m_Rapid.vignetteCenter.value.y));
+            if (m_Rapid.vignetteType.value == VignetteType.ColorMode)
+            {
+                rapid.SetColor("_VignetteColor", m_Rapid.vignetteColor.value);
+            }
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapid, (int)m_Rapid.vignetteType.value);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Rapid");
+        }
+
+        #endregion
+        
 
         #region RapidOldTVV2
 

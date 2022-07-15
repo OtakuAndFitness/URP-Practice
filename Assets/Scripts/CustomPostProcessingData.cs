@@ -87,6 +87,8 @@ namespace UnityEngine.Rendering.Universal
             public Shader aurora;
             public Shader rapidOldTV;
             public Shader rapidOldTVV2;
+            public Shader rapid;
+            public Shader rapidV2;
         }
 
         public CustomShaders customShaders;

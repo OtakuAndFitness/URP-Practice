@@ -54,6 +54,8 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material aurora;
         public readonly Material rapidOldTV;
         public readonly Material rapidOldTVV2;
+        public readonly Material rapid;
+        public readonly Material rapidV2;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -104,6 +106,8 @@ namespace UnityEngine.Rendering.Universal
             aurora = Load(data.customShaders.aurora);
             rapidOldTV = Load(data.customShaders.rapidOldTV);
             rapidOldTVV2 = Load(data.customShaders.rapidOldTVV2);
+            rapid = Load(data.customShaders.rapid);
+            rapidV2 = Load(data.customShaders.rapidV2);
         }
 
         Material Load(Shader shader)
@@ -169,7 +173,8 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(aurora);
             CoreUtils.Destroy(rapidOldTV);
             CoreUtils.Destroy(rapidOldTVV2);
-
+            CoreUtils.Destroy(rapid);
+            CoreUtils.Destroy(rapidV2);
 
         }
     }
