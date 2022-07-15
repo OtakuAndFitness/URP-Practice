@@ -78,6 +78,11 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private RapidOldTVV2 m_RapidOldTVV2;
         private Rapid m_Rapid;
         private RapidV2 m_RapidV2;
+        
+        //Sharpen
+        private V1 m_V1;
+        private V2 m_V2;
+        private V3 m_V3;
 
 
         private MaterialLibrary m_Materials;
@@ -180,6 +185,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_RapidOldTVV2 = stack.GetComponent<RapidOldTVV2>();
             m_Rapid = stack.GetComponent<Rapid>();
             m_RapidV2 = stack.GetComponent<RapidV2>();
+            //Sharpen
+            m_V1 = stack.GetComponent<V1>();
+            m_V2 = stack.GetComponent<V2>();
+            m_V3 = stack.GetComponent<V3>();
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -409,8 +418,75 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
 
             #endregion
+
+            #region Sharpen
+
+            if (m_V1.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupV1(cmd, ref renderingData, m_Materials.v1);
+            }
+            
+            if (m_V2.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupV2(cmd, ref renderingData, m_Materials.v2);
+            }
+            
+            if (m_V3.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupV3(cmd, ref renderingData, m_Materials.v3);
+            }
+
+            #endregion
             
         }
+
+        #region Sharpen
+        
+        private void SetupV3(CommandBuffer cmd, ref RenderingData renderingData, Material v3)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("SharpenV3");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            Vector2 p = new Vector2(1.0f + (3.2f * m_V3.Sharpness.value), 0.8f * m_V3.Sharpness.value);
+            v3.SetVector("_Params", p);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v3);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("SharpenV3");
+        }
+
+        private void SetupV2(CommandBuffer cmd, ref RenderingData renderingData, Material v2)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("SharpenV2");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            v2.SetFloat("_Sharpness", m_V2.Sharpness.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v2);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("SharpenV2");
+        }
+
+        private void SetupV1(CommandBuffer cmd, ref RenderingData renderingData, Material v1)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("SharpenV1");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            v1.SetVector("_Params", new Vector2(m_V1.Strength.value, m_V1.Threshold.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v1);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("SharpenV1");
+        }
+
+        #endregion
+        
 
         #region RapidV2
 

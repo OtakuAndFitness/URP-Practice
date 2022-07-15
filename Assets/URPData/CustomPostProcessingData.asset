@@ -53,3 +53,6 @@ MonoBehaviour:
     rapidOldTVV2: {fileID: 4800000, guid: 425377194f72443b1a6e3f47c0cc7ffb, type: 3}
     rapid: {fileID: 4800000, guid: 71b9d7e187334440492db4d24b48a5c9, type: 3}
     rapidV2: {fileID: 4800000, guid: 8df85e4bc48b445968f232ff8e5a5a92, type: 3}
+    v1: {fileID: 4800000, guid: f960164d8dbe7431a85d3cb4bf29481f, type: 3}
+    v2: {fileID: 4800000, guid: 00eeaa44c3e5f4ec3b1962385cdd2ecb, type: 3}
+    v3: {fileID: 4800000, guid: c71ef0f7af1d04d9fa09e6a7be6fb342, type: 3}

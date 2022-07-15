@@ -57,6 +57,11 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material rapid;
         public readonly Material rapidV2;
         
+        //Sharpen
+        public readonly Material v1;
+        public readonly Material v2;
+        public readonly Material v3;
+        
         public MaterialLibrary(CustomPostProcessingData data)
         {
             //blur
@@ -108,6 +113,11 @@ namespace UnityEngine.Rendering.Universal
             rapidOldTVV2 = Load(data.customShaders.rapidOldTVV2);
             rapid = Load(data.customShaders.rapid);
             rapidV2 = Load(data.customShaders.rapidV2);
+            
+            //Sharpen
+            v1 = Load(data.customShaders.v1);
+            v2 = Load(data.customShaders.v2);
+            v3 = Load(data.customShaders.v3);
         }
 
         Material Load(Shader shader)
@@ -175,6 +185,11 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(rapidOldTVV2);
             CoreUtils.Destroy(rapid);
             CoreUtils.Destroy(rapidV2);
+            
+            //Sharpen
+            CoreUtils.Destroy(v1);
+            CoreUtils.Destroy(v2);
+            CoreUtils.Destroy(v3);
 
         }
     }

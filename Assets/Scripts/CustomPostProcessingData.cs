@@ -89,6 +89,11 @@ namespace UnityEngine.Rendering.Universal
             public Shader rapidOldTVV2;
             public Shader rapid;
             public Shader rapidV2;
+            
+            //Sharpen
+            public Shader v1;
+            public Shader v2;
+            public Shader v3;
         }
 
         public CustomShaders customShaders;
