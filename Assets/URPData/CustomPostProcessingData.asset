@@ -53,9 +53,9 @@ MonoBehaviour:
     rapidOldTVV2: {fileID: 4800000, guid: 425377194f72443b1a6e3f47c0cc7ffb, type: 3}
     rapid: {fileID: 4800000, guid: 71b9d7e187334440492db4d24b48a5c9, type: 3}
     rapidV2: {fileID: 4800000, guid: 8df85e4bc48b445968f232ff8e5a5a92, type: 3}
-    v1: {fileID: 4800000, guid: f960164d8dbe7431a85d3cb4bf29481f, type: 3}
-    v2: {fileID: 4800000, guid: 00eeaa44c3e5f4ec3b1962385cdd2ecb, type: 3}
-    v3: {fileID: 4800000, guid: c71ef0f7af1d04d9fa09e6a7be6fb342, type: 3}
+    sharpenV1: {fileID: 4800000, guid: f960164d8dbe7431a85d3cb4bf29481f, type: 3}
+    sharpenV2: {fileID: 4800000, guid: 00eeaa44c3e5f4ec3b1962385cdd2ecb, type: 3}
+    sharpenV3: {fileID: 4800000, guid: c71ef0f7af1d04d9fa09e6a7be6fb342, type: 3}
     bleachBypass: {fileID: 4800000, guid: 0287a3b47b173487f815e140047503c6, type: 3}
     brightness: {fileID: 4800000, guid: acdeae9907592468f9c31c9920710005, type: 3}
     hue: {fileID: 4800000, guid: 20e78eebb8c204e3e8053a2c8c145fe5, type: 3}
@@ -65,3 +65,6 @@ MonoBehaviour:
     saturation: {fileID: 4800000, guid: d167ce01e373b4493849df306f249971, type: 3}
     technicolor: {fileID: 4800000, guid: 12c192b1bc94f4aaa9aec1be213a3812, type: 3}
     colorReplace: {fileID: 4800000, guid: 5016a23abea7240f1be8aaab3cce7ceb, type: 3}
+    contrast: {fileID: 4800000, guid: 533471df739b547cab6306335dd92a79, type: 3}
+    contrastV2: {fileID: 4800000, guid: 9aa7d5a8170d94bf983e56ca9e8e94ed, type: 3}
+    contrastV3: {fileID: 4800000, guid: 3eb6ad9e15827488e820f4a614b359ee, type: 3}

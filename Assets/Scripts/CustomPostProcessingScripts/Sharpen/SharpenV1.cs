@@ -8,7 +8,7 @@ using UnityEngine.Rendering.Universal;
 namespace UnityEngine.Rendering.Universal
 {
     [Serializable, VolumeComponentMenu("Custom-post-processing/Sharpen/V1")]
-    public class V1 : VolumeComponent, IPostProcessComponent
+    public class SharpenV1 : VolumeComponent, IPostProcessComponent
     {
         public ClampedFloatParameter Strength = new ClampedFloatParameter(0, 0,5);
         public ClampedFloatParameter Threshold = new ClampedFloatParameter(0.1f, 0,1);

@@ -7,10 +7,10 @@ using UnityEngine.Rendering.Universal;
 
 namespace UnityEngine.Rendering.Universal
 {
-    [Serializable, VolumeComponentMenu("Custom-post-processing/Sharpen/V3")]
-    public class V3 : VolumeComponent, IPostProcessComponent
+    [Serializable, VolumeComponentMenu("Custom-post-processing/Sharpen/V2")]
+    public class SharpenV2 : VolumeComponent, IPostProcessComponent
     {
-        public ClampedFloatParameter Sharpness = new ClampedFloatParameter(0, 0,1);
+        public ClampedFloatParameter Sharpness = new ClampedFloatParameter(0, 0,5);
 
         public bool IsActive()
         {

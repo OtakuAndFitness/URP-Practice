@@ -7,14 +7,14 @@ using UnityEngine.Rendering.Universal;
 
 namespace UnityEngine.Rendering.Universal
 {
-    [Serializable, VolumeComponentMenu("Custom-post-processing/Sharpen/V2")]
-    public class V2 : VolumeComponent, IPostProcessComponent
+    [Serializable, VolumeComponentMenu("Custom-post-processing/ColorAdjustment/Contrast")]
+    public class Contrast : VolumeComponent, IPostProcessComponent
     {
-        public ClampedFloatParameter Sharpness = new ClampedFloatParameter(0, 0,5);
-
+        public ClampedFloatParameter contrast = new ClampedFloatParameter(0, -1, 2);
+        
         public bool IsActive()
         {
-            return active && Sharpness.value != 0;
+            return active && contrast.value != 0;
         }
 
         public bool IsTileCompatible()
@@ -22,5 +22,5 @@ namespace UnityEngine.Rendering.Universal
             return false;
         }
     }
-
 }
+

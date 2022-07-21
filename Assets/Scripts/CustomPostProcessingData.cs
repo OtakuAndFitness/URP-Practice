@@ -91,9 +91,9 @@ namespace UnityEngine.Rendering.Universal
             public Shader rapidV2;
             
             //Sharpen
-            public Shader v1;
-            public Shader v2;
-            public Shader v3;
+            public Shader sharpenV1;
+            public Shader sharpenV2;
+            public Shader sharpenV3;
             
             //ColorAdjustment
             public Shader bleachBypass;
@@ -105,6 +105,9 @@ namespace UnityEngine.Rendering.Universal
             public Shader saturation;
             public Shader technicolor;
             public Shader colorReplace;
+            public Shader contrast;
+            public Shader contrastV2;
+            public Shader contrastV3;
         }
 
         public CustomShaders customShaders;

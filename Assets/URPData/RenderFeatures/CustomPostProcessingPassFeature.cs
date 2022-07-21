@@ -80,9 +80,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private RapidV2 m_RapidV2;
         
         //Sharpen
-        private V1 m_V1;
-        private V2 m_V2;
-        private V3 m_V3;
+        private SharpenV1 m_V1;
+        private SharpenV2 m_V2;
+        private SharpenV3 m_V3;
         
         //ColorAdjustment
         private BleachBypass m_BleachBypass;
@@ -94,6 +94,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         private Saturation m_Saturation;
         private Technicolor m_Technicolor;
         private ColorReplace m_ColorReplace;
+        private Contrast m_Contrast;
+        private ContrastV2 m_ContrastV2;
+        private ContrastV3 m_ContrastV3;
+
 
         private MaterialLibrary m_Materials;
         private CustomPostProcessingData m_Data;
@@ -196,9 +200,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_Rapid = stack.GetComponent<Rapid>();
             m_RapidV2 = stack.GetComponent<RapidV2>();
             //Sharpen
-            m_V1 = stack.GetComponent<V1>();
-            m_V2 = stack.GetComponent<V2>();
-            m_V3 = stack.GetComponent<V3>();
+            m_V1 = stack.GetComponent<SharpenV1>();
+            m_V2 = stack.GetComponent<SharpenV2>();
+            m_V3 = stack.GetComponent<SharpenV3>();
             //ColorAdjustment
             m_BleachBypass = stack.GetComponent<BleachBypass>();
             m_Brightness = stack.GetComponent<Brightness>();
@@ -209,6 +213,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_Saturation = stack.GetComponent<Saturation>();
             m_Technicolor = stack.GetComponent<Technicolor>();
             m_ColorReplace = stack.GetComponent<ColorReplace>();
+            m_Contrast = stack.GetComponent<Contrast>();
+            m_ContrastV2 = stack.GetComponent<ContrastV2>();
+            m_ContrastV3 = stack.GetComponent<ContrastV3>();
+
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);
@@ -443,17 +451,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
             if (m_V1.IsActive() && !cameraData.isSceneViewCamera)
             {
-                SetupV1(cmd, ref renderingData, m_Materials.v1);
+                SetupSharpenV1(cmd, ref renderingData, m_Materials.sharpenV1);
             }
             
             if (m_V2.IsActive() && !cameraData.isSceneViewCamera)
             {
-                SetupV2(cmd, ref renderingData, m_Materials.v2);
+                SetupSharpenV2(cmd, ref renderingData, m_Materials.sharpenV2);
             }
             
             if (m_V3.IsActive() && !cameraData.isSceneViewCamera)
             {
-                SetupV3(cmd, ref renderingData, m_Materials.v3);
+                SetupSharpenV3(cmd, ref renderingData, m_Materials.sharpenV3);
             }
 
             #endregion
@@ -505,9 +513,72 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 SetupColorReplace(cmd, ref renderingData, m_Materials.colorReplace);
             }
 
+            if (m_Contrast.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupContrast(cmd, ref renderingData, m_Materials.contrast);
+            }
+            
+            if (m_ContrastV2.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupContrastV2(cmd, ref renderingData, m_Materials.contrastV2);
+            }
+            
+            if (m_ContrastV3.IsActive() && !cameraData.isSceneViewCamera)
+            {
+                SetupContrastV3(cmd, ref renderingData, m_Materials.contrastV3);
+            }
+
             #endregion
             
         }
+
+        #region Contrast
+
+        private void SetupContrastV3(CommandBuffer cmd, ref RenderingData renderingData, Material contrastV3)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("ContrastV3");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            contrastV3.SetVector("_Contrast", m_ContrastV3.contrast.value);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrastV3);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("ContrastV3");
+        }
+
+        private void SetupContrastV2(CommandBuffer cmd, ref RenderingData renderingData, Material contrastV2)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("ContrastV2");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            contrastV2.SetFloat("_Contrast", m_ContrastV2.contrast.value + 1);
+            contrastV2.SetColor("_ContrastFactorRGB", new Color(m_ContrastV2.contrastFactorR.value, m_ContrastV2.contrastFactorG.value,m_ContrastV2.contrastFactorB.value));
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrastV2);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("ContrastV2");
+        }
+
+        private void SetupContrast(CommandBuffer cmd, ref RenderingData renderingData, Material contrast)
+        {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            cmd.BeginSample("Contrast");
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
+            contrast.SetFloat("_Contrast", m_Contrast.contrast.value + 1);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrast);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.EndSample("Contrast");
+        }
+
+        #endregion
+        
 
         #region ColorReplace
 
@@ -711,7 +782,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Sharpen
         
-        private void SetupV3(CommandBuffer cmd, ref RenderingData renderingData, Material v3)
+        private void SetupSharpenV3(CommandBuffer cmd, ref RenderingData renderingData, Material v3)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.depthBufferBits = 0;
@@ -726,7 +797,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.EndSample("SharpenV3");
         }
 
-        private void SetupV2(CommandBuffer cmd, ref RenderingData renderingData, Material v2)
+        private void SetupSharpenV2(CommandBuffer cmd, ref RenderingData renderingData, Material v2)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.depthBufferBits = 0;
@@ -740,7 +811,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.EndSample("SharpenV2");
         }
 
-        private void SetupV1(CommandBuffer cmd, ref RenderingData renderingData, Material v1)
+        private void SetupSharpenV1(CommandBuffer cmd, ref RenderingData renderingData, Material v1)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.depthBufferBits = 0;

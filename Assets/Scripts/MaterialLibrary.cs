@@ -58,9 +58,9 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material rapidV2;
         
         //Sharpen
-        public readonly Material v1;
-        public readonly Material v2;
-        public readonly Material v3;
+        public readonly Material sharpenV1;
+        public readonly Material sharpenV2;
+        public readonly Material sharpenV3;
         
         //ColorAdjustment
         public readonly Material bleachBypass;
@@ -72,6 +72,9 @@ namespace UnityEngine.Rendering.Universal
         public readonly Material saturation;
         public readonly Material technicolor;
         public readonly Material colorReplace;
+        public readonly Material contrast;
+        public readonly Material contrastV2;
+        public readonly Material contrastV3;
         
         public MaterialLibrary(CustomPostProcessingData data)
         {
@@ -126,9 +129,9 @@ namespace UnityEngine.Rendering.Universal
             rapidV2 = Load(data.customShaders.rapidV2);
             
             //Sharpen
-            v1 = Load(data.customShaders.v1);
-            v2 = Load(data.customShaders.v2);
-            v3 = Load(data.customShaders.v3);
+            sharpenV1 = Load(data.customShaders.sharpenV1);
+            sharpenV2 = Load(data.customShaders.sharpenV2);
+            sharpenV3 = Load(data.customShaders.sharpenV3);
             
             //ColorAdjustment
             bleachBypass = Load(data.customShaders.bleachBypass);
@@ -140,6 +143,9 @@ namespace UnityEngine.Rendering.Universal
             saturation = Load(data.customShaders.saturation);
             technicolor = Load(data.customShaders.technicolor);
             colorReplace = Load(data.customShaders.colorReplace);
+            contrast = Load(data.customShaders.contrast);
+            contrastV2 = Load(data.customShaders.contrastV2);
+            contrastV3 = Load(data.customShaders.contrastV3);
         }
 
         Material Load(Shader shader)
@@ -209,9 +215,9 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(rapidV2);
             
             //Sharpen
-            CoreUtils.Destroy(v1);
-            CoreUtils.Destroy(v2);
-            CoreUtils.Destroy(v3);
+            CoreUtils.Destroy(sharpenV1);
+            CoreUtils.Destroy(sharpenV2);
+            CoreUtils.Destroy(sharpenV3);
             
             //ColorAdjustment
             CoreUtils.Destroy(bleachBypass);
@@ -223,6 +229,9 @@ namespace UnityEngine.Rendering.Universal
             CoreUtils.Destroy(saturation);
             CoreUtils.Destroy(technicolor);
             CoreUtils.Destroy(colorReplace);
+            CoreUtils.Destroy(contrast);
+            CoreUtils.Destroy(contrastV2);
+            CoreUtils.Destroy(contrastV3);
 
         }
     }
