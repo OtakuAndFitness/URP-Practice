@@ -8,6 +8,9 @@ float3 _LightDirection;
 TEXTURE2D(_MainTex);
 SAMPLER(sampler_MainTex);
 
+Texture3D(_DitherMaskLOD);
+SAMPLER(sampler_DitherMaskLOD);
+
 CBUFFER_START(UnityPerMaterial)
     float4 _MainTex_ST;
     #ifdef _Alpha_ON
@@ -63,5 +66,15 @@ half4 ShadowPassFragment(Varyings input) : SV_TARGET
     #ifdef _Alpha_ON
         clip(_Alpha * 1.5 - col.a);
     #endif
+    return 0;
+}
+
+half4 ShadowFadePassFragment(Varyings input) : SV_TARGET
+{
+    half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
+    half alpha = col.a;
+    half alphaRef = SAMPLE_TEXTURE3D(_DitherMaskLOD, sampler_DitherMaskLOD, float3(input.positionCS.xy * 0.25, alpha * 0.9375)).a;
+    clip(alphaRef - 0.01);
+
     return 0;
 }
