@@ -28,7 +28,6 @@ Shader "Custom/PostProcessing/Glitch/TileJitter"
 			// 基础数据准备
 			 half4 stripNoise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, i.uv);
 			 half threshold = 1.001 - _Indensity * 1.001;
-
 			// uv偏移
 			half uvShift = step(threshold, pow(abs(stripNoise.x), 3));
 			float2 uv = frac(i.uv + stripNoise.yz * uvShift);
