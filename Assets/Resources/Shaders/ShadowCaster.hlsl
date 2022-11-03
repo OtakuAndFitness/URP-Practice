@@ -8,7 +8,7 @@ float3 _LightDirection;
 TEXTURE2D(_MainTex);
 SAMPLER(sampler_MainTex);
 
-Texture3D(_DitherMaskLOD);
+TEXTURE3D(_DitherMaskLOD);
 SAMPLER(sampler_DitherMaskLOD);
 
 CBUFFER_START(UnityPerMaterial)
