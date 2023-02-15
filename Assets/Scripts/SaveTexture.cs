@@ -22,6 +22,7 @@ public class SaveTexture : MonoBehaviour
         RenderTexture.active = rt;
         tex.ReadPixels(new Rect(0,0,textureSize,textureSize),0,0,false);
         File.WriteAllBytes(Application.dataPath + "/Resources/Textures/" + texName + ".tga", tex.EncodeToTGA());
+        
     }
     
     

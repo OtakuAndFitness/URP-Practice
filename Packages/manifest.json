@@ -2,10 +2,10 @@
   "dependencies": {
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.cinemachine": "2.9.1",
-    "com.unity.collab-proxy": "1.17.6",
-    "com.unity.ide.rider": "3.0.15",
+    "com.unity.collab-proxy": "1.17.7",
+    "com.unity.ide.rider": "3.0.18",
     "com.unity.recorder": "3.0.3",
-    "com.unity.render-pipelines.universal": "12.1.7",
+    "com.unity.render-pipelines.universal": "12.1.8",
     "com.unity.test-framework": "1.1.33",
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.timeline": "1.7.1",

@@ -14,8 +14,8 @@ public class ParticleExporter : MonoBehaviour
     // Framerate at which you want to play the animation
     public int frameRate = 25;                  // export frame rate 导出帧率，设置Time.captureFramerate会忽略真实时间，直接使用此帧率
     public float frameCount = 100;              // export frame count 导出帧的数目，100帧则相当于导出5秒钟的光效时间。由于导出每一帧的时间很长，所以导出时间会远远长于直观的光效播放时间
-    public int screenWidth = 960;               // not use 暂时没用，希望可以直接设置屏幕的大小（即光效画布的大小）
-    public int screenHeight = 640;
+    // public int screenWidth = 960;               // not use 暂时没用，希望可以直接设置屏幕的大小（即光效画布的大小）
+    // public int screenHeight = 640;
     public Vector3 cameraPosition = Vector3.zero;
     public Vector3 cameraRotation = Vector3.zero;
  

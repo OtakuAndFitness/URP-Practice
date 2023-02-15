@@ -59,7 +59,7 @@ Shader "Otaku/PreIntegratedLUT"
 
             half4 frag (Varyings i) : SV_Target
             {
-                float radian = 1.0 / (i.uv.y * _Max1R + 0.0001);
+                float radian = 2.0 * 1.0 / (i.uv.y * _Max1R + 0.0001);
 
                 float3 color = IntegratedLUT(lerp(-1,1,i.uv.x),radian);
                 return float4(color,1);
