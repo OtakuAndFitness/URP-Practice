@@ -105,29 +105,29 @@ float3 IntegratedLUT(float x, float radius)
 {
     float theta = acos(x);
     float a = -PI;
-    float b = 0;
+    // float b = 0;
     float3 totalWeight = float3(0,0,0);
     float3 totalLight = float3(0,0,0);
-    while (b <= 0.5 * PI)
+    // while (b <= 0.5 * PI)
+    // {
+        // a = -PI;
+    while (a <= PI)
     {
-        a = -PI;
-        while (a <= PI)
-        {
-            float sampleDist = sqrt(2 - 2 * cos(a) * cos(b)) * radius;
-            // float sampleDist = 2 * radius * sin(a / 2);
+        // float sampleDist = sqrt(2 - 2 * cos(a) * cos(b)) * radius;
+        float sampleDist = abs(2.0 * radius * sin(a * 0.5));
 
-            float diffuse = saturate(cos(b) * cos(theta + a));
-            // float diffuse = saturate(cos(theta + a));
+        // float diffuse = saturate(cos(b) * cos(theta + a));
+        float diffuse = saturate(cos(theta + a));
 
-            float3 weight = Profile(sampleDist);
-            totalLight += diffuse * weight;
-            totalWeight += weight;
-            a += 0.05;
-        }
-        b += 0.05;
+        float3 weight = Profile(sampleDist);
+        totalLight += diffuse * weight;
+        totalWeight += weight;
+        a += 0.05;
     }
+        // b += 0.05;
+    // }
 
-    totalLight *= 2;
+    // totalLight *= 2;
     float3 param = totalLight / totalWeight;
 
     #if _TONE_UNCHARTED

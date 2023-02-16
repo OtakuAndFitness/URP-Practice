@@ -235,7 +235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textureSize: 1024
-  texName: SkinLutTest
+  texName: SkinLut
 --- !u!1 &1222436963
 GameObject:
   m_ObjectHideFlags: 0
