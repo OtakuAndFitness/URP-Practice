@@ -22,6 +22,7 @@ public class SaveTexture : EditorWindow
     {
         GUILayout.Label("Create Skin Lut", EditorStyles.boldLabel);
         textureSize = EditorGUILayout.IntField("Texture Size", textureSize);
+        textureSize = Mathf.Abs(textureSize);
         if (!Mathf.IsPowerOfTwo(textureSize))
         {
             textureSize = Mathf.ClosestPowerOfTwo(textureSize);
@@ -29,7 +30,6 @@ public class SaveTexture : EditorWindow
         if (textureSize == 0){
             textureSize = 64;
         }
-        textureSize = Mathf.Abs(textureSize);
         texName = EditorGUILayout.TextField("Texuture Name", texName);
         if (string.IsNullOrEmpty(texName))
         {
