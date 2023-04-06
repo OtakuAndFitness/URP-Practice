@@ -31,7 +31,9 @@ namespace UnityEngine.Rendering.Universal
             // {
                 AssetDatabase.CreateAsset(instance, assetPath);
                 AssignShaders(instance.customShaders);
+                EditorUtility.SetDirty(instance);
                 Selection.activeObject = instance;
+                AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             // }
             
