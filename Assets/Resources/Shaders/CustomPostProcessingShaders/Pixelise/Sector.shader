@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/Pixel/Sector"
+Shader "Custom/PostProcessing/Pixelise/Sector"
 {
     Properties
     {

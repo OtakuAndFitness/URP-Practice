@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/Vignette/RapidOldTV"
+Shader "Custom/PostProcessing/Vignette/RapidV2"
 {
     Properties
     {

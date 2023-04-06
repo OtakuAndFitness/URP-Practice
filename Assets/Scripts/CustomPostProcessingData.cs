@@ -13,7 +13,7 @@ namespace UnityEngine.Rendering.Universal
 #if UNITY_EDITOR
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812")]
 
-        [MenuItem("Assets/Create/Rendering/Universal Render Pipeline/Additional Post-process Data", priority = CoreUtils.assetCreateMenuPriority3 + 1)]
+        [MenuItem("Assets/Create/Rendering/Universal Render Pipeline/Custom Post-process Data", priority = CoreUtils.assetCreateMenuPriority3 + 1)]
         static void CreateAdditionalPostProcessData()
         {
             //ProjectWindowUtil.StartNameEditingIfProjectWindowExists(0, CreateInstance<CreatePostProcessDataAsset>(), "CustomPostProcessData.asset", null, null);
@@ -30,6 +30,7 @@ namespace UnityEngine.Rendering.Universal
             // else
             // {
                 AssetDatabase.CreateAsset(instance, assetPath);
+                AssignShaders(instance.customShaders);
                 Selection.activeObject = instance;
                 AssetDatabase.Refresh();
             // }
@@ -109,8 +110,77 @@ namespace UnityEngine.Rendering.Universal
             public Shader contrastV2;
             public Shader contrastV3;
         }
-
+        
         public CustomShaders customShaders;
+
+        private static void AssignShaders(CustomShaders customShaders)
+        {
+            if (customShaders == null)
+            {
+                Debug.LogError("Custom Shaders is null");
+                return;
+            }
+            
+            customShaders.gaussianBlur = Shader.Find("Custom/PostProcessing/Blur/GaussianBlur");
+            customShaders.boxBlur = Shader.Find("Custom/PostProcessing/Blur/BoxBlur");
+            customShaders.kawaseBlur = Shader.Find("Custom/PostProcessing/Blur/KawaseBlur");
+            customShaders.dualKawaseBlur = Shader.Find("Custom/PostProcessing/Blur/DualKawaseBlur");
+            customShaders.bokehBlur = Shader.Find("Custom/PostProcessing/Blur/BokehBlur");
+            customShaders.tiltShfitBlur = Shader.Find("Custom/PostProcessing/Blur/TiltShiftBlur");
+            customShaders.irisBlur = Shader.Find("Custom/PostProcessing/Blur/IrisBlur");
+            customShaders.grainyBlur = Shader.Find("Custom/PostProcessing/Blur/GrainyBlur");
+            customShaders.radialBlur = Shader.Find("Custom/PostProcessing/Blur/RadialBlur");
+            customShaders.directionalBlur = Shader.Find("Custom/PostProcessing/Blur/DirectionalBlur");
+            customShaders.rgbSplit = Shader.Find("Custom/PostProcessing/Glitch/RGBSplit");
+            customShaders.imageBlock = Shader.Find("Custom/PostProcessing/Glitch/ImageBlock");
+            customShaders.lineBlock = Shader.Find("Custom/PostProcessing/Glitch/LineBlock");
+            customShaders.tileJitter = Shader.Find("Custom/PostProcessing/Glitch/TileJitter");
+            customShaders.scanLineJitter = Shader.Find("Custom/PostProcessing/Glitch/ScanLineJitter");
+            customShaders.digitalStripe = Shader.Find("Custom/PostProcessing/Glitch/DigitalStripe");
+            customShaders.analogNoise = Shader.Find("Custom/PostProcessing/Glitch/AnalogNoise");
+            customShaders.screenJump = Shader.Find("Custom/PostProcessing/Glitch/ScreenJump");
+            customShaders.screenShake = Shader.Find("Custom/PostProcessing/Glitch/ScreenShake");
+            customShaders.waveJitter = Shader.Find("Custom/PostProcessing/Glitch/WaveJitter");
+            customShaders.roberts = Shader.Find("Custom/PostProcessing/EdgeDetection/Roberts");
+            customShaders.robertsNeon = Shader.Find("Custom/PostProcessing/EdgeDetection/RobertsNeon");
+            customShaders.scharr = Shader.Find("Custom/PostProcessing/EdgeDetection/Scharr");
+            customShaders.scharrNeon = Shader.Find("Custom/PostProcessing/EdgeDetection/ScharrNeon");
+            customShaders.sobel = Shader.Find("Custom/PostProcessing/EdgeDetection/Sobel");
+            customShaders.sobelNeon = Shader.Find("Custom/PostProcessing/EdgeDetection/SobelNeon");
+            customShaders.circle = Shader.Find("Custom/PostProcessing/Pixelise/Circle");
+            customShaders.diamond = Shader.Find("Custom/PostProcessing/Pixelise/Diamond");
+            customShaders.hexagon = Shader.Find("Custom/PostProcessing/Pixelise/Hexagon");
+            customShaders.hexagonGrid = Shader.Find("Custom/PostProcessing/Pixelise/HexagonGrid");
+            customShaders.leaf = Shader.Find("Custom/PostProcessing/Pixelise/Leaf");
+            customShaders.led = Shader.Find("Custom/PostProcessing/Pixelise/Led");
+            customShaders.quad = Shader.Find("Custom/PostProcessing/Pixelise/Quad");
+            customShaders.sector = Shader.Find("Custom/PostProcessing/Pixelise/Sector");
+            customShaders.triangle = Shader.Find("Custom/PostProcessing/Pixelise/Triangle");
+            customShaders.aurora = Shader.Find("Custom/PostProcessing/Vignette/Aurora");
+            customShaders.rapidOldTV = Shader.Find("Custom/PostProcessing/Vignette/RapidOldTV");
+            customShaders.rapidOldTVV2 = Shader.Find("Custom/PostProcessing/Vignette/RapidOldTVV2");
+            customShaders.rapid = Shader.Find("Custom/PostProcessing/Vignette/Rapid");
+            customShaders.rapidV2 = Shader.Find("Custom/PostProcessing/Vignette/RapidV2");
+            customShaders.sharpenV1 = Shader.Find("Custom/PostProcessing/Sharpen/SharpenV1");
+            customShaders.sharpenV2 = Shader.Find("Custom/PostProcessing/Sharpen/SharpenV2");
+            customShaders.sharpenV3 = Shader.Find("Custom/PostProcessing/Sharpen/SharpenV3");
+            customShaders.bleachBypass = Shader.Find("Custom/PostProcessing/ColorAdjustment/BleachBypass");
+            customShaders.brightness = Shader.Find("Custom/PostProcessing/ColorAdjustment/Brightness");
+            customShaders.hue = Shader.Find("Custom/PostProcessing/ColorAdjustment/Hue");
+            customShaders.tint = Shader.Find("Custom/PostProcessing/ColorAdjustment/Tint");
+            customShaders.whiteBalance = Shader.Find("Custom/PostProcessing/ColorAdjustment/WhiteBalance");
+            customShaders.lensFilter = Shader.Find("Custom/PostProcessing/ColorAdjustment/LensFilter");
+            customShaders.saturation = Shader.Find("Custom/PostProcessing/ColorAdjustment/Saturation");
+            customShaders.technicolor = Shader.Find("Custom/PostProcessing/ColorAdjustment/Technicolor");
+            customShaders.colorReplace = Shader.Find("Custom/PostProcessing/ColorAdjustment/ColorReplace");
+            customShaders.contrast = Shader.Find("Custom/PostProcessing/ColorAdjustment/Contrast");
+            customShaders.contrastV2 = Shader.Find("Custom/PostProcessing/ColorAdjustment/ContrastV2");
+            customShaders.contrastV3 = Shader.Find("Custom/PostProcessing/ColorAdjustment/ContrastV3");
+            
+        }
     }
+    
+    
+
 }
 

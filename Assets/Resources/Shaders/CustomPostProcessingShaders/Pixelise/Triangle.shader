@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/Pixel/Triangle"
+Shader "Custom/PostProcessing/Pixelise/Triangle"
 {
     Properties
     {

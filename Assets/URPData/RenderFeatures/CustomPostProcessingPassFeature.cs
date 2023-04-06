@@ -542,7 +542,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("ContrastV3");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            contrastV3.SetVector("_Contrast", m_ContrastV3.contrast.value);
+            contrastV3.SetVector(CustomPostProcessingShaderConstants._Contrast, m_ContrastV3.contrast.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrastV3);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("ContrastV3");
@@ -556,8 +556,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("ContrastV2");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            contrastV2.SetFloat("_Contrast", m_ContrastV2.contrast.value + 1);
-            contrastV2.SetColor("_ContrastFactorRGB", new Color(m_ContrastV2.contrastFactorR.value, m_ContrastV2.contrastFactorG.value,m_ContrastV2.contrastFactorB.value));
+            contrastV2.SetFloat(CustomPostProcessingShaderConstants._Contrast, m_ContrastV2.contrast.value + 1);
+            contrastV2.SetColor(CustomPostProcessingShaderConstants._ContrastFactorRGB, new Color(m_ContrastV2.contrastFactorR.value, m_ContrastV2.contrastFactorG.value,m_ContrastV2.contrastFactorB.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrastV2);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("ContrastV2");
@@ -571,7 +571,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Contrast");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            contrast.SetFloat("_Contrast", m_Contrast.contrast.value + 1);
+            contrast.SetFloat(CustomPostProcessingShaderConstants._Contrast, m_Contrast.contrast.value + 1);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrast);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Contrast");
@@ -590,12 +590,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("ColorReplace");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            colorReplace.SetFloat("_Range", m_ColorReplace.Range.value);
-            colorReplace.SetFloat("_Fuzziness", m_ColorReplace.Fuzziness.value);
+            colorReplace.SetFloat(CustomPostProcessingShaderConstants._Range, m_ColorReplace.Range.value);
+            colorReplace.SetFloat(CustomPostProcessingShaderConstants._Fuzziness, m_ColorReplace.Fuzziness.value);
             if (m_ColorReplace.colorType == ColorType.Original)
             {
-                colorReplace.SetColor("_FromColor", m_ColorReplace.FromColor.value);
-                colorReplace.SetColor("_ToColor", m_ColorReplace.ToColor.value);
+                colorReplace.SetColor(CustomPostProcessingShaderConstants._FromColor, m_ColorReplace.FromColor.value);
+                colorReplace.SetColor(CustomPostProcessingShaderConstants._ToColor, m_ColorReplace.ToColor.value);
             }
             else
             {
@@ -607,12 +607,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
                 if (m_ColorReplace.FromGradientColor.value != null)
                 {
-                    colorReplace.SetColor("_FromColor", m_ColorReplace.FromGradientColor.value.Evaluate(TimeX * 0.01f));
+                    colorReplace.SetColor(CustomPostProcessingShaderConstants._FromColor, m_ColorReplace.FromGradientColor.value.Evaluate(TimeX * 0.01f));
                 }
 
                 if (m_ColorReplace.ToGradientColor.value != null)
                 {
-                    colorReplace.SetColor("_ToColor", m_ColorReplace.ToGradientColor.value.Evaluate(TimeX * 0.01f));
+                    colorReplace.SetColor(CustomPostProcessingShaderConstants._ToColor, m_ColorReplace.ToGradientColor.value.Evaluate(TimeX * 0.01f));
                 }
             }
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, colorReplace);
@@ -633,9 +633,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Technicolor");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            technicolor.SetFloat("_Exposure", 8.01f - m_Technicolor.exposure.value);
-            technicolor.SetFloat("_Indensity", m_Technicolor.indensity.value);
-            technicolor.SetColor("_ColorBalance", Color.white - new Color(m_Technicolor.colorBalanceR.value, m_Technicolor.colorBalanceG.value, m_Technicolor.colorBalanceB.value));
+            technicolor.SetFloat(CustomPostProcessingShaderConstants._Exposure, 8.01f - m_Technicolor.exposure.value);
+            technicolor.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_Technicolor.indensity.value);
+            technicolor.SetColor(CustomPostProcessingShaderConstants._ColorBalance, Color.white - new Color(m_Technicolor.colorBalanceR.value, m_Technicolor.colorBalanceG.value, m_Technicolor.colorBalanceB.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, technicolor);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Technicolor");
@@ -654,7 +654,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Saturation");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            saturation.SetFloat("_Saturation", m_Saturation.saturation.value);
+            saturation.SetFloat(CustomPostProcessingShaderConstants._Saturation, m_Saturation.saturation.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, saturation);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Saturation");
@@ -673,8 +673,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("LensFilter");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            lensFilter.SetFloat("_Indensity", m_LensFilter.Indensity.value);
-            lensFilter.SetColor("_LensColor", m_LensFilter.LensColor.value);
+            lensFilter.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_LensFilter.Indensity.value);
+            lensFilter.SetColor(CustomPostProcessingShaderConstants._LensColor, m_LensFilter.LensColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, lensFilter);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("LensFilter");
@@ -693,8 +693,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("WhiteBalance");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            whiteBalance.SetFloat("_Temperature", m_WhiteBalance.temperature.value);
-            whiteBalance.SetFloat("_Tint", m_WhiteBalance.tint.value);
+            whiteBalance.SetFloat(CustomPostProcessingShaderConstants._Temperature, m_WhiteBalance.temperature.value);
+            whiteBalance.SetFloat(CustomPostProcessingShaderConstants._Tint, m_WhiteBalance.tint.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, whiteBalance);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("WhiteBalance");
@@ -713,8 +713,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Tint");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            tint.SetFloat("_Indensity", m_Tint.indensity.value);
-            tint.SetColor("_ColorTint", m_Tint.colorTint.value);
+            tint.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_Tint.indensity.value);
+            tint.SetColor(CustomPostProcessingShaderConstants._ColorTint, m_Tint.colorTint.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tint);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Tint");
@@ -733,7 +733,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Hue");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            hue.SetFloat("_HueDegree", m_Hue.HueDegree.value);
+            hue.SetFloat(CustomPostProcessingShaderConstants._HueDegree, m_Hue.HueDegree.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hue);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Hue");
@@ -752,7 +752,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Brightness");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            brightness.SetFloat("_Brightness", m_Brightness.brightness.value);
+            brightness.SetFloat(CustomPostProcessingShaderConstants._Brightness, m_Brightness.brightness.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, brightness);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Brightness");
@@ -771,7 +771,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("BleachBypass");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            bleachBypass.SetFloat("_Indensity", m_BleachBypass.Indensity.value);
+            bleachBypass.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_BleachBypass.Indensity.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, bleachBypass);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("BleachBypass");
@@ -791,7 +791,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             Vector2 p = new Vector2(1.0f + (3.2f * m_V3.Sharpness.value), 0.8f * m_V3.Sharpness.value);
-            v3.SetVector("_Params", p);
+            v3.SetVector(CustomPostProcessingShaderConstants._Params, p);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v3);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("SharpenV3");
@@ -805,7 +805,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("SharpenV2");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            v2.SetFloat("_Sharpness", m_V2.Sharpness.value);
+            v2.SetFloat(CustomPostProcessingShaderConstants._Sharpness, m_V2.Sharpness.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v2);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("SharpenV2");
@@ -819,7 +819,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("SharpenV1");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            v1.SetVector("_Params", new Vector2(m_V1.Strength.value, m_V1.Threshold.value));
+            v1.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_V1.Strength.value, m_V1.Threshold.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v1);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("SharpenV1");
@@ -838,10 +838,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Rapid");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            rapidV2.SetVector("_Params", new Vector4(m_RapidV2.vignetteIndensity.value, m_RapidV2.vignetteSharpness.value, m_RapidV2.vignetteCenter.value.x, m_RapidV2.vignetteCenter.value.y));
+            rapidV2.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_RapidV2.vignetteIndensity.value, m_RapidV2.vignetteSharpness.value, m_RapidV2.vignetteCenter.value.x, m_RapidV2.vignetteCenter.value.y));
             if (m_RapidV2.vignetteType.value == VignetteType.ColorMode)
             {
-                rapidV2.SetColor("_VignetteColor", m_RapidV2.vignetteColor.value);
+                rapidV2.SetColor(CustomPostProcessingShaderConstants._VignetteColor, m_RapidV2.vignetteColor.value);
             }
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapidV2, (int)m_RapidV2.vignetteType.value);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
@@ -861,10 +861,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Rapid");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            rapid.SetVector("_Params", new Vector3(m_Rapid.vignetteIndensity.value, m_Rapid.vignetteCenter.value.x, m_Rapid.vignetteCenter.value.y));
+            rapid.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(m_Rapid.vignetteIndensity.value, m_Rapid.vignetteCenter.value.x, m_Rapid.vignetteCenter.value.y));
             if (m_Rapid.vignetteType.value == VignetteType.ColorMode)
             {
-                rapid.SetColor("_VignetteColor", m_Rapid.vignetteColor.value);
+                rapid.SetColor(CustomPostProcessingShaderConstants._VignetteColor, m_Rapid.vignetteColor.value);
             }
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapid, (int)m_Rapid.vignetteType.value);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
@@ -884,10 +884,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("RapidOldTVV2");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            rapidOldTvv2.SetVector("_Params", new Vector2(m_RapidOldTVV2.vignetteSize.value, m_RapidOldTVV2.sizeOffset.value));
+            rapidOldTvv2.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_RapidOldTVV2.vignetteSize.value, m_RapidOldTVV2.sizeOffset.value));
             if (m_RapidOldTVV2.vignetteType.value == VignetteType.ColorMode)
             {
-                rapidOldTvv2.SetColor("_VignetteColor", m_RapidOldTVV2.vignetteColor.value);
+                rapidOldTvv2.SetColor(CustomPostProcessingShaderConstants._VignetteColor, m_RapidOldTVV2.vignetteColor.value);
             }
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapidOldTvv2, (int)m_RapidOldTVV2.vignetteType.value);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
@@ -907,10 +907,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("RapidOldTV");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            rapidOldTV.SetVector("_Params", new Vector3(m_RapidOldTV.vignetteIndensity.value, m_RapidOldTV.vignetteCenter.value.x, m_RapidOldTV.vignetteCenter.value.y));
+            rapidOldTV.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(m_RapidOldTV.vignetteIndensity.value, m_RapidOldTV.vignetteCenter.value.x, m_RapidOldTV.vignetteCenter.value.y));
             if (m_RapidOldTV.vignetteType.value == VignetteType.ColorMode)
             {
-                rapidOldTV.SetColor("_VignetteColor", m_RapidOldTV.vignetteColor.value);
+                rapidOldTV.SetColor(CustomPostProcessingShaderConstants._VignetteColor, m_RapidOldTV.vignetteColor.value);
             }
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapidOldTV, (int)m_RapidOldTV.vignetteType.value);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
@@ -935,8 +935,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 TimeX = 0;
             }
-            aurora.SetVector("_Params", new Vector4(m_Aurora.vignetteArea.value, m_Aurora.vignetteSmothness.value, m_Aurora.colorChange.value, TimeX));
-            aurora.SetVector("_Params2", new Vector4(m_Aurora.colorFactorR.value, m_Aurora.colorFactorG.value,m_Aurora.colorFactorB.value, m_Aurora.vignetteFading.value));
+            aurora.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_Aurora.vignetteArea.value, m_Aurora.vignetteSmothness.value, m_Aurora.colorChange.value, TimeX));
+            aurora.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector4(m_Aurora.colorFactorR.value, m_Aurora.colorFactorG.value,m_Aurora.colorFactorB.value, m_Aurora.vignetteFading.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, aurora);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Aurora");
@@ -966,7 +966,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                     ratio = 1f;
                 }
             }
-            triangle.SetVector("_Params", new Vector4(size, ratio, m_Triangle.pixelScaleX.value * 20, m_Triangle.pixelScaleY.value * 20));
+            triangle.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(size, ratio, m_Triangle.pixelScaleX.value * 20, m_Triangle.pixelScaleY.value * 20));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, triangle);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Triangle");
@@ -987,9 +987,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             float size = (1.01f - m_Sector.pixelSize.value) * 300f;
             Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / (float)opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Sector.circleRadius.value, 0f);
-            sector.SetVector("_Params", parameters);
-            sector.SetVector("_Params2", new Vector2(m_Sector.pixelIntervalX.value, m_Sector.pixelIntervalY.value));
-            sector.SetColor("_BackgroundColor", m_Sector.backgroundColor.value);
+            sector.SetVector(CustomPostProcessingShaderConstants._Params, parameters);
+            sector.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector2(m_Sector.pixelIntervalX.value, m_Sector.pixelIntervalY.value));
+            sector.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Sector.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, sector);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Sector");
@@ -1009,7 +1009,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             float size = (1.01f - m_Quad.pixelSize.value) * 200f;
-            quad.SetFloat("_PixelSize", size);
+            quad.SetFloat(CustomPostProcessingShaderConstants._PixelSize, size);
             float ratio = m_Quad.pixelRatio.value;
             if (m_Quad.useAutoScreenRatio.value)
             {
@@ -1019,7 +1019,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                     ratio = 1f;
                 }
             }
-            quad.SetVector("_Params", new Vector4(size, ratio, m_Quad.pixelScaleX.value, m_Quad.pixelScaleY.value));
+            quad.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(size, ratio, m_Quad.pixelScaleX.value, m_Quad.pixelScaleY.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, quad);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Quad");
@@ -1049,8 +1049,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                     ratio = 1f;
                 }
             }
-            led.SetVector("_Params", new Vector3(size, ratio, m_Led.ledRadius.value));
-            led.SetColor("_BackgroundColor", m_Led.backgroundColor.value);
+            led.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(size, ratio, m_Led.ledRadius.value));
+            led.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Led.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, led);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Led");
@@ -1080,7 +1080,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                     ratio = 1f;
                 }
             }
-            leaf.SetVector("_Params", new Vector4(size,ratio, m_Leaf.pixelScaleX.value * 20,m_Leaf.pixelScaleY.value * 20));
+            leaf.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(size,ratio, m_Leaf.pixelScaleX.value * 20,m_Leaf.pixelScaleY.value * 20));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, leaf);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Leaf");
@@ -1099,7 +1099,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("HexagonGrid");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            hexagonGrid.SetVector("_Params", new Vector2(m_HexagonGrid.pixelSize.value, m_HexagonGrid.gridWidth.value));
+            hexagonGrid.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_HexagonGrid.pixelSize.value, m_HexagonGrid.gridWidth.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hexagonGrid);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("HexagonGrid");
@@ -1118,7 +1118,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Hexagon");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            hexagon.SetFloat("_PixelSize", m_Hexagon.pixelSize.value);
+            hexagon.SetFloat(CustomPostProcessingShaderConstants._PixelSize, m_Hexagon.pixelSize.value);
             float size = m_Hexagon.pixelSize.value * 0.2f;
             float ratio = m_Hexagon.pixelRatio.value;
             if (m_Hexagon.useAutoScreenRatio.value)
@@ -1129,7 +1129,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                     ratio = 1f;
                 }
             }
-            hexagon.SetVector("_Params", new Vector4(size,ratio, m_Hexagon.pixelScaleX.value,m_Hexagon.pixelScaleY.value));
+            hexagon.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(size,ratio, m_Hexagon.pixelScaleX.value,m_Hexagon.pixelScaleY.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hexagon);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Hexagon");
@@ -1148,7 +1148,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Diamond");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            diamond.SetFloat("_PixelSize", m_Diamond.pixelSize.value);
+            diamond.SetFloat(CustomPostProcessingShaderConstants._PixelSize, m_Diamond.pixelSize.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, diamond);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Diamond");
@@ -1169,9 +1169,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             float size = (1.01f - m_Circle.pixelSize.value) * 300f;
             Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / (float)opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Circle.circleRadius.value, 0f);
-            circle.SetVector("_Params", parameters);
-            circle.SetVector("_Params2", new Vector2(m_Circle.pixelIntervalX.value, m_Circle.pixelIntervalY.value));
-            circle.SetColor("_BackgroundColor", m_Circle.backgroundColor.value);
+            circle.SetVector(CustomPostProcessingShaderConstants._Params, parameters);
+            circle.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector2(m_Circle.pixelIntervalX.value, m_Circle.pixelIntervalY.value));
+            circle.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Circle.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, circle);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Circle");
@@ -1190,8 +1190,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("SobelNeon");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            sobelNeon.SetVector("_Params", new Vector4(m_SobelNeon.edgeWidth.value, m_SobelNeon.edgeNeonFade.value, m_SobelNeon.brightness.value, m_SobelNeon.backgroundFade.value));
-            sobelNeon.SetColor("_BackgroundColor", m_SobelNeon.backgroundColor.value);
+            sobelNeon.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_SobelNeon.edgeWidth.value, m_SobelNeon.edgeNeonFade.value, m_SobelNeon.brightness.value, m_SobelNeon.backgroundFade.value));
+            sobelNeon.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_SobelNeon.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, sobelNeon);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("SobelNeon");
@@ -1210,9 +1210,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Sobel");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            sobel.SetVector("_Params", new Vector2(m_Sobel.edgeWidth.value, m_Sobel.backgroundFade.value));
-            sobel.SetColor("_EdgeColor", m_Sobel.edgeColor.value);
-            sobel.SetColor("_BackgroundColor", m_Sobel.backgroundColor.value);
+            sobel.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_Sobel.edgeWidth.value, m_Sobel.backgroundFade.value));
+            sobel.SetColor(CustomPostProcessingShaderConstants._EdgeColor, m_Sobel.edgeColor.value);
+            sobel.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Sobel.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, sobel);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Sobel");
@@ -1231,8 +1231,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("ScharrNeon");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            scharrNeon.SetVector("_Params", new Vector4(m_ScharrNeon.edgeWidth.value, m_ScharrNeon.edgeNeonFade.value, m_ScharrNeon.brightness.value, m_ScharrNeon.backgroundFade.value));
-            scharrNeon.SetColor("_BackgroundColor", m_ScharrNeon.backgroundColor.value);
+            scharrNeon.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_ScharrNeon.edgeWidth.value, m_ScharrNeon.edgeNeonFade.value, m_ScharrNeon.brightness.value, m_ScharrNeon.backgroundFade.value));
+            scharrNeon.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_ScharrNeon.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scharrNeon);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("ScharrNeon");
@@ -1249,9 +1249,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Scharr");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            scharr.SetVector("_Params", new Vector2(m_Scharr.edgeWidth.value, m_Scharr.backgroundFade.value));
-            scharr.SetColor("_EdgeColor", m_Scharr.edgeColor.value);
-            scharr.SetColor("_BackgroundColor", m_Scharr.backgroundColor.value);
+            scharr.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_Scharr.edgeWidth.value, m_Scharr.backgroundFade.value));
+            scharr.SetColor(CustomPostProcessingShaderConstants._EdgeColor, m_Scharr.edgeColor.value);
+            scharr.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Scharr.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scharr);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Scharr");
@@ -1267,8 +1267,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("RobertsNeon");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            robertsNeon.SetVector("_Params", new Vector4(m_RobertsNeon.edgeWidth.value, m_RobertsNeon.edgeNeonFade.value, m_RobertsNeon.brightness.value, m_RobertsNeon.backgroundFade.value));
-            robertsNeon.SetColor("_BackgroundColor", m_RobertsNeon.backgroundColor.value);
+            robertsNeon.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_RobertsNeon.edgeWidth.value, m_RobertsNeon.edgeNeonFade.value, m_RobertsNeon.brightness.value, m_RobertsNeon.backgroundFade.value));
+            robertsNeon.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_RobertsNeon.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, robertsNeon);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("RobertsNeon");
@@ -1287,9 +1287,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("Roberts");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            roberts.SetVector("_Params", new Vector2(m_Roberts.edgeWidth.value, m_Roberts.backgroundFade.value));
-            roberts.SetColor("_EdgeColor", m_Roberts.edgeColor.value);
-            roberts.SetColor("_BackgroundColor", m_Roberts.backgroundColor.value);
+            roberts.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_Roberts.edgeWidth.value, m_Roberts.backgroundFade.value));
+            roberts.SetColor(CustomPostProcessingShaderConstants._EdgeColor, m_Roberts.edgeColor.value);
+            roberts.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Roberts.backgroundColor.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, roberts);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("Roberts");
@@ -1309,8 +1309,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             UpdateFrequencyWJ(waveJitter);
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            waveJitter.SetVector("_Params", new Vector4(m_WaveJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_WaveJitter.Frequency.value, m_WaveJitter.RGBSplit.value , m_WaveJitter.Speed.value, m_WaveJitter.Amount.value));
-            waveJitter.SetVector("_Resolution", m_WaveJitter.CustomResolution.value ? m_WaveJitter.Resolution.value : new Vector2(opaqueDesc.width,opaqueDesc.height));
+            waveJitter.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_WaveJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_WaveJitter.Frequency.value, m_WaveJitter.RGBSplit.value , m_WaveJitter.Speed.value, m_WaveJitter.Amount.value));
+            waveJitter.SetVector(CustomPostProcessingShaderConstants._Resolution, m_WaveJitter.CustomResolution.value ? m_WaveJitter.Resolution.value : new Vector2(opaqueDesc.width,opaqueDesc.height));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, waveJitter, (int)m_WaveJitter.JitterDirection.value);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("WaveJitter");
@@ -1346,7 +1346,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("ScreenShake");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            screenShake.SetFloat("_ScreenShake", m_ScreenShake.ScreenShakeIndensity.value);
+            screenShake.SetFloat(CustomPostProcessingShaderConstants._ScreenShake, m_ScreenShake.ScreenShakeIndensity.value);
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, screenShake, (int)m_ScreenShake.ScreenShakeDirection.value);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("ScreenShake");
@@ -1366,7 +1366,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             ScreenJumpTime += Time.deltaTime * m_ScreenJump.ScreenJumpIndensity.value * 9.8f;
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            screenJump.SetVector("_Params", new Vector2(m_ScreenJump.ScreenJumpIndensity.value, m_ScreenJump.isHorizontalReverse.value ? -ScreenJumpTime : ScreenJumpTime));
+            screenJump.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_ScreenJump.ScreenJumpIndensity.value, m_ScreenJump.isHorizontalReverse.value ? -ScreenJumpTime : ScreenJumpTime));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, screenJump, (int)m_ScreenJump.ScreenJumpDirection.value);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("ScreenJump");
@@ -1390,7 +1390,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            analogNoise.SetVector("_Params", new Vector4(m_AnalogNoise.NoiseSpeed.value, m_AnalogNoise.NoiseFading.value, m_AnalogNoise.LuminanceJitterThreshold.value, TimeX));
+            analogNoise.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_AnalogNoise.NoiseSpeed.value, m_AnalogNoise.NoiseFading.value, m_AnalogNoise.LuminanceJitterThreshold.value, TimeX));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, analogNoise);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("AnalogNoise");
@@ -1411,16 +1411,16 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             UpdateFrequencyDS(m_DigitalStripe.frequency.value, m_DigitalStripe.noiseTextureWidth.value, m_DigitalStripe.noiseTextureHeight.value, m_DigitalStripe.stripeLength.value);
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            digitalStripe.SetFloat("_Indensity", m_DigitalStripe.indensity.value);
+            digitalStripe.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_DigitalStripe.indensity.value);
             if (_noiseTexture != null)
             {
-                digitalStripe.SetTexture("_NoiseTex", _noiseTexture);
+                digitalStripe.SetTexture(CustomPostProcessingShaderConstants._NoiseTex, _noiseTexture);
             }
             if (m_DigitalStripe.needStripColorAdjust.value)
             {
                 digitalStripe.EnableKeyword("NEED_TRASH_FRAME");
-                digitalStripe.SetColor("_StripColorAdjustColor", m_DigitalStripe.stripColorAdjustColor.value);
-                digitalStripe.SetFloat("_StripColorAdjustIndensity", m_DigitalStripe.stripColorAdjustIndensity.value);
+                digitalStripe.SetColor(CustomPostProcessingShaderConstants._StripColorAdjustColor, m_DigitalStripe.stripColorAdjustColor.value);
+                digitalStripe.SetFloat(CustomPostProcessingShaderConstants._StripColorAdjustIndensity, m_DigitalStripe.stripColorAdjustIndensity.value);
             }
             else
             {
@@ -1484,7 +1484,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             float threshold = Mathf.Clamp01(1.0f - m_ScanLineJitter.JitterIndensity.value * 1.2f);
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            scanLineJitter.SetVector("_Params", new Vector3(displacement, threshold, m_ScanLineJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_ScanLineJitter.Frequency.value));
+            scanLineJitter.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(displacement, threshold, m_ScanLineJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_ScanLineJitter.Frequency.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scanLineJitter, (int)m_ScanLineJitter.JitterDirection.value);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("ScanLineJitter");
@@ -1529,7 +1529,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            tileJitter.SetVector("_Params", new Vector4(m_TileJitter.SplittingNumber.value, m_TileJitter.Amount.value , m_TileJitter.Speed.value * 100f, m_TileJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_TileJitter.Frequency.value));
+            tileJitter.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_TileJitter.SplittingNumber.value, m_TileJitter.Amount.value , m_TileJitter.Speed.value * 100f, m_TileJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_TileJitter.Frequency.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tileJitter, m_TileJitter.SplittingDirection.value == Direction.Horizontal ? 0 : 1);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("TileJitter");
@@ -1571,10 +1571,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            lineBlock.SetVector("_Params", new Vector3(
+            lineBlock.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(
                 m_LineBlock.IntervalType.value == IntervalType.Random ? randomFrequency : m_LineBlock.Frequency.value,
                 TimeX * m_LineBlock.Speed.value * 0.2f , m_LineBlock.Amount.value));
-            lineBlock.SetVector("_Params2", new Vector3(m_LineBlock.Offset.value, 1 / m_LineBlock.LinesWidth.value, m_LineBlock.Alpha.value));
+            lineBlock.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector3(m_LineBlock.Offset.value, 1 / m_LineBlock.LinesWidth.value, m_LineBlock.Alpha.value));
             int pass = (int)m_LineBlock.BlockDirection.value;
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, lineBlock,pass);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
@@ -1622,9 +1622,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            imageBlock.SetVector("_Params", new Vector3(TimeX * m_ImageBlock.Speed.value, m_ImageBlock.Amount.value, m_ImageBlock.Fade.value));
-            imageBlock.SetVector("_Params2", new Vector4(m_ImageBlock.BlockLayer1_U.value, m_ImageBlock.BlockLayer1_V.value, m_ImageBlock.BlockLayer2_U.value, m_ImageBlock.BlockLayer2_V.value));
-            imageBlock.SetVector("_Params3", new Vector3(m_ImageBlock.RGBSplitIndensity.value, m_ImageBlock.BlockLayer1_Indensity.value, m_ImageBlock.BlockLayer2_Indensity.value));
+            imageBlock.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(TimeX * m_ImageBlock.Speed.value, m_ImageBlock.Amount.value, m_ImageBlock.Fade.value));
+            imageBlock.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector4(m_ImageBlock.BlockLayer1_U.value, m_ImageBlock.BlockLayer1_V.value, m_ImageBlock.BlockLayer2_U.value, m_ImageBlock.BlockLayer2_V.value));
+            imageBlock.SetVector(CustomPostProcessingShaderConstants._Params3, new Vector3(m_ImageBlock.RGBSplitIndensity.value, m_ImageBlock.BlockLayer1_Indensity.value, m_ImageBlock.BlockLayer2_Indensity.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, imageBlock);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("ImageBlock");
@@ -1648,8 +1648,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            rgbSplit.SetVector("_Params", new Vector4(m_RGBSplit.Fading.value, m_RGBSplit.Amount.value, m_RGBSplit.Speed.value, m_RGBSplit.CenterFading.value));
-            rgbSplit.SetVector("_Params2", new Vector3(TimeX, m_RGBSplit.AmountR.value, m_RGBSplit.AmountB.value));
+            rgbSplit.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_RGBSplit.Fading.value, m_RGBSplit.Amount.value, m_RGBSplit.Speed.value, m_RGBSplit.CenterFading.value));
+            rgbSplit.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector3(TimeX, m_RGBSplit.AmountR.value, m_RGBSplit.AmountB.value));
             int pass = (int)m_RGBSplit.SplitDirection.value;
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rgbSplit,pass);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
@@ -1673,7 +1673,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             float sinVal = (Mathf.Sin(m_DirectionalBlur.angle.value) * m_DirectionalBlur.indensity.value * 0.05f) / m_DirectionalBlur.blurCount.value;
             float cosVal = (Mathf.Cos(m_DirectionalBlur.angle.value) * m_DirectionalBlur.indensity.value * 0.05f) / m_DirectionalBlur.blurCount.value;  
-            directionalBlur.SetVector("_Params", new Vector3(m_DirectionalBlur.blurCount.value, sinVal, cosVal));
+            directionalBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(m_DirectionalBlur.blurCount.value, sinVal, cosVal));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, directionalBlur);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("DirectionalBlur");
@@ -1693,7 +1693,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("RadialBlur");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            radialBlur.SetVector("_Params", new Vector3(m_RadialBlur.indensity.value * 0.02f, m_RadialBlur.RadialCenterX.value, m_RadialBlur.RadialCenterY.value));
+            radialBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(m_RadialBlur.indensity.value * 0.02f, m_RadialBlur.RadialCenterX.value, m_RadialBlur.RadialCenterY.value));
             int pass = (int)m_RadialBlur.qualityLevel.value;
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, radialBlur, pass);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
@@ -1715,7 +1715,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("GrainyBlur");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            grainyBlur.SetVector("_Params", new Vector2(m_GrainyBlur.indensity.value / opaqueDesc.height, m_GrainyBlur.blurCount.value));
+            grainyBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_GrainyBlur.indensity.value / opaqueDesc.height, m_GrainyBlur.blurCount.value));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, grainyBlur);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("GrainyBlur");
@@ -1734,9 +1734,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("IrisBlur");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            irisBlur.SetVector("_GoldenRot", mGoldenRot);
-            irisBlur.SetVector("_Gradient", new Vector3(m_IrisBlur.centerOffsetX.value, m_IrisBlur.centerOffsetY.value, m_IrisBlur.areaSize.value * 0.1f));
-            irisBlur.SetVector("_Params", new Vector4(m_IrisBlur.blurCount.value, m_IrisBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
+            irisBlur.SetVector(CustomPostProcessingShaderConstants._GoldenRot, mGoldenRot);
+            irisBlur.SetVector(CustomPostProcessingShaderConstants._Gradient, new Vector3(m_IrisBlur.centerOffsetX.value, m_IrisBlur.centerOffsetY.value, m_IrisBlur.areaSize.value * 0.1f));
+            irisBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_IrisBlur.blurCount.value, m_IrisBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, irisBlur);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("IrisBlur");
@@ -1755,9 +1755,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("TiltShiftBlur");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            tiltShiftBlur.SetVector("_GoldenRot", mGoldenRot);
-            tiltShiftBlur.SetVector("_Gradient", new Vector3(m_TiltShiftBlur.centerOffset.value, m_TiltShiftBlur.areaSize.value, m_TiltShiftBlur.areaSmooth.value));
-            tiltShiftBlur.SetVector("_Params", new Vector4(m_TiltShiftBlur.blurCount.value, m_TiltShiftBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
+            tiltShiftBlur.SetVector(CustomPostProcessingShaderConstants._GoldenRot, mGoldenRot);
+            tiltShiftBlur.SetVector(CustomPostProcessingShaderConstants._Gradient, new Vector3(m_TiltShiftBlur.centerOffset.value, m_TiltShiftBlur.areaSize.value, m_TiltShiftBlur.areaSmooth.value));
+            tiltShiftBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_TiltShiftBlur.blurCount.value, m_TiltShiftBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tiltShiftBlur);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("TiltShiftBlur");
@@ -1778,8 +1778,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.BeginSample("BokehBlur");
             cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            bokehBlur.SetVector("_GoldenRot", mGoldenRot);
-            bokehBlur.SetVector("_Offset", new Vector4(m_BokehBlur.blurCount.value, m_BokehBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
+            bokehBlur.SetVector(CustomPostProcessingShaderConstants._GoldenRot, mGoldenRot);
+            bokehBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(m_BokehBlur.blurCount.value, m_BokehBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, bokehBlur);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.EndSample("BokehBlur");
@@ -1797,7 +1797,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             int height = opaqueDesc.height >> m_DualKawaseBlur.downSample.value;
             
             cmd.BeginSample("DualKawaseBlur");
-            dualKawaseBlur.SetFloat("_Offset", m_DualKawaseBlur.indensity.value);
+            dualKawaseBlur.SetFloat(CustomPostProcessingShaderConstants._Offset, m_DualKawaseBlur.indensity.value);
             RenderTargetIdentifier lastDown = m_ColorAttachment;
             for (int i = 0; i < m_DualKawaseBlur.blurCount.value; i++)
             {
@@ -1848,11 +1848,11 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             bool needSwitch = true;
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             for (int i = 0; i < m_KawaseBlur.blurCount.value; i++) {
-                kawaseBlur.SetFloat("_Offset", i / m_KawaseBlur.downSample.value + m_KawaseBlur.indensity.value);
+                kawaseBlur.SetFloat(CustomPostProcessingShaderConstants._Offset, i / m_KawaseBlur.downSample.value + m_KawaseBlur.indensity.value);
                 cmd.Blit(needSwitch ? m_TemporaryColorTexture01.Identifier() : m_TemporaryColorTexture02.Identifier(), needSwitch ? m_TemporaryColorTexture02.Identifier() : m_TemporaryColorTexture01.Identifier(),kawaseBlur);
                 needSwitch = !needSwitch;
             }
-            kawaseBlur.SetFloat("_Offset", m_KawaseBlur.blurCount.value / m_KawaseBlur.downSample.value + m_KawaseBlur.indensity.value);
+            kawaseBlur.SetFloat(CustomPostProcessingShaderConstants._Offset, m_KawaseBlur.blurCount.value / m_KawaseBlur.downSample.value + m_KawaseBlur.indensity.value);
             cmd.Blit(needSwitch ? m_TemporaryColorTexture01.Identifier() : m_TemporaryColorTexture02.Identifier(), m_ColorAttachment);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
@@ -1876,9 +1876,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, FilterMode.Bilinear);
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             for (int i = 0; i < m_BoxBlur.blurCount.value; i++) {
-                boxBlur.SetVector("_Offset", new Vector4(m_BoxBlur.indensity.value, m_BoxBlur.indensity.value, 0, 0));
+                boxBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(m_BoxBlur.indensity.value, 0, 0, 0));
                 cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_TemporaryColorTexture02.Identifier(), boxBlur);
-                boxBlur.SetVector("_Offset", new Vector4(m_BoxBlur.indensity.value, m_BoxBlur.indensity.value, 0, 0));
+                boxBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(0, m_BoxBlur.indensity.value, 0, 0));
                 cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture01.Identifier(), boxBlur);
             }
             cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment);
@@ -1907,10 +1907,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             for (int i = 0; i < m_GaussianBlur.blurCount.value; i++) {
                 //y-direction
-                gaussianBlur.SetVector("_Offset", new Vector4(0, m_GaussianBlur.indensity.value, 0, 0));
+                gaussianBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(0, m_GaussianBlur.indensity.value, 0, 0));
                 cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_TemporaryColorTexture02.Identifier(), gaussianBlur);
                 //x-direction
-                gaussianBlur.SetVector("_Offset", new Vector4(m_GaussianBlur.indensity.value, 0, 0, 0));
+                gaussianBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(m_GaussianBlur.indensity.value, 0, 0, 0));
                 cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture01.Identifier(), gaussianBlur);
                 
             }

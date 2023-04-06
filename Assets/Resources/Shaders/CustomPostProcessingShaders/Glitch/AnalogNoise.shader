@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/Glitch/TileJitter"
+Shader "Custom/PostProcessing/Glitch/AnalogNoise"
 {
     Properties
     {

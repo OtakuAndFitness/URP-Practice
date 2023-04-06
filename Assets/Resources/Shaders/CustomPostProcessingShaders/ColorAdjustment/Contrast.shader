@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/ColorAdjustment/Cotrast"
+Shader "Custom/PostProcessing/ColorAdjustment/Contrast"
 {
     Properties
     {

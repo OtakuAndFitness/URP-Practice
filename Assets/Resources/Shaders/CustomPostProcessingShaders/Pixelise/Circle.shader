@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/Pixel/Circle"
+Shader "Custom/PostProcessing/Pixelise/Circle"
 {
     Properties
     {

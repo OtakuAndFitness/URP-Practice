@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/Sharpen/V3"
+Shader "Custom/PostProcessing/Sharpen/SharpenV3"
 {
     Properties
     {

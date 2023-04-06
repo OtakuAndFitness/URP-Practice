@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/Glitch/ScreenJump"
+Shader "Custom/PostProcessing/Glitch/ScreenShake"
 {
     Properties
     {

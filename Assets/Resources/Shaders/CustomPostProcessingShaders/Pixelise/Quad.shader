@@ -1,4 +1,4 @@
-Shader "Custom/PostProcessing/Pixel/Quad"
+Shader "Custom/PostProcessing/Pixelise/Quad"
 {
     Properties
     {
