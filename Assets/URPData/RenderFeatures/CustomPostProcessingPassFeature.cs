@@ -1963,6 +1963,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             return;
         }
         
+        //check if camera is overlay
+        if (renderingData.cameraData.renderType == CameraRenderType.Overlay)
+        {
+            //I don't want to do post processing in overlay camera
+            return;
+        }
+        
         var cameraColorTarget = renderer.cameraColorTarget;
         // var cameraDepth = renderer.cameraDepthTarget;
         // var dest = RenderTargetHandle.CameraTarget;
