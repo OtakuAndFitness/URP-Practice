@@ -1920,21 +1920,21 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             // cmd.GetTemporaryRT(m_TemporaryColorTexture03.id, opaqueDesc, m_GaussianBlur.filterMode.value);
             
             cmd.BeginSample("GaussianBlur");
-            cmd.GetTemporaryRT(m_TemporaryBlurTexture03.id, opaqueDesc, FilterMode.Point);
-            cmd.GetTemporaryRT(m_TemporaryBlurTexture04.id, opaqueDesc, FilterMode.Point);
-            cmd.Blit(m_ColorAttachment, m_TemporaryBlurTexture03.Identifier());
+            cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Point);
+            cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, FilterMode.Point);
+            cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
             for (int i = 0; i < m_GaussianBlur.blurCount.value; i++) {
                 //y-direction
                 gaussianBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(0, m_GaussianBlur.indensity.value, 0, 0));
-                cmd.Blit(m_TemporaryBlurTexture03.Identifier(), m_TemporaryBlurTexture04.Identifier(), gaussianBlur);
+                cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_TemporaryColorTexture02.Identifier(), gaussianBlur);
                 //x-direction
                 gaussianBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(m_GaussianBlur.indensity.value, 0, 0, 0));
-                cmd.Blit(m_TemporaryBlurTexture04.Identifier(), m_TemporaryBlurTexture03.Identifier(), gaussianBlur);
+                cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture01.Identifier(), gaussianBlur);
                 
             }
-            cmd.Blit(m_TemporaryBlurTexture03.Identifier(), m_ColorAttachment);
-            cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture03.id);
-            cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture04.id);
+            cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
+            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
             cmd.EndSample("GaussianBlur");
             
             
