@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using UnityEngine.Windows;
+using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 public class SaveTexture : EditorWindow
 {

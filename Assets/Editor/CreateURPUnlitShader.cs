@@ -12,7 +12,13 @@ public class CreateURPUnlitShader
     static void CreateCustomShader()
     {
         StreamReader inp_stm = new StreamReader(templatePath);
-        string outPutPath = AssetDatabase.GenerateUniqueAssetPath(Path.Combine(AssetDatabase.GetAssetPath(Selection.activeInstanceID),
+        string path = AssetDatabase.GetAssetPath(Selection.activeInstanceID);
+        if (!string.IsNullOrEmpty(Path.GetExtension(path)))//选中了某个文件，有了文件扩展名
+        {
+            string fileName = Path.GetFileName(path);
+            path = path.Substring(0, path.Length - fileName.Length);
+        }
+        string outPutPath = AssetDatabase.GenerateUniqueAssetPath(Path.Combine(path,
             "NewUnlitShader.shader"));
         
         File.WriteAllText(outPutPath,inp_stm.ReadToEnd());
