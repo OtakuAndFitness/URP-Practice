@@ -85,7 +85,7 @@ Shader "Custom/Glitter"
 
                 viewDir = normalize(mul(viewDir, float3x3(i.T2W0.xyz, i.T2W1.xyz, i.T2W2.xyz)));
                 float2 viewUV = i.uv + viewDir.xy * _ViewOffset;
-                // float3 noise = voronoiNoise3D(   * _CellDensity);
+                // float3 noise = voronoiNoise3D(worldPos * _CellDensity);
                 // float2 noise = Voronoi(viewUV, _CellOffset, _CellDensity).xy;
                 float2 noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, viewUV).xy;
                 float glitter = smoothstep(_CellValue + _CellSoft, _CellValue - _CellSoft, noise.x);
