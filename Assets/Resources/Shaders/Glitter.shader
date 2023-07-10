@@ -3,6 +3,7 @@ Shader "Custom/Glitter"
     Properties
     {
         [HDR]_Color ("Color", Color) = (1,1,1,1)
+        _NoiseTex("Noise Tex", 2D) = "white"{}
         _CellOffset ("Cell Offset", float) = 10 
         _CellDensity ("Cell Density", float) = 50
         _CellValue ("Cell Value", Range(0, 1)) = 0.1
@@ -26,7 +27,6 @@ Shader "Custom/Glitter"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "VoronoiNoise.hlsl"
 
             struct appdata
             {
@@ -57,6 +57,9 @@ Shader "Custom/Glitter"
                 float _Strength;
             CBUFFER_END
 
+            TEXTURE2D(_NoiseTex);
+            SAMPLER(sampler_NoiseTex);
+
 
             v2f vert (appdata v)
             {
@@ -83,7 +86,8 @@ Shader "Custom/Glitter"
                 viewDir = normalize(mul(viewDir, float3x3(i.T2W0.xyz, i.T2W1.xyz, i.T2W2.xyz)));
                 float2 viewUV = i.uv + viewDir.xy * _ViewOffset;
                 // float3 noise = voronoiNoise3D(worldPos * _CellDensity);
-                float2 noise = Voronoi(viewUV, _CellOffset, _CellDensity).xy; 
+                // float2 noise = Voronoi(viewUV, _CellOffset, _CellDensity).xy;
+                float2 noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, viewUV).xy;
                 float glitter = smoothstep(_CellValue + _CellSoft, _CellValue - _CellSoft, noise.x);
                 glitter *= sin(noise.y * _Time.y * _ShineSpeed);   
                 

@@ -19,17 +19,21 @@ Material:
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs: []
+    m_TexEnvs:
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: 9ff543bed415e354fbff19d45b07bf74, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _CellDensity: 30
     - _CellOffset: 10
-    - _CellSoft: 0.225
+    - _CellSoft: 0.605
     - _CellValue: 0.037
-    - _Range: 1
-    - _ShineSpeed: 1
-    - _Strength: 1
+    - _Range: 2.5
+    - _ShineSpeed: 5
+    - _Strength: 5
     - _ViewOffset: 0.01
     m_Colors:
-    - _Color: {r: 1, g: 0, b: 0, a: 1}
+    - _Color: {r: 0.7490196, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
