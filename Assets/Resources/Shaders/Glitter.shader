@@ -4,8 +4,8 @@ Shader "Custom/Glitter"
     {
         [HDR]_Color ("Color", Color) = (1,1,1,1)
         _NoiseTex("Noise Tex", 2D) = "white"{}
-        _CellOffset ("Cell Offset", float) = 10 
-        _CellDensity ("Cell Density", float) = 50
+//        _CellOffset ("Cell Offset", float) = 10 
+//        _CellDensity ("Cell Density", float) = 50
         _CellValue ("Cell Value", Range(0, 1)) = 0.1
         _CellSoft ("Cell Soft", Range(0, 1)) = 0.2
         _ShineSpeed ("Shine Speed", float) = 1
@@ -47,8 +47,8 @@ Shader "Custom/Glitter"
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
-                float _CellOffset;
-                float _CellDensity;
+                // float _CellOffset;
+                // float _CellDensity;
                 float _CellValue;
                 float _CellSoft;
                 float _ShineSpeed;
