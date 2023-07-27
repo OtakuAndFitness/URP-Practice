@@ -8,7 +8,8 @@ public class CreateURPUnlitShader
 {
     private static string templatePath = "Assets/Editor/UnlitShaderTemplate.txt";
 
-    [MenuItem("Assets/Create/Shader/CustomUnlit")]
+    //官方有自定义覆盖模板的方法，所以这里放弃使用
+    // [MenuItem("Assets/Create/Shader/CustomUnlit")]
     static void CreateCustomShader()
     {
         StreamReader inp_stm = new StreamReader(templatePath);
