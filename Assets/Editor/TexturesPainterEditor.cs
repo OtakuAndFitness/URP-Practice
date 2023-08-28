@@ -105,7 +105,7 @@ public class TexturesPainterEditor : Editor
                "gridlist", GUILayout.Width(340), GUILayout.Height(70));
             _painter.BrushSizeInPrecent = Mathf.Max(1,
                Mathf.RoundToInt(_painter.BrushSize * _painter.ControlMaskTexture.width / 100));
-            _painter.DrawBrushSize = _painter.BrushSize * _painter.transform.localPosition.x *
+            _painter.DrawBrushSize = _painter.BrushSize * _painter.transform.localScale.x *
                                      (_meshFilter.sharedMesh.bounds.size.x / 200);
 
          }
