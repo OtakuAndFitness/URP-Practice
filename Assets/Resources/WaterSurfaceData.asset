@@ -79,7 +79,7 @@ MonoBehaviour:
     m_NumColorKeys: 4
     m_NumAlphaKeys: 2
   foamSettings:
-    foamType: 0
+    foamType: 1
     basicFoam:
       serializedVersion: 2
       m_Curve:
