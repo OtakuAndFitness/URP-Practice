@@ -152,7 +152,7 @@ public class TexturesPainterEditor : Editor
       TextureImporterPlatformSettings platformSettings = textureImporter.GetPlatformTextureSettings("Standalone");
       TextureImporterPlatformSettings settings = new TextureImporterPlatformSettings()
       {
-         format = TextureImporterFormat.RGBA32,
+         format = TextureImporterFormat.RGBA32,//Do not use any compressed format, otherwise setPixels/GetPixels methods will feedback an error
          name = platformSettings.name,
          overridden = true
       };
