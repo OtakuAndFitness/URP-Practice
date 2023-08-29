@@ -125,6 +125,12 @@ public class TexturesPainterEditor : Editor
 
       string fileName = Selection.activeTransform.name;
 
+      if (string.IsNullOrEmpty(_painter.ControlMaskTextureFolder))
+      {
+         EditorUtility.DisplayDialog("Error", "Control Mask Folder must be not empty", "OK", null);
+         return;
+      }
+
       string path = Path.Combine(_painter.ControlMaskTextureFolder, fileName + ".png");
       
       path = AssetDatabase.GenerateUniqueAssetPath(path);
