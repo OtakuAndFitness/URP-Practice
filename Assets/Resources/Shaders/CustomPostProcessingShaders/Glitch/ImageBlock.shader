@@ -2,35 +2,35 @@ Shader "Custom/PostProcessing/Glitch/ImageBlock"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
-        _Params("_Params", vector) = (1,1,1,1)
-        _Params2("_Params2", vector) = (1,1,1,1)
-        _Params3("_Params3", vector) = (1,1,1,1)
+//        _MainTex("Main Tex", 2D) = "white"{}
+//        _Params("_Params", vector) = (1,1,1,1)
+//        _Params2("_Params2", vector) = (1,1,1,1)
+//        _Params3("_Params3", vector) = (1,1,1,1)
 
     }
     
     HLSLINCLUDE
 
-    #include "../CustomPPHeader.hlsl"
+    #include "../CustomPostProcessing.hlsl"
 
-    CBUFFER_START(UnityPerMaterial)
-        half3 _Params;
-		half4 _Params2;
-        half3 _Params3;
-    CBUFFER_END
+    // CBUFFER_START(UnityPerMaterial)
+        float3 _ImageBlockParams;
+		float4 _ImageBlockParams2;
+        float3 _ImageBlockParams3;
+    // CBUFFER_END
 
-    #define _TimeX _Params.x
-	#define _Offset _Params.y
-	#define _Fade _Params.z
+    #define _TimeX _ImageBlockParams.x
+	#define _Offset _ImageBlockParams.y
+	#define _Fade _ImageBlockParams.z
 
-	#define _BlockLayer1_U _Params2.w
-	#define _BlockLayer1_V _Params2.x
-	#define _BlockLayer2_U _Params2.y
-	#define _BlockLayer2_V _Params2.z
+	#define _BlockLayer1_U _ImageBlockParams2.w
+	#define _BlockLayer1_V _ImageBlockParams2.x
+	#define _BlockLayer2_U _ImageBlockParams2.y
+	#define _BlockLayer2_V _ImageBlockParams2.z
 
-	#define _RGBSplit_Indensity _Params3.x
-	#define _BlockLayer1_Indensity _Params3.y
-	#define _BlockLayer2_Indensity _Params3.z
+	#define _RGBSplit_Indensity _ImageBlockParams3.x
+	#define _BlockLayer1_Indensity _ImageBlockParams3.y
+	#define _BlockLayer2_Indensity _ImageBlockParams3.z
 
     float randomNoise(float2 seed)
 	{
@@ -57,9 +57,9 @@ Shader "Custom/PostProcessing/Glitch/ImageBlock"
 		float RGBSplitNoise = pow(randomNoise(5.1379), 7.1) * _RGBSplit_Indensity;
 		float lineNoise = lineNoise1 * lineNoise2 * _Offset  - RGBSplitNoise;
 		
-		float4 colorR = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
-		float4 colorG = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv + float2(lineNoise * 0.05 * randomNoise(7.0), 0));
-		float4 colorB = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv - float2(lineNoise * 0.05 * randomNoise(23.0), 0));
+		float4 colorR = GetSource(uv);
+		float4 colorG = GetSource(uv + float2(lineNoise * 0.05 * randomNoise(7.0), 0));
+		float4 colorB = GetSource(uv - float2(lineNoise * 0.05 * randomNoise(23.0), 0));
 		
 		float4 result = float4(float3(colorR.x, colorG.y, colorB.z), colorR.a + colorG.a + colorB.a);
 		result = lerp(colorR, result, _Fade);
@@ -77,12 +77,13 @@ Shader "Custom/PostProcessing/Glitch/ImageBlock"
 
         Pass
         {
+        	Name "Image Block"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
             
             ENDHLSL
         }

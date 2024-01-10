@@ -5,7 +5,7 @@ using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace UnityEditor.Rendering.Universal
+namespace PostProcessingExtends.Effects
 {
     [VolumeComponentEditor(typeof(RapidOldTVV2))]
     public class RapidOldTVV2Editor : VolumeComponentEditor

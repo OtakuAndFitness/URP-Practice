@@ -5,7 +5,7 @@ using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-namespace UnityEditor.Rendering.Universal
+namespace PostProcessingExtends.Effects
 {
     [VolumeComponentEditor(typeof(ScharrNeon))]
     public class ScharrNeonEditor : VolumeComponentEditor

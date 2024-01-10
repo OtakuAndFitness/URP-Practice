@@ -2,24 +2,24 @@ Shader "Custom/PostProcessing/EdgeDetection/Sobel"
 {
     Properties
     {
-    	_MainTex("Main Tex", 2D) = "white"{}
-        _Params("_Params", Vector) = (1,1,1,1)
-    	_EdgeColor("_EdgeColor", Color) = (1,1,1,1)
-    	_BackgroundColor("_BackgroundColor", Color) = (1,1,1,1)
+//    	_MainTex("Main Tex", 2D) = "white"{}
+//        _Params("_Params", Vector) = (1,1,1,1)
+//    	_EdgeColor("_EdgeColor", Color) = (1,1,1,1)
+//    	_BackgroundColor("_BackgroundColor", Color) = (1,1,1,1)
     }
     
     HLSLINCLUDE
 
-		#include "../CustomPPHeader.hlsl"
+		#include "../CustomPostProcessing.hlsl"
 
-		CBUFFER_START(UnityPerMaterial)
-		    half2 _Params;
-			half4 _EdgeColor;
-			half4 _BackgroundColor;
-		CBUFFER_END
+		// CBUFFER_START(UnityPerMaterial)
+		    float2 _SobelParams;
+			half4 _SobelEdgeColor;
+			half4 _SobelBackgroundColor;
+		// CBUFFER_END
 
-		#define _EdgeWidth _Params.x
-		#define _BackgroundFade _Params.y
+		#define _EdgeWidth _SobelParams.x
+		#define _BackgroundFade _SobelParams.y
 		
 
 		float intensity(in float4 color)
@@ -30,14 +30,14 @@ Shader "Custom/PostProcessing/EdgeDetection/Sobel"
 		float sobel(float stepx, float stepy, float2 center)
 		{
 			// get samples around pixel
-			float topLeft = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, stepy)));
-			float midLeft = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, 0)));
-			float bottomLeft = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, -stepy)));
-			float midTop = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(0, stepy)));
-			float midBottom = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(0, -stepy)));
-			float topRight = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, stepy)));
-			float midRight = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, 0)));
-			float bottomRight = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, -stepy)));
+			float topLeft = intensity(GetSource(center + float2(-stepx, stepy)));
+			float midLeft = intensity(GetSource(center + float2(-stepx, 0)));
+			float bottomLeft = intensity(GetSource(center + float2(-stepx, -stepy)));
+			float midTop = intensity(GetSource(center + float2(0, stepy)));
+			float midBottom = intensity(GetSource(center + float2(0, -stepy)));
+			float topRight = intensity(GetSource(center + float2(stepx, stepy)));
+			float midRight = intensity(GetSource(center + float2(stepx, 0)));
+			float bottomRight = intensity(GetSource(center + float2(stepx, -stepy)));
 			
 			// Sobel masks (see http://en.wikipedia.org/wiki/Sobel_operator)
 			//        1 0 -1     -1 -2 -1
@@ -57,13 +57,13 @@ Shader "Custom/PostProcessing/EdgeDetection/Sobel"
 		half4 frag(Varyings i): SV_Target
 		{
 			
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 			
 			float sobelGradient= sobel(_EdgeWidth /_ScreenParams.x, _EdgeWidth /_ScreenParams.y , i.uv);
 
-			half4 backgroundColor = lerp(sceneColor, _BackgroundColor, _BackgroundFade);
+			half4 backgroundColor = lerp(sceneColor, _SobelBackgroundColor, _BackgroundFade);
 
-			float3 edgeColor = lerp(backgroundColor.rgb, _EdgeColor.rgb, sobelGradient);
+			float3 edgeColor = lerp(backgroundColor.rgb, _SobelEdgeColor.rgb, sobelGradient);
 
 			return float4(edgeColor, 1);
 
@@ -78,12 +78,13 @@ Shader "Custom/PostProcessing/EdgeDetection/Sobel"
 
         Pass
         {
+        	Name "Sobel"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

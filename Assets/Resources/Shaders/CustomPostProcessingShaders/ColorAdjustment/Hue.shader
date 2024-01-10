@@ -2,15 +2,15 @@ Shader "Custom/PostProcessing/ColorAdjustment/Hue"
 {
     Properties
     {
-        _HueDegree("HueDegree", Float) = 1
-        _MainTex("MainTex", 2D) = "white" {}
+//        _HueDegree("HueDegree", Float) = 1
+//        _MainTex("MainTex", 2D) = "white" {}
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
-        CBUFFER_START(UnityPerMaterial)
+        #include "../CustomPostProcessing.hlsl"
+        // CBUFFER_START(UnityPerMaterial)
             float _HueDegree;
-        CBUFFER_END
+        // CBUFFER_END
 
         half3 Hue_Degree(float3 In, float Offset)
 		{
@@ -43,7 +43,7 @@ Shader "Custom/PostProcessing/ColorAdjustment/Hue"
 
 			//half3 col = 0.5 + 0.5 * cos(_Time.y + i.texcoord.xyx + float3(0, 2, 4));
 
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 
 			//half3 finalColor = lerp(sceneColor.rgb, col, _Float1 *0.1);
 
@@ -58,12 +58,13 @@ Shader "Custom/PostProcessing/ColorAdjustment/Hue"
 
         Pass
         {
+        	Name "Hue"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

@@ -2,22 +2,22 @@ Shader "Custom/PostProcessing/Pixelise/Hexagon"
 {
     Properties
     {
-        _MainTex("MainTex", 2D) = "white" {}
-        _Params("Params", Vector) = (1,1,1,1)
+//        _MainTex("MainTex", 2D) = "white" {}
+//        _Params("Params", Vector) = (1,1,1,1)
         
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
-        CBUFFER_START(UnityPerMaterial)
-            float4 _Params;
-        CBUFFER_END
+        // CBUFFER_START(UnityPerMaterial)
+            float4 _HexagonParams;
+        // CBUFFER_END
 
-        #define _PixelSize _Params.x
-		#define _PixelRatio _Params.y
-		#define _PixelScaleX _Params.z
-		#define _PixelScaleY _Params.w
+        #define _PixelSize _HexagonParams.x
+		#define _PixelRatio _HexagonParams.y
+		#define _PixelScaleX _HexagonParams.z
+		#define _PixelScaleY _HexagonParams.w
 		
 
 		float HexDist(float2 a, float2 b)
@@ -86,7 +86,7 @@ Shader "Custom/PostProcessing/Pixelise/Hexagon"
 		{
 			float2 ratio = float2(_PixelRatio * _PixelScaleX, _PixelScaleY);
 			float2 nearest = NearestHex(_PixelSize, i.uv * ratio);
-			float4 finalColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, nearest / ratio);
+			float4 finalColor = GetSource(nearest / ratio);
 			return finalColor;
 		}
 		
@@ -97,8 +97,8 @@ Shader "Custom/PostProcessing/Pixelise/Hexagon"
 			int i = hexIndex.x;
 			int j = hexIndex.y;
 			float2 r;
-			r.x = i * _Params.x;
-			r.y = j * _Params.y + (i % 2.0) * _Params.y / 2.0;
+			r.x = i * _PixelSize;
+			r.y = j * _PixelRatio + (i % 2.0) * _PixelRatio / 2.0;
 			return r;
 		}
 
@@ -108,12 +108,12 @@ Shader "Custom/PostProcessing/Pixelise/Hexagon"
 			float2 r;
 
 			int it = int(floor(uv.x / size));
-			float yts = uv.y - float(it % 2.0) * _Params.y / 2.0;
-			int jt = int(floor((1.0 / _Params.y) * yts));
+			float yts = uv.y - float(it % 2.0) * _PixelRatio / 2.0;
+			int jt = int(floor((1.0 / _PixelRatio) * yts));
 			float xt = uv.x - it * size;
-			float yt = yts - jt * _Params.y;
-			int deltaj = (yt > _Params.y / 2.0) ? 1 : 0;
-			float fcond = size * (2.0 / 3.0) * abs(0.5 - yt / _Params.y);
+			float yt = yts - jt * _PixelRatio;
+			int deltaj = (yt > _PixelRatio / 2.0) ? 1 : 0;
+			float fcond = size * (2.0 / 3.0) * abs(0.5 - yt / _PixelRatio);
 
 			if (xt > fcond)
 			{
@@ -139,12 +139,13 @@ Shader "Custom/PostProcessing/Pixelise/Hexagon"
 
         Pass
         {
+        	Name "Hexagon"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment FragHex
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
             
 
             

@@ -2,37 +2,37 @@ Shader "Custom/PostProcessing/EdgeDetection/ScharrNeon"
 {
     Properties
     {
-    	_MainTex("Main Tex", 2D) = "white"{}
-        _Params("_Params", Vector) = (1,1,1,1)
-    	_BackgroundColor("_BackgroundColor", Color) = (1,1,1,1)
+//    	_MainTex("Main Tex", 2D) = "white"{}
+//        _Params("_Params", Vector) = (1,1,1,1)
+//    	_BackgroundColor("_BackgroundColor", Color) = (1,1,1,1)
     }
     
     HLSLINCLUDE
 
-		#include "../CustomPPHeader.hlsl"
+		#include "../CustomPostProcessing.hlsl"
 
-		CBUFFER_START(UnityPerMaterial)
-		    half4 _Params;
-			half4 _BackgroundColor;
-		CBUFFER_END
+		// CBUFFER_START(UnityPerMaterial)
+		    float4 _ScharrNeonParams;
+			half4 _ScharrNeonBackgroundColor;
+		// CBUFFER_END
 
-		#define _EdgeWidth _Params.x
-		#define _EdgeNeonFade _Params.y
-		#define _Brigtness _Params.z
-		#define _BackgroundFade _Params.w
+		#define _EdgeWidth _ScharrNeonParams.x
+		#define _EdgeNeonFade _ScharrNeonParams.y
+		#define _Brigtness _ScharrNeonParams.z
+		#define _BackgroundFade _ScharrNeonParams.w
 		
 		
 		float3 scharr(float stepx, float stepy, float2 center)
 		{
 			// get samples around pixel
-			float3 topLeft = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, stepy)).rgb;
-			float3 midLeft = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, 0)).rgb;
-			float3 bottomLeft = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, -stepy)).rgb;
-			float3 midTop = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(0, stepy)).rgb;
-			float3 midBottom = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(0, -stepy)).rgb;
-			float3 topRight = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, stepy)).rgb;
-			float3 midRight = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, 0)).rgb;
-			float3 bottomRight = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, -stepy)).rgb;
+			float3 topLeft = GetSource(center + float2(-stepx, stepy)).rgb;
+			float3 midLeft = GetSource(float2(-stepx, 0)).rgb;
+			float3 bottomLeft = GetSource(center + float2(-stepx, -stepy)).rgb;
+			float3 midTop = GetSource(center + float2(0, stepy)).rgb;
+			float3 midBottom = GetSource(center + float2(0, -stepy)).rgb;
+			float3 topRight = GetSource(center + float2(stepx, stepy)).rgb;
+			float3 midRight = GetSource(center + float2(stepx, 0)).rgb;
+			float3 bottomRight = GetSource(center + float2(stepx, -stepy)).rgb;
 			
 			
 			// scharr masks ( http://en.wikipedia.org/wiki/Sobel_operator#Alternative_operators)
@@ -53,11 +53,11 @@ Shader "Custom/PostProcessing/EdgeDetection/ScharrNeon"
 		
 		half4 frag(Varyings i): SV_Target
 		{
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 			
 			float3 scharrGradient = scharr(_EdgeWidth / _ScreenParams.x, _EdgeWidth / _ScreenParams.y, i.uv);
 			
-			half3 backgroundColor = lerp(_BackgroundColor.rgb, sceneColor.rgb, _BackgroundFade);
+			half3 backgroundColor = lerp(_ScharrNeonBackgroundColor.rgb, sceneColor.rgb, _BackgroundFade);
 			
 			float3 edgeColor = lerp(backgroundColor.rgb, scharrGradient.rgb, _EdgeNeonFade);
 			
@@ -73,12 +73,13 @@ Shader "Custom/PostProcessing/EdgeDetection/ScharrNeon"
 
         Pass
         {
+        	Name "Scharr Neon"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

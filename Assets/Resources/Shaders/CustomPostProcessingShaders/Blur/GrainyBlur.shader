@@ -2,8 +2,8 @@ Shader "Custom/PostProcessing/Blur/GrainyBlur"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
-    	_Params("Params", Vector) = (1,1,1,1)
+//        _MainTex("Main Tex", 2D) = "white"{}
+//    	_Params("Params", Vector) = (1,1,1,1)
     }
 
     SubShader
@@ -14,20 +14,23 @@ Shader "Custom/PostProcessing/Blur/GrainyBlur"
 
         Pass
         {
+        	Name "Grainy Blur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
-            #include "../CustomPPHeader.hlsl"
+            #include "../CustomPostProcessing.hlsl"
 
-            CBUFFER_START(UnityPerMaterial)
+            // CBUFFER_START(UnityPerMaterial)
                 // float4 _MainTex_ST;
                 // half4 _BaseColor;
-                half2 _Params;	
-            CBUFFER_END
+                // half2 _Params;	
+            // CBUFFER_END
+	        float _GrainyBlurSize;
+	        float _GrainyIteration;
 
             float Rand(float2 n)
 	        {
@@ -40,23 +43,23 @@ Shader "Custom/PostProcessing/Blur/GrainyBlur"
 				half4 finalColor = half4(0.0, 0.0, 0.0, 0.0);
 				float random = Rand(i.uv);
 				
-				for (int k = 0; k < int(_Params.y); k ++)
+				for (int k = 0; k < int(_GrainyIteration); k ++)
 				{
 					random = frac(43758.5453 * random + 0.61432);;
 					randomOffset.x = (random - 0.5) * 2.0;
 					random = frac(43758.5453 * random + 0.61432);
 					randomOffset.y = (random - 0.5) * 2.0;
 					
-					finalColor += SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, half2(i.uv + randomOffset * _Params.x));
+					finalColor += GetSource(i.uv + randomOffset * _SourceTexture_TexelSize.xy * (1.0f + k * _GrainyBlurSize));
 				}
-				return finalColor / _Params.y;
+				return finalColor / _GrainyIteration;
 			}
             
 
             half4 frag(Varyings IN) : SV_Target
             {
-                UNITY_SETUP_INSTANCE_ID(IN);
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
+                // UNITY_SETUP_INSTANCE_ID(IN);
+                // UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
                 
 		        // half4 col = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv) * _BaseColor;
                 return GrainyBlur(IN);

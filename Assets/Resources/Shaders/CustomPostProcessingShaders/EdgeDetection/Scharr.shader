@@ -2,24 +2,24 @@ Shader "Custom/PostProcessing/EdgeDetection/Scharr"
 {
     Properties
     {
-    	_MainTex("Main Tex", 2D) = "white"{}
-        _Params("_Params", Vector) = (1,1,1,1)
-    	_EdgeColor("_EdgeColor", Color) = (1,1,1,1)
-    	_BackgroundColor("_BackgroundColor", Color) = (1,1,1,1)
+//    	_MainTex("Main Tex", 2D) = "white"{}
+//        _Params("_Params", Vector) = (1,1,1,1)
+//    	_EdgeColor("_EdgeColor", Color) = (1,1,1,1)
+//    	_BackgroundColor("_BackgroundColor", Color) = (1,1,1,1)
     }
     
     HLSLINCLUDE
 
-		#include "../CustomPPHeader.hlsl"
+		#include "../CustomPostProcessing.hlsl"
 
-		CBUFFER_START(UnityPerMaterial)
-		    half2 _Params;
-			half4 _EdgeColor;
-			half4 _BackgroundColor;
-		CBUFFER_END
+		// CBUFFER_START(UnityPerMaterial)
+		    float2 _ScharrParams;
+			half4 _ScharrEdgeColor;
+			half4 _ScharrBackgroundColor;
+		// CBUFFER_END
 
-		#define _EdgeWidth _Params.x
-		#define _BackgroundFade _Params.y
+		#define _EdgeWidth _ScharrParams.x
+		#define _BackgroundFade _ScharrParams.y
 
 
 		float intensity(in float4 color)
@@ -30,14 +30,14 @@ Shader "Custom/PostProcessing/EdgeDetection/Scharr"
 		float scharr(float stepx, float stepy, float2 center)
 		{
 			// get samples around pixel
-			float topLeft = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, stepy)));
-			float midLeft = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, 0)));
-			float bottomLeft = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, -stepy)));
-			float midTop = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(0, stepy)));
-			float midBottom = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(0, -stepy)));
-			float topRight = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, stepy)));
-			float midRight = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, 0)));
-			float bottomRight = intensity(SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, -stepy)));
+			float topLeft = intensity(GetSource(center + float2(-stepx, stepy)));
+			float midLeft = intensity(GetSource( center + float2(-stepx, 0)));
+			float bottomLeft = intensity(GetSource(center + float2(-stepx, -stepy)));
+			float midTop = intensity(GetSource(center + float2(0, stepy)));
+			float midBottom = intensity(GetSource(center + float2(0, -stepy)));
+			float topRight = intensity(GetSource(center + float2(stepx, stepy)));
+			float midRight = intensity(GetSource(center + float2(stepx, 0)));
+			float bottomRight = intensity(GetSource(center + float2(stepx, -stepy)));
 
 			// scharr masks ( http://en.wikipedia.org/wiki/Sobel_operator#Alternative_operators)
 			//        3 0 -3        3 10   3
@@ -58,16 +58,16 @@ Shader "Custom/PostProcessing/EdgeDetection/Scharr"
 		half4 frag(Varyings i) : SV_Target
 		{
 
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 
 			float scharrGradient = scharr(_EdgeWidth / _ScreenParams.x, _EdgeWidth / _ScreenParams.y , i.uv);
 
 			//return sceneColor * scharrGradient;
 			//BackgroundFading
-			sceneColor = lerp(sceneColor, _BackgroundColor, _BackgroundFade);
+			sceneColor = lerp(sceneColor, _ScharrBackgroundColor, _BackgroundFade);
 
 			//Edge Opacity
-			float3 edgeColor = lerp(sceneColor.rgb, _EdgeColor.rgb, scharrGradient);
+			float3 edgeColor = lerp(sceneColor.rgb, _ScharrEdgeColor.rgb, scharrGradient);
 
 			return float4(edgeColor, 1);
 
@@ -82,12 +82,13 @@ Shader "Custom/PostProcessing/EdgeDetection/Scharr"
 
         Pass
         {
+        	Name "Scharr"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

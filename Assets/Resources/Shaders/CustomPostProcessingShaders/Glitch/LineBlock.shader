@@ -2,29 +2,29 @@ Shader "Custom/PostProcessing/Glitch/LineBlock"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
-        _Params("_Params", vector) = (1,1,1,1)
-        _Params2("_Params2", vector) = (1,1,1,1)
+//        _MainTex("Main Tex", 2D) = "white"{}
+//        _Params("_Params", vector) = (1,1,1,1)
+//        _Params2("_Params2", vector) = (1,1,1,1)
 //        _Params3("_Params3", vector) = (1,1,1,1)
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
 		#pragma shader_feature USING_FREQUENCY_INFINITE
 
-        CBUFFER_START(UnityPerMaterial)
-            half4 _Params;
-		    half4 _Params2;
+        // CBUFFER_START(UnityPerMaterial)
+            float4 _LineBlockParams;
+		    float4 _LineBlockParams2;
             // half3 _Params3;
-        CBUFFER_END
+        // CBUFFER_END
 
-        #define _Frequency _Params.x
-	    #define _TimeX _Params.y
-	    #define _Amount _Params.z
-	    #define _Offset _Params2.x
-	    #define _LinesWidth _Params2.y
-	    #define _Alpha _Params2.z
+        #define _Frequency _LineBlockParams.x
+	    #define _TimeX _LineBlockParams.y
+	    #define _Amount _LineBlockParams.z
+	    #define _Offset _LineBlockParams2.x
+	    #define _LinesWidth _LineBlockParams2.y
+	    #define _Alpha _LineBlockParams2.z
 
         float randomNoise(float2 c)
 		{
@@ -89,7 +89,7 @@ Shader "Custom/PostProcessing/Glitch/LineBlock"
 			// [3] 生成源色调的blockLine Glitch
 			float2 uv_blockLine = uv;
 			uv_blockLine = saturate(uv_blockLine + float2(0.1 * blockLine_random, 0));
-			float4 blockLineColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, abs(uv_blockLine));
+			float4 blockLineColor = GetSource(abs(uv_blockLine));
 			
 			// [4] 将RGB转到YUV空间，并做色调偏移
 			// RGB -> YUV
@@ -102,7 +102,7 @@ Shader "Custom/PostProcessing/Glitch/LineBlock"
 			
 			
 			// [5] 与源场景图进行混合
-			float4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			float4 sceneColor = GetSource(i.uv);
 			return lerp(sceneColor, float4(blockLineColor_rgb, blockLineColor.a), _Alpha);
 		}
 		
@@ -134,7 +134,7 @@ Shader "Custom/PostProcessing/Glitch/LineBlock"
 			// [3] 生成源色调的blockLine Glitch
 			float2 uv_blockLine = uv;
 			uv_blockLine = saturate(uv_blockLine + float2(0, 0.1 * blockLine_random));
-			float4 blockLineColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, abs(uv_blockLine));
+			float4 blockLineColor = GetSource(abs(uv_blockLine));
 			
 			// [4] 将RGB转到YUV空间，并做色调偏移
 			// RGB -> YUV
@@ -146,7 +146,7 @@ Shader "Custom/PostProcessing/Glitch/LineBlock"
 			float3 blockLineColor_rgb = yuv2rgb(blockLineColor_yuv);
 			
 			// [5] 与源场景图进行混合
-			float4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			float4 sceneColor = GetSource(i.uv);
 			return lerp(sceneColor, float4(blockLineColor_rgb, blockLineColor.a), _Alpha);
 		}
     ENDHLSL
@@ -159,12 +159,13 @@ Shader "Custom/PostProcessing/Glitch/LineBlock"
 
         Pass
         {
+        	Name "LineBlock Horizontal"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment Frag_Horizontal
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL
@@ -172,12 +173,13 @@ Shader "Custom/PostProcessing/Glitch/LineBlock"
     	
     	 Pass
         {
+        	Name "LineBlock Vertical"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment Frag_Vertical
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

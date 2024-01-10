@@ -2,36 +2,36 @@ Shader "Custom/PostProcessing/Glitch/DigitalStripe"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
-    	_NoiseTex("Noise Tex", 2D) = "white"{}
-        _StripColorAdjustColor("_StripColorAdjustColor", vector) = (1,1,1,1)
-        _Indensity("_Indensity", float) = 1
-        _StripColorAdjustIndensity("_StripColorAdjustIndensity", float) = 1
+//        _MainTex("Main Tex", 2D) = "white"{}
+//    	_NoiseTex("Noise Tex", 2D) = "white"{}
+//        _StripColorAdjustColor("_StripColorAdjustColor", vector) = (1,1,1,1)
+//        _Indensity("_Indensity", float) = 1
+//        _StripColorAdjustIndensity("_StripColorAdjustIndensity", float) = 1
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
 		#pragma shader_feature NEED_TRASH_FRAME
     
-		TEXTURE2D(_NoiseTex);
-		SAMPLER(sampler_NoiseTex);
+		TEXTURE2D(_DigitalStripeNoiseTex);
+		SAMPLER(sampler_DigitalStripeNoiseTex);
 
-        CBUFFER_START(UnityPerMaterial)
+        // CBUFFER_START(UnityPerMaterial)
             half4 _StripColorAdjustColor;
-		    float _Indensity;
+		    float _DigitalStripeIndensity;
             float _StripColorAdjustIndensity;
-        CBUFFER_END
+        // CBUFFER_END
 
         half4 Frag(Varyings i): SV_Target
 		{
 			// 基础数据准备
-			 half4 stripNoise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, i.uv);
-			 half threshold = 1.001 - _Indensity * 1.001;
+			 half4 stripNoise = SAMPLE_TEXTURE2D(_DigitalStripeNoiseTex, sampler_DigitalStripeNoiseTex, i.uv);
+			 half threshold = 1.001 - _DigitalStripeIndensity * 1.001;
 			// uv偏移
 			half uvShift = step(threshold, pow(abs(stripNoise.x), 3));
 			float2 uv = frac(i.uv + stripNoise.yz * uvShift);
-			half4 source = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+			half4 source = GetSource(uv);
 
 	#ifndef NEED_TRASH_FRAME
 			return source;
@@ -52,12 +52,13 @@ Shader "Custom/PostProcessing/Glitch/DigitalStripe"
 
         Pass
         {
+        	Name "Digital Stripe"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment Frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

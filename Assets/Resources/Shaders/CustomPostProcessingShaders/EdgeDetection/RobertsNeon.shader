@@ -2,33 +2,33 @@ Shader "Custom/PostProcessing/EdgeDetection/RobertsNeon"
 {
     Properties
     {
-    	_MainTex("Main Tex", 2D) = "white"{}
-        _Params("_Params", Vector) = (1,1,1,1)
-    	_BackgroundColor("_BackgroundColor", Color) = (1,1,1,1)
+//    	_MainTex("Main Tex", 2D) = "white"{}
+//        _Params("_Params", Vector) = (1,1,1,1)
+//    	_BackgroundColor("_BackgroundColor", Color) = (1,1,1,1)
     }
     
     HLSLINCLUDE
 
-		#include "../CustomPPHeader.hlsl"
+		#include "../CustomPostProcessing.hlsl"
 
-		CBUFFER_START(UnityPerMaterial)
-			half4 _Params;
-			half4 _BackgroundColor;
-		CBUFFER_END
+		// CBUFFER_START(UnityPerMaterial)
+			float4 _RobertsNeonParams;
+			half4 _RobertsNeonBackgroundColor;
+		// CBUFFER_END
     
-		#define _EdgeWidth _Params.x
-		#define _EdgeNeonFade _Params.y
-		#define _Brigtness _Params.z
-		#define _BackgroundFade _Params.w
+		#define _EdgeWidth _RobertsNeonParams.x
+		#define _EdgeNeonFade _RobertsNeonParams.y
+		#define _Brigtness _RobertsNeonParams.z
+		#define _BackgroundFade _RobertsNeonParams.w
 		
 		
 		float3 sobel(float stepx, float stepy, float2 center)
 		{
 			// get samples around pixel
-			float3 topLeft = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, stepy)).rgb;
-			float3 bottomLeft = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(-stepx, -stepy)).rgb;
-			float3 topRight = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, stepy)).rgb;
-			float3 bottomRight = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, center + float2(stepx, -stepy)).rgb;
+			float3 topLeft = GetSource(center + float2(-stepx, stepy)).rgb;
+			float3 bottomLeft = GetSource(center + float2(-stepx, -stepy)).rgb;
+			float3 topRight = GetSource(center + float2(stepx, stepy)).rgb;
+			float3 bottomRight = GetSource(center + float2(stepx, -stepy)).rgb;
 			
 			// Roberts Operator
 			//X = -1   0      Y = 0  -1
@@ -50,11 +50,11 @@ Shader "Custom/PostProcessing/EdgeDetection/RobertsNeon"
 		{
 			
 			
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 			
 			float3 sobelGradient = sobel(_EdgeWidth / _ScreenParams.x, _EdgeWidth / _ScreenParams.y, i.uv);
 			
-			half3 backgroundColor = lerp(_BackgroundColor.rgb, sceneColor.rgb, _BackgroundFade);
+			half3 backgroundColor = lerp(_RobertsNeonBackgroundColor.rgb, sceneColor.rgb, _BackgroundFade);
 			
 			//Edge Opacity
 			float3 edgeColor = lerp(backgroundColor.rgb, sobelGradient.rgb, _EdgeNeonFade);
@@ -71,12 +71,13 @@ Shader "Custom/PostProcessing/EdgeDetection/RobertsNeon"
 
         Pass
         {
+        	Name "Roberts Neon"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

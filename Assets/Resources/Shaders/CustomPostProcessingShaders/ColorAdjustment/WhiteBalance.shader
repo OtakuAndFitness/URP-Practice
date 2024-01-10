@@ -2,17 +2,17 @@ Shader "Custom/PostProcessing/ColorAdjustment/WhiteBalance"
 {
     Properties
     {
-        _Temperature("Temperature", Float) = 1
-    	_Tint("Tint", Float) = 1
-        _MainTex("MainTex", 2D) = "white" {}
+//        _Temperature("Temperature", Float) = 1
+//    	_Tint("Tint", Float) = 1
+//        _MainTex("MainTex", 2D) = "white" {}
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
-        CBUFFER_START(UnityPerMaterial)
-			float _Temperature;
-            float _Tint;
-        CBUFFER_END
+        #include "../CustomPostProcessing.hlsl"
+        // CBUFFER_START(UnityPerMaterial)
+			float _WhiteBalanceTemperature;
+            float _WhiteBalanceTint;
+        // CBUFFER_END
 
         float3 WhiteBalance(float3 In, float Temperature, float Tint)
 		{
@@ -62,11 +62,11 @@ Shader "Custom/PostProcessing/ColorAdjustment/WhiteBalance"
 		half4 frag(Varyings i) : SV_Target
 		{
 
-			half3 col = 0.5 + 0.5 * cos(_Time.y + i.uv.xyx + float3(0, 2, 4));
+			// half3 col = 0.5 + 0.5 * cos(_Time.y + i.uv.xyx + float3(0, 2, 4));
 
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 
-			half3 finalColor = WhiteBalance(sceneColor.rgb, _Temperature, _Tint);
+			half3 finalColor = WhiteBalance(sceneColor.rgb, _WhiteBalanceTemperature, _WhiteBalanceTint);
 			return half4(finalColor, 1.0);
 		}
     ENDHLSL
@@ -78,12 +78,13 @@ Shader "Custom/PostProcessing/ColorAdjustment/WhiteBalance"
 
         Pass
         {
+        	Name "White Balance"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

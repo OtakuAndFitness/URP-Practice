@@ -2,15 +2,15 @@ Shader "Custom/PostProcessing/ColorAdjustment/Saturation"
 {
     Properties
     {
-        _Saturation("Saturation", Float) = 1
-        _MainTex("MainTex", 2D) = "white" {}
+//        _Saturation("Saturation", Float) = 1
+//        _MainTex("MainTex", 2D) = "white" {}
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
-        CBUFFER_START(UnityPerMaterial)
+        #include "../CustomPostProcessing.hlsl"
+        // CBUFFER_START(UnityPerMaterial)
             float _Saturation;
-        CBUFFER_END
+        // CBUFFER_END
 
         half3 Saturation(half3 In, half Saturation)
 		{
@@ -24,7 +24,7 @@ Shader "Custom/PostProcessing/ColorAdjustment/Saturation"
 
 			// half3 col = 0.5 + 0.5 * cos(_Time.y + i.uv.xyx + half3(0, 2, 4));
 
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 
 			return half4(Saturation(sceneColor.rgb, _Saturation), 1.0);
 		}
@@ -37,12 +37,13 @@ Shader "Custom/PostProcessing/ColorAdjustment/Saturation"
 
         Pass
         {
+        	Name "Saturation"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

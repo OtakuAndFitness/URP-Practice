@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityEngine.Rendering.Universal
+namespace PostProcessingExtends
 {
     public enum Direction
     {
@@ -22,5 +22,12 @@ namespace UnityEngine.Rendering.Universal
         Horizontal = 0,
         Vertical = 1,
         Horizontal_Vertical =2,
+    }
+
+    public enum CustomPostProcessingInjectionPoint
+    {
+        AfterOpaqueAndSkybox,
+        BeforePostProcess,
+        AfterPostProcess
     }
 }

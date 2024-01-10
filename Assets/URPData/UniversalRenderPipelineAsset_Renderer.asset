@@ -68,22 +68,6 @@ MonoBehaviour:
   m_Active: 0
   settings:
     buffer: 0
---- !u!114 &-2817100262308493125
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2b608056d9724ab189c1e6d07179e2b, type: 3}
-  m_Name: CustomPostProcessingPassFeature
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  evt: 500
-  m_CustomPostProcessingData: {fileID: 11400000, guid: e5a9d2ee2e73546018be6fce16a9f297,
-    type: 2}
 --- !u!114 &-2279555701087228421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,6 +92,9 @@ MonoBehaviour:
       PassNames: []
     overrideMaterial: {fileID: 2100000, guid: bd4ab655477c84777a193ae6905af9ab, type: 2}
     overrideMaterialPassIndex: 0
+    overrideShader: {fileID: 0}
+    overrideShaderPassIndex: 0
+    overrideMode: 1
     overrideDepthState: 0
     depthCompareFunction: 4
     enableWrite: 1
@@ -165,6 +152,7 @@ MonoBehaviour:
   debugShaders:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7,
       type: 3}
+    hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
   m_RendererFeatures:
   - {fileID: -2279555701087228421}
   - {fileID: -9211086459116845694}
@@ -173,8 +161,8 @@ MonoBehaviour:
   - {fileID: -875905420751796347}
   - {fileID: 8525881253142399699}
   - {fileID: -3935514202656126420}
-  - {fileID: -2817100262308493125}
-  m_RendererFeatureMap: fbadfade2a645de08205eef8aaa52b8071be7fed1a9fcac90bc2911894250d728507401ba928d8f3d30ab7e2d30352762c4a2d16af3e62c9bb4871b03ca6e7d8
+  - {fileID: 705367770667400188}
+  m_RendererFeatureMap: fbadfade2a645de08205eef8aaa52b8071be7fed1a9fcac90bc2911894250d728507401ba928d8f3d30ab7e2d30352762c4a2d16af3e62c9fcbba30e40f8c909
   m_UseNativeRenderPass: 1
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -186,13 +174,17 @@ MonoBehaviour:
     samplingPS: {fileID: 4800000, guid: 04c410c9937594faa893a11dceb85f7e, type: 3}
     stencilDeferredPS: {fileID: 4800000, guid: e9155b26e1bc55942a41e518703fe304, type: 3}
     fallbackErrorPS: {fileID: 4800000, guid: e6e9a19c3678ded42a3bc431ebef7dbd, type: 3}
+    fallbackLoadingPS: {fileID: 4800000, guid: 7f888aff2ac86494babad1c2c5daeee2, type: 3}
     materialErrorPS: {fileID: 4800000, guid: 5fd9a8feb75a4b5894c241777f519d4e, type: 3}
     coreBlitPS: {fileID: 4800000, guid: 93446b5c5339d4f00b85c159e1159b7c, type: 3}
     coreBlitColorAndDepthPS: {fileID: 4800000, guid: d104b2fc1ca6445babb8e90b0758136b,
       type: 3}
+    blitHDROverlay: {fileID: 4800000, guid: a89bee29cffa951418fc1e2da94d1959, type: 3}
     cameraMotionVector: {fileID: 4800000, guid: c56b7e0d4c7cb484e959caeeedae9bbf,
       type: 3}
     objectMotionVector: {fileID: 4800000, guid: 7b3ede40266cd49a395def176e1bc486,
+      type: 3}
+    dataDrivenLensFlare: {fileID: 4800000, guid: 6cda457ac28612740adb23da5d39ea92,
       type: 3}
   m_AssetVersion: 2
   m_OpaqueLayerMask:
@@ -213,9 +205,20 @@ MonoBehaviour:
   m_DepthPrimingMode: 0
   m_CopyDepthMode: 0
   m_AccurateGbufferNormals: 0
-  m_ClusteredRendering: 0
-  m_TileSize: 32
   m_IntermediateTextureMode: 1
+--- !u!114 &705367770667400188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07d079e360a49ed46994bd72bd0526c1, type: 3}
+  m_Name: CustomPostProcessingFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &4688981219480330176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,6 +243,9 @@ MonoBehaviour:
       PassNames: []
     overrideMaterial: {fileID: 0}
     overrideMaterialPassIndex: 0
+    overrideShader: {fileID: 0}
+    overrideShaderPassIndex: 0
+    overrideMode: 1
     overrideDepthState: 0
     depthCompareFunction: 4
     enableWrite: 1

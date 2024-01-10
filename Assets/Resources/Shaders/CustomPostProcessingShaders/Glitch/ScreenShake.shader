@@ -2,22 +2,22 @@ Shader "Custom/PostProcessing/Glitch/ScreenShake"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
-        _ScreenShake("_ScreenShake", Float) = 1
+//        _MainTex("Main Tex", 2D) = "white"{}
+//        _ScreenShake("_ScreenShake", Float) = 1
 //        _Params2("_Params2", vector) = (1,1,1,1)
 //        _Params3("_Params3", vector) = (1,1,1,1)
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
 		// #pragma shader_feature USING_FREQUENCY_INFINITE
 
-        CBUFFER_START(UnityPerMaterial)
-			half _ScreenShake;
+        // CBUFFER_START(UnityPerMaterial)
+			float _ScreenShakeParams;
 			// half4 _Params2;
             // half3 _Params3;
-        CBUFFER_END
+        // CBUFFER_END
 
         float randomNoise(float x, float y)
 		{
@@ -27,9 +27,9 @@ Shader "Custom/PostProcessing/Glitch/ScreenShake"
 		
 		half4 Frag_Horizontal(Varyings i): SV_Target
 		{
-			float shake = (randomNoise(_Time.x, 2) - 0.5) * _ScreenShake;
+			float shake = (randomNoise(_Time.x, 2) - 0.5) * _ScreenShakeParams;
 			
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, frac(float2(i.uv.x + shake, i.uv.y)));
+			half4 sceneColor = GetSource(frac(float2(i.uv.x + shake, i.uv.y)));
 			
 			return sceneColor;
 		}
@@ -37,9 +37,9 @@ Shader "Custom/PostProcessing/Glitch/ScreenShake"
 		half4 Frag_Vertical(Varyings i): SV_Target
 		{
 			
-			float shake = (randomNoise(_Time.x, 2) - 0.5) * _ScreenShake;
+			float shake = (randomNoise(_Time.x, 2) - 0.5) * _ScreenShakeParams;
 			
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, frac(float2(i.uv.x, i.uv.y + shake)));
+			half4 sceneColor = GetSource(frac(float2(i.uv.x, i.uv.y + shake)));
 			
 			return sceneColor;
 		}
@@ -53,12 +53,13 @@ Shader "Custom/PostProcessing/Glitch/ScreenShake"
 
         Pass
         {
+        	Name "ScreenShake Horizontal"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment Frag_Horizontal
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL
@@ -66,12 +67,13 @@ Shader "Custom/PostProcessing/Glitch/ScreenShake"
     	
     	 Pass
         {
+			Name "ScreenShake Vertical"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment Frag_Vertical
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

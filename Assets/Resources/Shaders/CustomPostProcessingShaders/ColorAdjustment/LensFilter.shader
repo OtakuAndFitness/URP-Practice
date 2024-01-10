@@ -2,17 +2,17 @@ Shader "Custom/PostProcessing/ColorAdjustment/LensFilter"
 {
     Properties
     {
-        _Indensity("Indensity", Float) = 1
-    	_LensColor("LensColor", Color) = (1,1,1,1)
-        _MainTex("MainTex", 2D) = "white" {}
+//        _Indensity("Indensity", Float) = 1
+//    	_LensColor("LensColor", Color) = (1,1,1,1)
+//        _MainTex("MainTex", 2D) = "white" {}
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
-        CBUFFER_START(UnityPerMaterial)
-			float _Indensity;
+        #include "../CustomPostProcessing.hlsl"
+        // CBUFFER_START(UnityPerMaterial)
+			float _LensFilterIndensity;
             half4 _LensColor;
-        CBUFFER_END
+        // CBUFFER_END
 
         half luminance(half3 color)
 		{
@@ -21,7 +21,7 @@ Shader "Custom/PostProcessing/ColorAdjustment/LensFilter"
 
 		half4 frag(Varyings i): SV_Target
 		{
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 
 			half lum = luminance(sceneColor.rgb);
 
@@ -31,7 +31,7 @@ Shader "Custom/PostProcessing/ColorAdjustment/LensFilter"
 			// Interpolate withhalf4(1.0, 1.0, 1.0, 1.0) based on luminance
 			filterColor = lerp(filterColor, half4(1.0, 1.0, 1.0, 1.0), saturate(lum - 0.5) * 2.0);
 
-			filterColor = lerp(sceneColor, filterColor, saturate(lum * _Indensity));
+			filterColor = lerp(sceneColor, filterColor, saturate(lum * _LensFilterIndensity));
 
 			return half4(filterColor.rgb, sceneColor.a);
 		}
@@ -44,12 +44,13 @@ Shader "Custom/PostProcessing/ColorAdjustment/LensFilter"
 
         Pass
         {
+        	Name "Lens Filter"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

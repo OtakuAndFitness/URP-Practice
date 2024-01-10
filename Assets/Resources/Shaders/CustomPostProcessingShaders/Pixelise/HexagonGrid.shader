@@ -2,20 +2,20 @@ Shader "Custom/PostProcessing/Pixelise/HexagonGrid"
 {
     Properties
     {
-        _MainTex("MainTex", 2D) = "white" {}
-        _Params("Params", Vector) = (1,1,1,1)
+//        _MainTex("MainTex", 2D) = "white" {}
+//        _Params("Params", Vector) = (1,1,1,1)
         
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
-        CBUFFER_START(UnityPerMaterial)
-            float2 _Params;
-        CBUFFER_END
+        // CBUFFER_START(UnityPerMaterial)
+            float2 _HexagonGridParams;
+        // CBUFFER_END
 
-        #define _PixelSize _Params.x
-		#define _GridWidth _Params.y
+        #define _PixelSize _HexagonGridParams.x
+		#define _GridWidth _HexagonGridParams.y
 
 
 		float HexDist(float2 a, float2 b)
@@ -88,7 +88,7 @@ Shader "Custom/PostProcessing/Pixelise/HexagonGrid"
 			float pixelSize = _PixelSize * _ScreenParams.x * 0.2;
 			float2 nearest = NearestHex(pixelSize, i.uv * _ScreenParams.xy);
 
-			float4 finalColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, nearest / _ScreenParams.xy);
+			float4 finalColor = GetSource(nearest / _ScreenParams.xy);
 
 			float dist = HexDist(i.uv * _ScreenParams.xy, nearest);
 
@@ -104,8 +104,8 @@ Shader "Custom/PostProcessing/Pixelise/HexagonGrid"
 			int i = hexIndex.x;
 			int j = hexIndex.y;
 			float2 r;
-			r.x = i * _Params.x;
-			r.y = j * _Params.y + (i % 2.0) * _Params.y / 2.0;
+			r.x = i * _PixelSize;
+			r.y = j * _GridWidth + (i % 2.0) * _GridWidth / 2.0;
 			return r;
 		}
 
@@ -115,12 +115,12 @@ Shader "Custom/PostProcessing/Pixelise/HexagonGrid"
 			float2 r;
 
 			int it = int(floor(uv.x / size));
-			float yts = uv.y - float(it % 2.0) * _Params.y / 2.0;
-			int jt = int(floor((1.0 / _Params.y) * yts));
+			float yts = uv.y - float(it % 2.0) * _GridWidth / 2.0;
+			int jt = int(floor((1.0 / _GridWidth) * yts));
 			float xt = uv.x - it * size;
-			float yt = yts - jt * _Params.y;
-			int deltaj = (yt > _Params.y / 2.0) ? 1 : 0;
-			float fcond = size * (2.0 / 3.0) * abs(0.5 - yt / _Params.y);
+			float yt = yts - jt * _GridWidth;
+			int deltaj = (yt > _GridWidth / 2.0) ? 1 : 0;
+			float fcond = size * (2.0 / 3.0) * abs(0.5 - yt / _GridWidth);
 
 			if (xt > fcond)
 			{
@@ -146,12 +146,13 @@ Shader "Custom/PostProcessing/Pixelise/HexagonGrid"
 
         Pass
         {
+        	Name "Hexagon Grid"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment FragHexGrid
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
             
 
             

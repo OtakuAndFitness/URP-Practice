@@ -2,17 +2,17 @@ Shader "Custom/PostProcessing/ColorAdjustment/ContrastV2"
 {
     Properties
     {
-        _Contrast("Contrast", Float) = 1
-    	_ContrastFactorRGB("ContrastFactorRGB", Color) = (1,1,1,1)
-        _MainTex("MainTex", 2D) = "white" {}
+//        _Contrast("Contrast", Float) = 1
+//    	_ContrastFactorRGB("ContrastFactorRGB", Color) = (1,1,1,1)
+//        _MainTex("MainTex", 2D) = "white" {}
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
-        CBUFFER_START(UnityPerMaterial)
-			float _Contrast;
-			half3 _ContrastFactorRGB;
-        CBUFFER_END
+        #include "../CustomPostProcessing.hlsl"
+        // CBUFFER_START(UnityPerMaterial)
+			float _ContrastV2;
+			half3 _ContrastV2FactorRGB;
+        // CBUFFER_END
 
         half3 ColorAdjustment_Contrast_V2(float3 In, half3 ContrastFactor, float Contrast)
 		{
@@ -23,9 +23,9 @@ Shader "Custom/PostProcessing/ColorAdjustment/ContrastV2"
 		half4 frag(Varyings i) : SV_Target
 		{
 
-			half4 finalColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 finalColor = GetSource(i.uv);
 
-			finalColor.rgb = ColorAdjustment_Contrast_V2(finalColor.rgb , _ContrastFactorRGB,_Contrast);
+			finalColor.rgb = ColorAdjustment_Contrast_V2(finalColor.rgb , _ContrastV2FactorRGB, _ContrastV2);
 
 			return finalColor;
 		}
@@ -38,12 +38,13 @@ Shader "Custom/PostProcessing/ColorAdjustment/ContrastV2"
 
         Pass
         {
+        	Name "ContrastV2"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

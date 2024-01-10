@@ -2,15 +2,15 @@ Shader "Custom/PostProcessing/ColorAdjustment/BleachBypass"
 {
     Properties
     {
-        _Indensity("Indensity", Float) = 1
-        _MainTex("MainTex", 2D) = "white" {}
+//        _Indensity("Indensity", Float) = 1
+//        _MainTex("MainTex", 2D) = "white" {}
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
-        CBUFFER_START(UnityPerMaterial)
-            float _Indensity;
-        CBUFFER_END
+        #include "../CustomPostProcessing.hlsl"
+        // CBUFFER_START(UnityPerMaterial)
+            float _BleachBypassIndensity;
+        // CBUFFER_END
 
         half luminance(half3 color)
 		{
@@ -20,7 +20,7 @@ Shader "Custom/PostProcessing/ColorAdjustment/BleachBypass"
 		//reference : https://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html
 		half4 frag(Varyings i): SV_Target
 		{	
-			half4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 color = GetSource(i.uv);
 			half lum = luminance(color.rgb);
 			half3 blend = half3(lum, lum, lum);
 			half L = min(1.0, max(0.0, 10.0 * (lum - 0.45)));
@@ -28,7 +28,7 @@ Shader "Custom/PostProcessing/ColorAdjustment/BleachBypass"
 			half3 result2 = 1.0 - 2.0 * (1.0 - blend) * (1.0 - color.rgb);
 			half3 newColor = lerp(result1, result2, L);
 			
-			return lerp(color, half4(newColor, color.a), _Indensity);
+			return lerp(color, half4(newColor, color.a), _BleachBypassIndensity);
 		}
     ENDHLSL
 
@@ -39,12 +39,13 @@ Shader "Custom/PostProcessing/ColorAdjustment/BleachBypass"
 
         Pass
         {
+        	Name "BleachBypass"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

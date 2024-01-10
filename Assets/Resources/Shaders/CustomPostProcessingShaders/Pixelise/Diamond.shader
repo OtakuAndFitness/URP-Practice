@@ -2,21 +2,21 @@ Shader "Custom/PostProcessing/Pixelise/Diamond"
 {
     Properties
     {
-        _MainTex("MainTex", 2D) = "white" {}
-        _PixelSize("PixelSize", Float) = 1
+//        _MainTex("MainTex", 2D) = "white" {}
+//        _PixelSize("PixelSize", Float) = 1
         
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
-        CBUFFER_START(UnityPerMaterial)
-            float _PixelSize;
-        CBUFFER_END
+        // CBUFFER_START(UnityPerMaterial)
+            float _DiamondPixelSize;
+        // CBUFFER_END
 
         float2 DiamondPixelizeUV(float2 uv)
 		{
-			half2 pixelSize = 10 / _PixelSize;
+			half2 pixelSize = 10 / _DiamondPixelSize;
 			
 			half2 coord = uv * pixelSize;
 			
@@ -44,7 +44,7 @@ Shader "Custom/PostProcessing/Pixelise/Diamond"
 		{
 			float2 uv = DiamondPixelizeUV(i.uv);
 			
-			return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+			return GetSource(uv);
 		}
 
     ENDHLSL
@@ -57,12 +57,13 @@ Shader "Custom/PostProcessing/Pixelise/Diamond"
 
         Pass
         {
+        	Name "Diamond"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
             
 
             

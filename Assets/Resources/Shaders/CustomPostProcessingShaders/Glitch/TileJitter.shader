@@ -2,28 +2,28 @@ Shader "Custom/PostProcessing/Glitch/TileJitter"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
-        _Params("_Params", vector) = (1,1,1,1)
+//        _MainTex("Main Tex", 2D) = "white"{}
+//        _Params("_Params", vector) = (1,1,1,1)
 //        _Params2("_Params2", vector) = (1,1,1,1)
 //        _Params3("_Params3", vector) = (1,1,1,1)
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
     	#pragma shader_feature JITTER_DIRECTION_HORIZONTAL
 		#pragma shader_feature USING_FREQUENCY_INFINITE
 
-        CBUFFER_START(UnityPerMaterial)
-            half4 _Params;
+        // CBUFFER_START(UnityPerMaterial)
+            half4 _TileJitterParams;
 		    // half4 _Params2;
             // half3 _Params3;
-        CBUFFER_END
+        // CBUFFER_END
 
-        #define _SplittingNumber _Params.x
-		#define _JitterAmount _Params.y
-		#define _JitterSpeed _Params.z
-		#define _Frequency _Params.w
+        #define _SplittingNumber _TileJitterParams.x
+		#define _JitterAmount _TileJitterParams.y
+		#define _JitterSpeed _TileJitterParams.z
+		#define _Frequency _TileJitterParams.w
 
 
         float randomNoise(float2 c)
@@ -54,7 +54,7 @@ Shader "Custom/PostProcessing/Glitch/TileJitter"
 			}
 
 			// -------------------------------Final Sample------------------------------
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+			half4 sceneColor = GetSource(uv);
 			return sceneColor;
 		}
 		
@@ -80,7 +80,7 @@ Shader "Custom/PostProcessing/Glitch/TileJitter"
 			}
 
 			// -------------------------------Final Sample------------------------------
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+			half4 sceneColor = GetSource(uv);
 			return sceneColor;
 		}
     ENDHLSL
@@ -93,12 +93,13 @@ Shader "Custom/PostProcessing/Glitch/TileJitter"
 
         Pass
         {
+        	Name "TileJitter Horizontal"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment Frag_Horizontal
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL
@@ -106,12 +107,13 @@ Shader "Custom/PostProcessing/Glitch/TileJitter"
     	
     	 Pass
         {
+        	Name "TileJitter Vertical"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment Frag_Vertical
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

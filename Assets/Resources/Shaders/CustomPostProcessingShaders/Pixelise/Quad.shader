@@ -2,22 +2,22 @@ Shader "Custom/PostProcessing/Pixelise/Quad"
 {
     Properties
     {
-        _MainTex("MainTex", 2D) = "white" {}
-        _Params("Params", Vector) = (1,1,1,1)
+//        _MainTex("MainTex", 2D) = "white" {}
+//        _Params("Params", Vector) = (1,1,1,1)
         
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
-        CBUFFER_START(UnityPerMaterial)
-            float4 _Params;
-        CBUFFER_END
+        // CBUFFER_START(UnityPerMaterial)
+            float4 _QuadParams;
+        // CBUFFER_END
 
-        #define _PixelSize _Params.x
-		#define _PixelRatio _Params.y
-		#define _PixelScaleX _Params.z
-		#define _PixelScaleY _Params.w	
+        #define _PixelSize _QuadParams.x
+		#define _PixelRatio _QuadParams.y
+		#define _PixelScaleX _QuadParams.z
+		#define _PixelScaleY _QuadParams.w	
 
 		float2 RectPixelizeUV( half2 uv)
 		{
@@ -35,7 +35,7 @@ Shader "Custom/PostProcessing/Pixelise/Quad"
 
 			float2 uv = RectPixelizeUV(i.uv);
 
-			float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+			float4 color = GetSource(uv);
 
 			return color;
 
@@ -52,12 +52,12 @@ Shader "Custom/PostProcessing/Pixelise/Quad"
 
         Pass
         {
+        	Name "Quad"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
             
 
             

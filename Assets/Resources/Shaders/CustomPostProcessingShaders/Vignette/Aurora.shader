@@ -2,27 +2,27 @@ Shader "Custom/PostProcessing/Vignette/Aurora"
 {
     Properties
     {
-        _Color("Color", Color) = (1, 1, 1, 1)
-        _MainTex("MainTex", 2D) = "white" {}
-        _Params("Params", Vector) = (1,1,1,1)
-        _Params2("Params", Vector) = (1,1,1,1)
+//        _Color("Color", Color) = (1, 1, 1, 1)
+//        _MainTex("MainTex", 2D) = "white" {}
+//        _Params("Params", Vector) = (1,1,1,1)
+//        _Params2("Params", Vector) = (1,1,1,1)
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
-        CBUFFER_START(UnityPerMaterial)
-            float4 _Params;
-            half4 _Params2;
-            half4 _Color;
-        CBUFFER_END
+        // CBUFFER_START(UnityPerMaterial)
+            float4 _AuroraParameters;
+            half4 _AuroraParameters2;
+            // half4 _Color;
+        // CBUFFER_END
 
-        #define _VignetteArea _Params.x
-		#define _VignetteSmoothness _Params.y
-		#define _ColorChange _Params.z
-		#define _TimeX _Params.w
-        #define _ColorFactor _Params2.xyz
-        #define _Fading _Params2.w
+        #define _VignetteArea _AuroraParameters.x
+		#define _VignetteSmoothness _AuroraParameters.y
+		#define _ColorChange _AuroraParameters.z
+		#define _TimeX _AuroraParameters.w
+        #define _ColorFactor _AuroraParameters2.xyz
+        #define _Fading _AuroraParameters2.w
 
 	    half4 frag(Varyings i): SV_Target
 		{	
@@ -37,7 +37,7 @@ Shader "Custom/PostProcessing/Vignette/Aurora"
 				_ColorFactor.g * 0.5 * (sin(1.28 * waveFactor + _TimeX * 3.15) + 1.0),
 				_ColorFactor.b * 0.4 * (sin(1.28 * waveFactor + _TimeX * 1.26) + 1.0)
 			);
-			half4 mainCol = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
+			half4 mainCol = GetSource(uv);
 			half3 finalColor = lerp(mainCol.rgb, AuroraColor, vignetteIndensity * _Fading);
 			return half4(finalColor, 1.0);
 		}
@@ -54,9 +54,9 @@ Shader "Custom/PostProcessing/Vignette/Aurora"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

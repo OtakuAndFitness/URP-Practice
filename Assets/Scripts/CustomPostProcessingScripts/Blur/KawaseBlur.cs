@@ -1,28 +1,81 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using PostProcessingExtends;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace UnityEngine.Rendering.Universal
+namespace UPostProcessingExtends.Effects
 {
-    [Serializable,VolumeComponentMenu("Custom-post-processing/Blur/KawaseBlur")]
-    public class KawaseBlur : VolumeComponent, IPostProcessComponent
+    [Serializable,VolumeComponentMenu("Custom-Post-Processing/Blur/KawaseBlur")]
+    public class KawaseBlur : CustomPostProcessingBase
     {
         // public KawaseFilerModeParameter filterMode = new KawaseFilerModeParameter(FilterMode.Bilinear);
-        public ClampedIntParameter blurCount = new ClampedIntParameter(1, 1, 10);
-        public ClampedIntParameter downSample = new ClampedIntParameter(1, 1, 6);
-        public ClampedFloatParameter indensity = new ClampedFloatParameter(0f, 0, 3);
+        public ClampedFloatParameter blurSize= new ClampedFloatParameter(0.6f, 0.0f, 3.0f);
+        public ClampedFloatParameter downSample = new ClampedFloatParameter(2f, 1f, 8f);
+        public ClampedIntParameter iteration = new ClampedIntParameter(0, 0, 20);
 
-        public bool IsActive()
+        private const string _shaderName = "Custom/PostProcessing/Blur/KawaseBlur";
+        private RTHandle _tempRT0;
+        private RTHandle _tempRT1;
+        private string _tempRT0Name => "_TemporaryRenderTexture0";
+        private string _tempRT1Name => "_TemporaryRenderTexture1";
+
+        private int _blurSizeKeyword = Shader.PropertyToID("_KawaseBlurSize");
+        
+        public override bool IsActive() =>  _material != null && iteration.value > 0;
+        
+
+        public override CustomPostProcessingInjectionPoint InjectionPoint =>
+            CustomPostProcessingInjectionPoint.AfterPostProcess;
+        public override int OrderInInjectionPoint => 8;
+
+        public override void Setup()
         {
-            return active && indensity.value != 0;
+            if (_material == null)
+            {
+                _material = CoreUtils.CreateEngineMaterial(_shaderName);
+            }
+        }
+        
+        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+        {
+            var descriptor = GetCameraRenderTextureDescriptor(renderingData);
+            descriptor.width = (int)(descriptor.width / downSample.value);
+            descriptor.height = (int)(descriptor.height / downSample.value);
+
+            RenderingUtils.ReAllocateIfNeeded(ref _tempRT0, descriptor, name: _tempRT0Name,
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
+            RenderingUtils.ReAllocateIfNeeded(ref _tempRT1, descriptor, name: _tempRT1Name,
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
         }
 
-        public bool IsTileCompatible()
+        public override void Render(CommandBuffer cmd, ref RenderingData renderingData, in RTHandle source, in RTHandle destination)
         {
-            return false;
+            if (_material == null)
+            {
+                return;
+            }
+
+            Draw(cmd, source, _tempRT0);
+            for (int i = 0; i < iteration.value; i++)
+            {
+                cmd.SetGlobalFloat(_blurSizeKeyword, 1.0f + i * blurSize.value);
+                Draw(cmd, _tempRT0, _tempRT1, 0);
+                CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+            }
+            Draw(cmd, _tempRT0, destination);
+        }
+        
+        public override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            
+            CoreUtils.Destroy(_material);
+            
+            _tempRT0?.Release();
+            _tempRT1?.Release();
         }
     }
     

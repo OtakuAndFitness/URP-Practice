@@ -2,11 +2,11 @@ Shader "Custom/PostProcessing/Blur/TiltShiftBlur"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
+//        _MainTex("Main Tex", 2D) = "white"{}
 //        _Offset("Offset", Float) = 1
-		_Params("Params", Vector) = (1,1,1,1)
-    	_Gradient("Gradient", Vector) = (1,1,1,1)
-    	_GoldenRot("GoldenRot", Vector) = (1,1,1,1)
+//		_Params("Params", Vector) = (1,1,1,1)
+//    	_Gradient("Gradient", Vector) = (1,1,1,1)
+//    	_GoldenRot("GoldenRot", Vector) = (1,1,1,1)
 
     }
 
@@ -23,43 +23,44 @@ Shader "Custom/PostProcessing/Blur/TiltShiftBlur"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
-            #include "../CustomPPHeader.hlsl"
+            #include "../CustomPostProcessing.hlsl"
 
-            CBUFFER_START(UnityPerMaterial)
+            // CBUFFER_START(UnityPerMaterial)
                 // float4 _MainTex_TexelSize;
                 // float _Offset;
                 // float4 _BaseMap_ST;
                 // half4 _BaseColor;
-                half3 _Gradient;
-	            half4 _GoldenRot;
+                float3 _TiltShiftBlurGradient;
+	            // half4 _GoldenRot;
 	            // uniform half4 _Distortion;
-	            half4 _Params;
-            CBUFFER_END
+	            float2 _TiltShiftBlurParameters;
+            // CBUFFER_END
 
             float TiltShiftMask(float2 uv)
 	        {
-		        float centerY = uv.y * 2.0 - 1.0 + _Gradient.x; // [0,1] -> [-1,1]
-		        return pow(abs(centerY * _Gradient.y), _Gradient.z);
+		        float centerY = uv.y * 2.0 - 1.0 + _TiltShiftBlurGradient.x; // [0,1] -> [-1,1]
+		        return pow(abs(centerY * _TiltShiftBlurGradient.y), _TiltShiftBlurGradient.z);
 	        }
 
             half4 TiltShiftBlur(Varyings IN)
 			{
-				half2x2 rot = half2x2(_GoldenRot);
+				float a = 2.3389f;
+                float2x2 rot = float2x2(cos(a), -sin(a), sin(a), cos(a));
 				half4 accumulator = 0.0;
 				half4 divisor = 0.0;
 				
 				half r = 1.0;
-				half2 angle = half2(0.0, _Params.y * saturate(TiltShiftMask(IN.uv)));
+				half2 angle = half2(0.0, _TiltShiftBlurParameters.y * saturate(TiltShiftMask(IN.uv)));
 				
-				for (int j = 0; j < _Params.x; j ++)
+				for (int j = 0; j < int(_TiltShiftBlurParameters.x); j ++)
 				{
 					r += 1.0 / r;
 					angle = mul(rot, angle);
-					half4 bokeh = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, float2(IN.uv + _Params.zw * (r - 1.0) * angle));
+					half4 bokeh = GetSource(IN.uv + _SourceTexture_TexelSize.xy * (r - 1.0) * angle);
 					accumulator += bokeh * bokeh;
 					divisor += bokeh;
 				}

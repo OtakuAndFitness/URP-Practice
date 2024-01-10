@@ -2,22 +2,22 @@ Shader "Custom/PostProcessing/Pixelise/Triangle"
 {
     Properties
     {
-        _MainTex("MainTex", 2D) = "white" {}
-        _Params("Params", Vector) = (1,1,1,1)
+//        _MainTex("MainTex", 2D) = "white" {}
+//        _Params("Params", Vector) = (1,1,1,1)
         
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
-        CBUFFER_START(UnityPerMaterial)
-            float4 _Params;
-        CBUFFER_END
+        // CBUFFER_START(UnityPerMaterial)
+            float4 _TriangleParams;
+        // CBUFFER_END
 
-        #define _PixelSize _Params.x
-		#define _PixelRatio _Params.y
-		#define _PixelScaleX _Params.z
-		#define _PixelScaleY _Params.w	
+        #define _PixelSize _TriangleParams.x
+		#define _PixelRatio _TriangleParams.y
+		#define _PixelScaleX _TriangleParams.z
+		#define _PixelScaleY _TriangleParams.w	
 
 		float2 TrianglePixelizeUV(float2 uv)
 		{
@@ -44,7 +44,7 @@ Shader "Custom/PostProcessing/Pixelise/Triangle"
 		{
 			float2 uv = TrianglePixelizeUV(i.uv);
 
-			return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);		
+			return GetSource(uv);		
 		}
 
 
@@ -58,12 +58,13 @@ Shader "Custom/PostProcessing/Pixelise/Triangle"
 
         Pass
         {
+        	Name "Triangle"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
             
 
             

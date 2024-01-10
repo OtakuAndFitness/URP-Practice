@@ -2,21 +2,21 @@ Shader "Custom/PostProcessing/ColorAdjustment/ColorReplace"
 {
     Properties
     {
-        _Range("Range", Float) = 1
-    	_Fuzziness("Fuzziness", Float) = 1
-    	_FromColor("FromColor", Color) = (1,1,1,1)
-    	_ToColor("ToColor", Color) = (1,1,1,1)
-        _MainTex("MainTex", 2D) = "white" {}
+//        _Range("Range", Float) = 1
+//    	_Fuzziness("Fuzziness", Float) = 1
+//    	_FromColor("FromColor", Color) = (1,1,1,1)
+//    	_ToColor("ToColor", Color) = (1,1,1,1)
+//        _MainTex("MainTex", 2D) = "white" {}
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
-        CBUFFER_START(UnityPerMaterial)
-			float _Range;
-            float _Fuzziness;
-			half4 _FromColor;
-			half4 _ToColor;
-        CBUFFER_END
+        #include "../CustomPostProcessing.hlsl"
+        // CBUFFER_START(UnityPerMaterial)
+			float _ColorReplaceRange;
+            float _ColorReplaceFuzziness;
+			half4 _ColorReplaceFromColor;
+			half4 _ColorReplaceToColor;
+        // CBUFFER_END
 
         half3 ColorReplace(half3 In, half3 From, half3 To, half Range, half Fuzziness)
 		{
@@ -29,9 +29,9 @@ Shader "Custom/PostProcessing/ColorAdjustment/ColorReplace"
 		half4 frag(Varyings i) : SV_Target
 		{
 
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 
-			half3 finalColor = ColorReplace(sceneColor.rgb, _FromColor.rgb , _ToColor.rgb , _Range, _Fuzziness);
+			half3 finalColor = ColorReplace(sceneColor.rgb, _ColorReplaceFromColor.rgb , _ColorReplaceToColor.rgb , _ColorReplaceRange, _ColorReplaceFuzziness);
 
 			return half4(finalColor, 1.0);
 		}
@@ -44,12 +44,13 @@ Shader "Custom/PostProcessing/ColorAdjustment/ColorReplace"
 
         Pass
         {
+        	Name "ColorReplace"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL

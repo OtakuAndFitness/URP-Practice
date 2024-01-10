@@ -2,28 +2,28 @@ Shader "Custom/PostProcessing/Glitch/AnalogNoise"
 {
     Properties
     {
-        _MainTex("Main Tex", 2D) = "white"{}
-        _Params("_Params", vector) = (1,1,1,1)
+//        _MainTex("Main Tex", 2D) = "white"{}
+//        _Params("_Params", vector) = (1,1,1,1)
 //        _Params2("_Params2", vector) = (1,1,1,1)
 //        _Params3("_Params3", vector) = (1,1,1,1)
     }
     
     HLSLINCLUDE
-        #include "../CustomPPHeader.hlsl"
+        #include "../CustomPostProcessing.hlsl"
 
 //    	#pragma shader_feature JITTER_DIRECTION_HORIZONTAL
 //		#pragma shader_feature USING_FREQUENCY_INFINITE
 
-        CBUFFER_START(UnityPerMaterial)
-            half4 _Params;
+        // CBUFFER_START(UnityPerMaterial)
+            half4 _AnalogNoiseParams;
 		    // half4 _Params2;
             // half3 _Params3;
-        CBUFFER_END
+        // CBUFFER_END
 
-        #define _Speed _Params.x
-		#define _Fading _Params.y
-		#define _LuminanceJitterThreshold _Params.z
-		#define _TimeX _Params.w
+        #define _Speed _AnalogNoiseParams.x
+		#define _Fading _AnalogNoiseParams.y
+		#define _LuminanceJitterThreshold _AnalogNoiseParams.z
+		#define _TimeX _AnalogNoiseParams.w
 
 
         float randomNoise(float2 c)
@@ -34,7 +34,7 @@ Shader "Custom/PostProcessing/Glitch/AnalogNoise"
 		half4 Frag(Varyings i): SV_Target
 		{
 
-			half4 sceneColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
+			half4 sceneColor = GetSource(i.uv);
 			half4 noiseColor = sceneColor;
 
 			half luminance = dot(noiseColor.rgb, half3(0.22, 0.707, 0.071));
@@ -63,12 +63,13 @@ Shader "Custom/PostProcessing/Glitch/AnalogNoise"
 
         Pass
         {
+        	Name "Analog Noise"
 //            Tags {"LightMode" = "UniversalForward"}
 
             HLSLPROGRAM
-	        #pragma vertex vertDefault
+	        #pragma vertex Vert
             #pragma fragment Frag
-            #pragma multi_compile_instancing
+            // #pragma multi_compile_instancing
 
             
             ENDHLSL
