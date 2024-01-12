@@ -8,7 +8,7 @@ using UnityEngine.Rendering.Universal;
 namespace PostProcessingExtends.Effects
 {
     [Serializable,VolumeComponentMenu("Custom-Post-Processing/Blur/RadialBlur")]
-    public class RadialBlur : CustomPostProcessingBase
+    public class RadialBlur : VolumeComponent, IPostProcessComponent
     {
         // public RadialBlurQualityParameter qualityLevel = new RadialBlurQualityParameter(RadialBlurQuality.RadialBlur_8Tap_Balance);
         // public RadialFilerModeParameter filterMode = new RadialFilerModeParameter(FilterMode.Bilinear);
@@ -17,48 +17,52 @@ namespace PostProcessingExtends.Effects
         public ClampedFloatParameter blurSize = new ClampedFloatParameter(0.6f, 0.0f, 1.0f);
         public ClampedIntParameter iteration = new ClampedIntParameter(0, 0, 30);
 
-        private const string _shaderName = "Custom/PostProcessing/Blur/RadialBlur";
+        // private const string _shaderName = "Custom/PostProcessing/Blur/RadialBlur";
         // private RTHandle _tempRT0;
         // private RTHandle _tempRT1;
         // private string _tempRT0Name => "_TemporaryRenderTexture0";
         // private string _tempRT1Name => "_TemporaryRenderTexture1";
 
-        private int _blurParametersKeyword = Shader.PropertyToID("_RadialBlurParameters");
+        // private int _blurParametersKeyword = Shader.PropertyToID("_RadialBlurParameters");
         
-        public override bool IsActive() =>  _material != null && iteration.value > 0;
-        
-
-        public override CustomPostProcessingInjectionPoint InjectionPoint =>
-            CustomPostProcessingInjectionPoint.AfterPostProcess;
-        public override int OrderInInjectionPoint => 9;
-        public override void Setup()
+        public bool IsActive() =>  iteration.value > 0;
+        public bool IsTileCompatible()
         {
-            if (_material == null)
-            {
-                _material = CoreUtils.CreateEngineMaterial(_shaderName);
-            }
+            return false;
         }
 
-        public override void Render(CommandBuffer cmd, ref RenderingData renderingData, in RTHandle source, in RTHandle destination)
-        {
-            if (_material == null)
-            {
-                return;
-            }
-            
-            cmd.SetGlobalVector(_blurParametersKeyword, new Vector4(iteration.value, blurSize.value * 0.02f,RadialCenterX.value, RadialCenterY.value));
-            Draw(cmd, source, destination, 0);
-        }
-        
-        public override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            
-            CoreUtils.Destroy(_material);
-            
-            // _tempRT0?.Release();
-            // _tempRT1?.Release();
-        }
+
+        // public override CustomPostProcessingInjectionPoint InjectionPoint =>
+        //     CustomPostProcessingInjectionPoint.AfterPostProcess;
+        // public override int OrderInInjectionPoint => 9;
+        // public override void Setup()
+        // {
+        //     if (_material == null)
+        //     {
+        //         _material = CoreUtils.CreateEngineMaterial(_shaderName);
+        //     }
+        // }
+        //
+        // public override void Render(CommandBuffer cmd, ref RenderingData renderingData, in RTHandle source, in RTHandle destination)
+        // {
+        //     if (_material == null)
+        //     {
+        //         return;
+        //     }
+        //     
+        //     cmd.SetGlobalVector(_blurParametersKeyword, new Vector4(iteration.value, blurSize.value * 0.02f,RadialCenterX.value, RadialCenterY.value));
+        //     Draw(cmd, source, destination, 0);
+        // }
+        //
+        // public override void Dispose(bool disposing)
+        // {
+        //     base.Dispose(disposing);
+        //     
+        //     CoreUtils.Destroy(_material);
+        //     
+        //     // _tempRT0?.Release();
+        //     // _tempRT1?.Release();
+        // }
     }
     
     // [Serializable]

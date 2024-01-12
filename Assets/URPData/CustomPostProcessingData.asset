@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7271889cf140ff84dbab1c1b6eb16d17, type: 3}
+  m_Name: CustomPostProcessingData
+  m_EditorClassIdentifier: 
+  customShaders:
+    gaussianBlur: {fileID: 4800000, guid: 3c802762de6da4a37aa53a68ba40767a, type: 3}
+    boxBlur: {fileID: 4800000, guid: 8247a682d4fd04d188b4ccbb33ac950d, type: 3}
+    kawaseBlur: {fileID: 4800000, guid: c260ddd246efd4830a12d35166bf04db, type: 3}
+    dualKawaseBlur: {fileID: 4800000, guid: 5f353561ec7ca447b9820ab126f34840, type: 3}
+    bokehBlur: {fileID: 4800000, guid: 29b73c02b240842c6a586840fa975c08, type: 3}
+    tiltShfitBlur: {fileID: 4800000, guid: c86202f35d30f4823b98805529231b16, type: 3}
+    irisBlur: {fileID: 4800000, guid: 35611a79d6b0e4580afe218cc67dc4f0, type: 3}
+    grainyBlur: {fileID: 4800000, guid: 8caefa2aab57c4b1cb41e65c318f393c, type: 3}
+    radialBlur: {fileID: 4800000, guid: a2d8e47f741b1df4fa4b1f02e325f040, type: 3}
+    directionalBlur: {fileID: 4800000, guid: 08533419947c97b418bfb70dbe61c189, type: 3}
+    rgbSplit: {fileID: 4800000, guid: 5d86447b315884c11a8c4eb1dfdec36f, type: 3}
+    imageBlock: {fileID: 4800000, guid: 7028a7ace36ab4cd7a5620a0a2cf3c65, type: 3}
+    lineBlock: {fileID: 4800000, guid: c20990fe9833ae64ca997aa811884251, type: 3}
+    tileJitter: {fileID: 4800000, guid: 6db49fd21acc143e49950a0e3443c28e, type: 3}
+    scanLineJitter: {fileID: 4800000, guid: af1966d1ed1e44bdea8791ddad3f05cc, type: 3}
+    digitalStripe: {fileID: 4800000, guid: 7f1c13c14202047c0a95eb3eb08395c6, type: 3}
+    analogNoise: {fileID: 4800000, guid: 5b5682146a2a54bda8109d7ab5be39fe, type: 3}
+    screenJump: {fileID: 4800000, guid: 70e75cedefecd4e05b0ff5604cf00a34, type: 3}
+    screenShake: {fileID: 4800000, guid: 163236073428a435093a741624f20d14, type: 3}
+    waveJitter: {fileID: 4800000, guid: 9b552ccda75374c3c990e0065f2c6001, type: 3}
+    roberts: {fileID: 4800000, guid: 136aeef4c76124e339fd33964d249d65, type: 3}
+    robertsNeon: {fileID: 4800000, guid: 6392d3b47726e4e8ea6af26dcf9ccce8, type: 3}
+    scharr: {fileID: 4800000, guid: b749c69b1440c4606aaf8d3c0e7c9135, type: 3}
+    scharrNeon: {fileID: 4800000, guid: 9c1fc5c22ca344dc5a37beb9f9d4d6b0, type: 3}
+    sobel: {fileID: 4800000, guid: 6eea16e506fd043ce82fd85141db03ce, type: 3}
+    sobelNeon: {fileID: 4800000, guid: 4b84d235935c14abe8f9f4ca15917ef6, type: 3}
+    circle: {fileID: 4800000, guid: c799f76ca39894ae3aef48e3804394e0, type: 3}
+    diamond: {fileID: 4800000, guid: 9a724e92a052d4982b511f10479809c1, type: 3}
+    hexagon: {fileID: 4800000, guid: 148f5066151154a0baecf65566b078b6, type: 3}
+    hexagonGrid: {fileID: 4800000, guid: a265a4f4299114cf496b7bcf8665b72c, type: 3}
+    leaf: {fileID: 4800000, guid: fdf6dc24c65ab48b7bc5d6b80d255974, type: 3}
+    led: {fileID: 4800000, guid: 9e523b892fa454a3793a68547bbec287, type: 3}
+    quad: {fileID: 4800000, guid: b91962d03691c4516a6587794f2500e6, type: 3}
+    sector: {fileID: 4800000, guid: 7648cc5148c414affb1b3c70bdecd8fe, type: 3}
+    triangle: {fileID: 4800000, guid: 1dcdffa3bb56f4054a3536e70793bd26, type: 3}
+    aurora: {fileID: 4800000, guid: a23e7c6892fd04fdeb6272cdf97794ec, type: 3}
+    rapidOldTV: {fileID: 4800000, guid: a115279832061460bb5efbd012b3de00, type: 3}
+    rapidOldTVV2: {fileID: 4800000, guid: 425377194f72443b1a6e3f47c0cc7ffb, type: 3}
+    rapid: {fileID: 4800000, guid: 71b9d7e187334440492db4d24b48a5c9, type: 3}
+    rapidV2: {fileID: 4800000, guid: 8df85e4bc48b445968f232ff8e5a5a92, type: 3}
+    sharpenV1: {fileID: 4800000, guid: f960164d8dbe7431a85d3cb4bf29481f, type: 3}
+    sharpenV2: {fileID: 4800000, guid: 00eeaa44c3e5f4ec3b1962385cdd2ecb, type: 3}
+    sharpenV3: {fileID: 4800000, guid: c71ef0f7af1d04d9fa09e6a7be6fb342, type: 3}
+    bleachBypass: {fileID: 4800000, guid: 0287a3b47b173487f815e140047503c6, type: 3}
+    brightness: {fileID: 4800000, guid: acdeae9907592468f9c31c9920710005, type: 3}
+    hue: {fileID: 4800000, guid: 20e78eebb8c204e3e8053a2c8c145fe5, type: 3}
+    tint: {fileID: 4800000, guid: b169bd2c8a45147abb98c98104b382f5, type: 3}
+    whiteBalance: {fileID: 4800000, guid: 5f669651ce5114d219195ea85875992e, type: 3}
+    lensFilter: {fileID: 4800000, guid: 1eaeb52996aea45f2be50f343ae5dde5, type: 3}
+    saturation: {fileID: 4800000, guid: d167ce01e373b4493849df306f249971, type: 3}
+    technicolor: {fileID: 4800000, guid: 12c192b1bc94f4aaa9aec1be213a3812, type: 3}
+    colorReplace: {fileID: 4800000, guid: 5016a23abea7240f1be8aaab3cce7ceb, type: 3}
+    colorReplaceV2: {fileID: 4800000, guid: 0c753da4fce3f304fa345fde95db33e7, type: 3}
+    contrast: {fileID: 4800000, guid: 533471df739b547cab6306335dd92a79, type: 3}
+    contrastV2: {fileID: 4800000, guid: 9aa7d5a8170d94bf983e56ca9e8e94ed, type: 3}
+    contrastV3: {fileID: 4800000, guid: 3eb6ad9e15827488e820f4a614b359ee, type: 3}
+    copyMaterial: {fileID: 4800000, guid: 63ff9a9324965524a83c29c5751f49dd, type: 3}
