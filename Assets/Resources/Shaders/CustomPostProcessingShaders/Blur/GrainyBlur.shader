@@ -50,7 +50,7 @@ Shader "Custom/PostProcessing/Blur/GrainyBlur"
 					random = frac(43758.5453 * random + 0.61432);
 					randomOffset.y = (random - 0.5) * 2.0;
 					
-					finalColor += GetSource(i.uv + randomOffset * _SourceTexture_TexelSize.xy * (1.0f + k * _GrainyBlurSize));
+					finalColor += GetSource(i.uv + randomOffset * GetSourceTexelSize().xy * (1.0f + k * _GrainyBlurSize));
 				}
 				return finalColor / _GrainyIteration;
 			}

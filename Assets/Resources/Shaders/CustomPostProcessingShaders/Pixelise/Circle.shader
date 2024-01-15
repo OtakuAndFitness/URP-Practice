@@ -21,6 +21,8 @@ Shader "Custom/PostProcessing/Pixelise/Circle"
         #define _PixelIntervalX _CircleParams2.x
 		#define _PixelIntervalY _CircleParams2.y
 
+        // TEXTURE2D_X(_BlitTexture);
+		// SAMPLER(sampler_BlitTexture);
 
 		float4 CirclePixelize(float2 uv)
 		{
@@ -41,7 +43,7 @@ Shader "Custom/PostProcessing/Pixelise/Circle"
 			circleCenter.x *= ratio;
 
 			//采样
-			float4 screenColor = GetSource(circleCenter);
+			float4 screenColor = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_BlitTexture, circleCenter);
 
 			//对于距离大于半径的像素，替换为背景色
 			if (dist > _CircleParams.z)  screenColor = _CircleBackground;

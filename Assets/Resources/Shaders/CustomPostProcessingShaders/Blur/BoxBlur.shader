@@ -38,7 +38,7 @@ Shader "Custom/PostProcessing/Blur/BoxBlur"
                 // UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
                 
 		        // half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                _BoxBlurSize *= _SourceTexture_TexelSize.xyxy;
+                _BoxBlurSize *= GetSourceTexelSize().xyxy;
                 float4 d = _BoxBlurSize.xyxy * float4(-1.0, -1.0, 1.0, 1.0);
 		
 		        half4 s = 0;

@@ -60,7 +60,7 @@ Shader "Custom/PostProcessing/Blur/TiltShiftBlur"
 				{
 					r += 1.0 / r;
 					angle = mul(rot, angle);
-					half4 bokeh = GetSource(IN.uv + _SourceTexture_TexelSize.xy * (r - 1.0) * angle);
+					half4 bokeh = GetSource(IN.uv + GetSourceTexelSize().xy * (r - 1.0) * angle);
 					accumulator += bokeh * bokeh;
 					divisor += bokeh;
 				}

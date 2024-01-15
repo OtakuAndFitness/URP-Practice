@@ -41,7 +41,7 @@ Shader "Custom/PostProcessing/Sharpen/SharpenV3"
 	    	ScreenSpaceData dataSS = GetScreenSpaceData(vertexID);
 	    	OUT.uv = dataSS.uv;
 	    	OUT.positionHCS = dataSS.positionHCS;
-	    	OUT.texcoord1 = half4(OUT.uv.xy - _SourceTexture_TexelSize.xy, OUT.uv.xy + _SourceTexture_TexelSize.xy);
+	    	OUT.texcoord1 = half4(OUT.uv.xy - GetSourceTexelSize().xy, OUT.uv.xy + GetSourceTexelSize().xy);
 		    return OUT;
 		}
 

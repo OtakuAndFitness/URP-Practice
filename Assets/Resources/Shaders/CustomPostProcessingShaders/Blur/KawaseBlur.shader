@@ -48,7 +48,7 @@ Shader "Custom/PostProcessing/Blur/KawaseBlur"
 	        	ScreenSpaceData dataSS = GetScreenSpaceData(vertexID);
 	        	output.positionHCS = dataSS.positionHCS;
 	        	output.uv = dataSS.uv;
-	        	output.uv1 = output.uv.xyxy + _KawaseBlurSize * float4(-0.5f, -0.5f, 0.5f, 0.5f) * _SourceTexture_TexelSize.xyxy;
+	        	output.uv1 = output.uv.xyxy + _KawaseBlurSize * float4(-0.5f, -0.5f, 0.5f, 0.5f) * GetSourceTexelSize().xyxy;
 
 	        	return output;
 	        }

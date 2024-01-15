@@ -58,7 +58,7 @@ Shader "Custom/PostProcessing/Blur/GaussianBlur"
                 
                 OUT.positionHCS = dataSS.positionHCS;
                 OUT.uv = dataSS.uv;
-                _GaussianBlurSize *= _SourceTexture_TexelSize.xyxy;
+                _GaussianBlurSize *= GetSourceTexelSize().xyxy;
                 OUT.uv01 = OUT.uv.xyxy + _GaussianBlurSize.xyxy * float4(1, 1, -1, -1);
 	    	    OUT.uv23 = OUT.uv.xyxy + _GaussianBlurSize.xyxy * float4(1, 1, -1, -1) * 2.0;
 	    	    OUT.uv45 = OUT.uv.xyxy + _GaussianBlurSize.xyxy * float4(1, 1, -1, -1) * 6.0;

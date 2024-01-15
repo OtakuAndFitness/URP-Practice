@@ -51,7 +51,7 @@ Shader "Custom/PostProcessing/Blur/IrisBlur"
 				{
 					r += 1.0 / r;
 					angle = mul(rot, angle);
-					half4 bokeh = GetSource(i.uv + _SourceTexture_TexelSize.xy * (r - 1.0) * angle);
+					half4 bokeh = GetSource(i.uv + GetSourceTexelSize().xy * (r - 1.0) * angle);
 					accumulator += bokeh * bokeh;
 					divisor += bokeh;
 				}

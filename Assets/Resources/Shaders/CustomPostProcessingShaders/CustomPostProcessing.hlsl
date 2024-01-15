@@ -5,10 +5,14 @@
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/UnityInput.hlsl"
 
-TEXTURE2D(_SourceTexture);
-SAMPLER(sampler_SourceTexture);
+// TEXTURE2D(_SourceTexture);
+// SAMPLER(sampler_SourceTexture);
 
-float4 _SourceTexture_TexelSize;
+TEXTURE2D(_BlitTexture);
+SAMPLER(sampler_BlitTexture);
+
+// float4 _SourceTexture_TexelSize;
+float4 _BlitTexture_TexelSize;
 
 struct Varyings
 {
@@ -27,7 +31,7 @@ struct ScreenSpaceData
 
 half4 GetSource(float2 uv)
 {
-    return SAMPLE_TEXTURE2D(_SourceTexture, sampler_SourceTexture, uv);
+    return SAMPLE_TEXTURE2D(_BlitTexture, sampler_BlitTexture, uv);
 }
 
 half4 GetSource(Varyings input)
@@ -37,7 +41,7 @@ half4 GetSource(Varyings input)
 
 float4 GetSourceTexelSize()
 {
-    return _SourceTexture_TexelSize;
+    return _BlitTexture_TexelSize;
 }
 
 ScreenSpaceData GetScreenSpaceData(uint vertexID : SV_VertexID)

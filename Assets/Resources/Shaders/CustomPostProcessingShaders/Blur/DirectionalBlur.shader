@@ -40,7 +40,7 @@ Shader "Custom/PostProcessing/Blur/DirectionalBlur"
 
 		        for (int k = -_DirectionalBlurSize.x; k < _DirectionalBlurSize.x; k++)
 		        {
-			        color += GetSource(i.uv - _DirectionalBlurSize.yz * _SourceTexture_TexelSize.xy * k);
+			        color += GetSource(i.uv - _DirectionalBlurSize.yz * GetSourceTexelSize().xy * k);
 		        }
 		        half4 finalColor = color / (_DirectionalBlurSize.x * 2.0);
 

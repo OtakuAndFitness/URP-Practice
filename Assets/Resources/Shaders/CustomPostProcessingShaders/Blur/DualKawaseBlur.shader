@@ -74,7 +74,7 @@ Shader "Custom/PostProcessing/Blur/DualKawaseBlur"
         	ScreenSpaceData dataSS = GetScreenSpaceData(vertexID);
         	OUT.positionHCS = dataSS.positionHCS;
         	OUT.uv = dataSS.uv;
-			OUT.uv1 = OUT.uv.xyxy + _DualKawaseBlurSize * float4(-0.5f, -0.5f, 0.5f, 0.5f) * _SourceTexture_TexelSize.xyxy;
+			OUT.uv1 = OUT.uv.xyxy + _DualKawaseBlurSize * float4(-0.5f, -0.5f, 0.5f, 0.5f) * GetSourceTexelSize().xyxy;
         	
 		
 		    // #if UNITY_UV_STARTS_AT_TOP
@@ -119,14 +119,14 @@ Shader "Custom/PostProcessing/Blur/DualKawaseBlur"
 
         	_DualKawaseBlurSize *= 0.5f;
 
-        	OUT.uv01.xy = OUT.uv + float2(-1.0f, -1.0f) * _SourceTexture_TexelSize.xy * _DualKawaseBlurSize;
-		    OUT.uv01.zw = OUT.uv + float2(-1.0f, 1.0f) * _SourceTexture_TexelSize.xy * _DualKawaseBlurSize;
-		    OUT.uv23.xy = OUT.uv + float2(0.0f, -2.0f) * _SourceTexture_TexelSize.xy * _DualKawaseBlurSize;
-		    OUT.uv23.zw = OUT.uv + float2(0.0f, 2.0f) * _SourceTexture_TexelSize.xy * _DualKawaseBlurSize;
-		    OUT.uv45.xy = OUT.uv + float2(1.0f, -1.0f) * _SourceTexture_TexelSize.xy * _DualKawaseBlurSize;
-		    OUT.uv45.zw = OUT.uv + float2(1.0f, 1.0f) * _SourceTexture_TexelSize.xy * _DualKawaseBlurSize;
-		    OUT.uv67.xy = OUT.uv + float2(-2.0f, 0.0f) * _SourceTexture_TexelSize.xy * _DualKawaseBlurSize;
-		    OUT.uv67.zw = OUT.uv + float2(2.0f, 0.0f) * _SourceTexture_TexelSize.xy * _DualKawaseBlurSize;
+        	OUT.uv01.xy = OUT.uv + float2(-1.0f, -1.0f) * GetSourceTexelSize().xy * _DualKawaseBlurSize;
+		    OUT.uv01.zw = OUT.uv + float2(-1.0f, 1.0f) * GetSourceTexelSize().xy * _DualKawaseBlurSize;
+		    OUT.uv23.xy = OUT.uv + float2(0.0f, -2.0f) * GetSourceTexelSize().xy * _DualKawaseBlurSize;
+		    OUT.uv23.zw = OUT.uv + float2(0.0f, 2.0f) * GetSourceTexelSize().xy * _DualKawaseBlurSize;
+		    OUT.uv45.xy = OUT.uv + float2(1.0f, -1.0f) * GetSourceTexelSize().xy * _DualKawaseBlurSize;
+		    OUT.uv45.zw = OUT.uv + float2(1.0f, 1.0f) * GetSourceTexelSize().xy * _DualKawaseBlurSize;
+		    OUT.uv67.xy = OUT.uv + float2(-2.0f, 0.0f) * GetSourceTexelSize().xy * _DualKawaseBlurSize;
+		    OUT.uv67.zw = OUT.uv + float2(2.0f, 0.0f) * GetSourceTexelSize().xy * _DualKawaseBlurSize;
             
             // UNITY_SETUP_INSTANCE_ID(IN);
             // UNITY_TRANSFER_INSTANCE_ID(IN, OUT);

@@ -44,7 +44,7 @@ Shader "Custom/PostProcessing/Blur/BokehBlur"
                 for (int i = 1; i <= _BokehIteration; i++) {
                     r = sqrt(i);
                     angle = mul(rot, angle);
-                    uv = IN.uv + _SourceTexture_TexelSize.xy * angle * r;
+                    uv = IN.uv + GetSourceTexelSize().xy * angle * r;
                     color += GetSource(uv);
                 }
 
