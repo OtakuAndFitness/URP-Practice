@@ -11,7 +11,6 @@ namespace PostProcessingExtends
         public readonly Material gaussianBlur;
         public readonly Material boxBlur;
         public readonly Material kawaseBlur;
-        public readonly Material dualKawaseBlur;
         public readonly Material bokehBlur;
         public readonly Material tiltShiftBlur;
         public readonly Material irisBlur;
@@ -86,7 +85,6 @@ namespace PostProcessingExtends
             gaussianBlur = Load(data.customShaders.gaussianBlur);
             boxBlur = Load(data.customShaders.boxBlur);
             kawaseBlur = Load(data.customShaders.kawaseBlur);
-            dualKawaseBlur = Load(data.customShaders.dualKawaseBlur);
             bokehBlur = Load(data.customShaders.bokehBlur);
             tiltShiftBlur = Load(data.customShaders.tiltShfitBlur);
             irisBlur = Load(data.customShaders.irisBlur);
@@ -176,7 +174,6 @@ namespace PostProcessingExtends
             CoreUtils.Destroy(gaussianBlur);
             CoreUtils.Destroy(boxBlur);
             CoreUtils.Destroy(kawaseBlur);
-            CoreUtils.Destroy(dualKawaseBlur);
             CoreUtils.Destroy(bokehBlur);
             CoreUtils.Destroy(tiltShiftBlur);
             CoreUtils.Destroy(irisBlur);

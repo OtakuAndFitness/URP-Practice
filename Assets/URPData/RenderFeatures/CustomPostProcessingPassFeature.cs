@@ -18,13 +18,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         // const string k_RenderPostProcessingTag = "Render AdditionalPostProcessing Effects";
         const string k_RenderCustomPostProcessingTag = "Render Custom PostProcessing Pass";
         
-        // private int _SourceTextureId = Shader.PropertyToID("_SourceTexture");
-
         //blur
         private GaussianBlur m_GaussianBlur;
         private BoxBlur m_BoxBlur;
         private KawaseBlur m_KawaseBlur;
-        private DualKawaseBlur m_DualKawaseBlur;
         private BokehBlur m_BokehBlur;
         private TiltShiftBlur m_TiltShiftBlur;
         private IrisBlur m_IrisBlur;
@@ -113,7 +110,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         RTHandle m_TemporaryColorTexture02;
 
         RTHandle m_TemporaryBlurTexture03;
-        // RTHandle m_TemporaryBlurTexture04;
+        RTHandle m_TemporaryBlurTexture04;
 
         // RenderTargetHandle m_TemporaryColorTexture03;
         // private RTHandle _sourceRT;
@@ -160,7 +157,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_TemporaryColorTexture01?.Release();
             m_TemporaryColorTexture02?.Release();
             m_TemporaryBlurTexture03?.Release();
-            
+            m_TemporaryBlurTexture04?.Release();
+
             _tempRT0?.Release();
             _tempRT1?.Release();
         }
@@ -175,12 +173,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.depthBufferBits = 0;
-            // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Point);
-            // cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, FilterMode.Point);
 
             //for custom post processing
-            // m_TemporaryColorTexture01.Init("m_TemporaryColorTexture01");
-            // m_TemporaryColorTexture02.Init("m_TemporaryColorTexture02");
             RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryColorTexture01, opaqueDesc, name: "_TemporaryRenderTexture01",
                 wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
             RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryColorTexture02, opaqueDesc, name: "_TemporaryRenderTexture02",
@@ -228,7 +222,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_GaussianBlur = stack.GetComponent<GaussianBlur>();
             m_BoxBlur = stack.GetComponent<BoxBlur>();
             m_KawaseBlur = stack.GetComponent<KawaseBlur>();
-            m_DualKawaseBlur = stack.GetComponent<DualKawaseBlur>();
             m_BokehBlur = stack.GetComponent<BokehBlur>();
             m_TiltShiftBlur = stack.GetComponent<TiltShiftBlur>();
             m_IrisBlur = stack.GetComponent<IrisBlur>();
@@ -287,14 +280,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             m_Contrast = stack.GetComponent<Contrast>();
             m_ContrastV2 = stack.GetComponent<ContrastV2>();
             m_ContrastV3 = stack.GetComponent<ContrastV3>();
-
-            // _destinationRT = renderingData.cameraData.renderer.cameraColorTargetHandle;
-            // _sourceRT = renderingData.cameraData.renderer.cameraColorTargetHandle;
             
             var cmd = CommandBufferPool.Get(k_RenderCustomPostProcessingTag);
-            // Blitter.BlitCameraTexture(cmd, _sourceRT, _tempRT0);
             Render(cmd, ref renderingData);
-            // Blitter.BlitCameraTexture(cmd, _tempRT1, _destinationRT);
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
             CommandBufferPool.Release(cmd);
@@ -312,7 +300,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.GaussianBlur)))
                 {
-                    SetupGaussianBlur(cmd, ref renderingData, m_Materials.gaussianBlur);
+                    SetupGaussianBlur(cmd, ref renderingData, m_Materials.gaussianBlur, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
             }
 
@@ -320,7 +310,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.BoxBlur)))
                 {
-                    SetupBoxBlur(cmd, ref renderingData, m_Materials.boxBlur);
+                    SetupBoxBlur(cmd, ref renderingData, m_Materials.boxBlur, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
             }
 
@@ -328,24 +320,20 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.KawaseBlur)))
                 {
-                    SetupKawaseBlur(cmd, ref renderingData, m_Materials.kawaseBlur);
+                    SetupKawaseBlur(cmd, ref renderingData, m_Materials.kawaseBlur, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
 
-            }
-
-            if (m_DualKawaseBlur.IsActive() && !cameraData.isSceneViewCamera)
-            {
-                using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.DualKawaseBlur)))
-                {
-                    SetupDualKawaseBlur(cmd, ref renderingData, m_Materials.dualKawaseBlur);
-                }
             }
 
             if (m_BokehBlur.IsActive() && !cameraData.isSceneViewCamera)
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.BokehBlur)))
                 {
-                    SetupBokehBlur(cmd, ref renderingData, m_Materials.bokehBlur);
+                    SetupBokehBlur(cmd, ref renderingData, m_Materials.bokehBlur, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
 
             }
@@ -354,7 +342,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.TiltShiftBlur)))
                 {
-                    SetupTiltShiftBlur(cmd, ref renderingData, m_Materials.tiltShiftBlur);
+                    SetupTiltShiftBlur(cmd, ref renderingData, m_Materials.tiltShiftBlur, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
             }
 
@@ -362,7 +352,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.IrisBlur)))
                 {
-                    SetupIrisBlur(cmd, ref renderingData, m_Materials.irisBlur);
+                    SetupIrisBlur(cmd, ref renderingData, m_Materials.irisBlur, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
             }
 
@@ -370,7 +362,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.GrainyBlur)))
                 {
-                    SetupGrainyBlur(cmd, ref renderingData, m_Materials.grainyBlur);
+                    SetupGrainyBlur(cmd, ref renderingData, m_Materials.grainyBlur, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
             }
 
@@ -378,7 +372,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.RadialBlur)))
                 {
-                    SetupRadialBlur(cmd, ref renderingData, m_Materials.radialBlur);
+                    SetupRadialBlur(cmd, ref renderingData, m_Materials.radialBlur, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
             }
 
@@ -409,7 +405,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ImageBlock)))
                 {
-                    SetupImageBlock(cmd, ref renderingData, m_Materials.imageBlock);
+                    SetupImageBlock(cmd, ref renderingData, m_Materials.imageBlock, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
+
                 }
             }
 
@@ -417,7 +415,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.LineBlock)))
                 {
-                    SetupLineBlock(cmd, ref renderingData, m_Materials.lineBlock);
+                    SetupLineBlock(cmd, ref renderingData, m_Materials.lineBlock, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -425,7 +424,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.TileJitter)))
                 {
-                    SetupTileJitter(cmd, ref renderingData, m_Materials.tileJitter);
+                    SetupTileJitter(cmd, ref renderingData, m_Materials.tileJitter, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -433,7 +433,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ScanLineJitter)))
                 {
-                    SetupScanLineJitter(cmd, ref renderingData, m_Materials.scanLineJitter);
+                    SetupScanLineJitter(cmd, ref renderingData, m_Materials.scanLineJitter, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -441,7 +442,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.DigitalStripe)))
                 {
-                    SetupDigitalStripe(cmd, ref renderingData, m_Materials.digitalStripe);
+                    SetupDigitalStripe(cmd, ref renderingData, m_Materials.digitalStripe, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -449,7 +451,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.AnalogNoise)))
                 {
-                    SetupAnalogNoise(cmd, ref renderingData, m_Materials.analogNoise);
+                    SetupAnalogNoise(cmd, ref renderingData, m_Materials.analogNoise, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -457,7 +460,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ScreenJump)))
                 {
-                    SetupScreenJump(cmd, ref renderingData, m_Materials.screenJump);
+                    SetupScreenJump(cmd, ref renderingData, m_Materials.screenJump, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -465,7 +469,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ScreenShake)))
                 {
-                    SetupScreenShake(cmd, ref renderingData, m_Materials.screenShake);
+                    SetupScreenShake(cmd, ref renderingData, m_Materials.screenShake, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -473,7 +478,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.WaveJitter)))
                 {
-                    SetupWaveJitter(cmd, ref renderingData, m_Materials.waveJitter);
+                    SetupWaveJitter(cmd, ref renderingData, m_Materials.waveJitter, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -485,7 +491,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Roberts)))
                 {
-                    SetupRoberts(cmd, ref renderingData, m_Materials.roberts);
+                    SetupRoberts(cmd, ref renderingData, m_Materials.roberts, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -493,7 +500,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.RobertsNeon)))
                 {
-                    SetupRobertsNeon(cmd, ref renderingData, m_Materials.robertsNeon);
+                    SetupRobertsNeon(cmd, ref renderingData, m_Materials.robertsNeon, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -501,7 +509,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Scharr)))
                 {
-                    SetupScharr(cmd, ref renderingData, m_Materials.scharr);
+                    SetupScharr(cmd, ref renderingData, m_Materials.scharr, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -509,7 +518,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ScharrNeon)))
                 {
-                    SetupScharrNeon(cmd, ref renderingData, m_Materials.scharrNeon);
+                    SetupScharrNeon(cmd, ref renderingData, m_Materials.scharrNeon, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -517,7 +527,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Sobel)))
                 {
-                    SetupSobel(cmd, ref renderingData, m_Materials.sobel);
+                    SetupSobel(cmd, ref renderingData, m_Materials.sobel, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -525,7 +536,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.SobelNeon)))
                 {
-                    SetupSobelNeon(cmd, ref renderingData, m_Materials.sobelNeon);
+                    SetupSobelNeon(cmd, ref renderingData, m_Materials.sobelNeon, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -537,7 +549,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Circle)))
                 {
-                    SetupCircle(cmd, ref renderingData, m_Materials.circle);
+                    SetupCircle(cmd, ref renderingData, m_Materials.circle, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -545,7 +558,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Diamond)))
                 {
-                    SetupDiamond(cmd, ref renderingData, m_Materials.diamond);
+                    SetupDiamond(cmd, ref renderingData, m_Materials.diamond, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -553,7 +567,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Hexagon)))
                 {
-                    SetupHexagon(cmd, ref renderingData, m_Materials.hexagon);
+                    SetupHexagon(cmd, ref renderingData, m_Materials.hexagon, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -561,7 +576,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.HexagonGrid)))
                 {
-                    SetupHexagonGrid(cmd, ref renderingData, m_Materials.hexagonGrid);
+                    SetupHexagonGrid(cmd, ref renderingData, m_Materials.hexagonGrid, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -569,7 +585,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Leaf)))
                 {
-                    SetupLeaf(cmd, ref renderingData, m_Materials.leaf);
+                    SetupLeaf(cmd, ref renderingData, m_Materials.leaf, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -577,7 +594,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Led)))
                 {
-                    SetupLed(cmd, ref renderingData, m_Materials.led);
+                    SetupLed(cmd, ref renderingData, m_Materials.led, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -585,7 +603,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Quad)))
                 {
-                    SetupQuad(cmd, ref renderingData, m_Materials.quad);
+                    SetupQuad(cmd, ref renderingData, m_Materials.quad, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -593,7 +612,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Sector)))
                 {
-                    SetupSector(cmd, ref renderingData, m_Materials.sector);
+                    SetupSector(cmd, ref renderingData, m_Materials.sector, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -601,7 +621,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Triangle)))
                 {
-                    SetupTriangle(cmd, ref renderingData, m_Materials.triangle);
+                    SetupTriangle(cmd, ref renderingData, m_Materials.triangle, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -613,7 +634,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Aurora)))
                 {
-                    SetupAurora(cmd, ref renderingData, m_Materials.aurora);
+                    SetupAurora(cmd, ref renderingData, m_Materials.aurora, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -621,7 +643,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.RapidOldTV)))
                 {
-                    SetupRapidOldTV(cmd, ref renderingData, m_Materials.rapidOldTV);
+                    SetupRapidOldTV(cmd, ref renderingData, m_Materials.rapidOldTV, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -629,7 +652,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.RapidOldTVV2)))
                 {
-                    SetupRapidOldTVV2(cmd, ref renderingData, m_Materials.rapidOldTVV2);
+                    SetupRapidOldTVV2(cmd, ref renderingData, m_Materials.rapidOldTVV2, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -637,7 +661,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Rapid)))
                 {
-                    SetupRapid(cmd, ref renderingData, m_Materials.rapid);
+                    SetupRapid(cmd, ref renderingData, m_Materials.rapid, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -645,7 +670,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.RapidV2)))
                 {
-                    SetupRapidV2(cmd, ref renderingData, m_Materials.rapidV2);
+                    SetupRapidV2(cmd, ref renderingData, m_Materials.rapidV2, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -657,7 +683,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.SharpenV1)))
                 {
-                    SetupSharpenV1(cmd, ref renderingData, m_Materials.sharpenV1);
+                    SetupSharpenV1(cmd, ref renderingData, m_Materials.sharpenV1, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -665,7 +692,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.SharpenV2)))
                 {
-                    SetupSharpenV2(cmd, ref renderingData, m_Materials.sharpenV2);
+                    SetupSharpenV2(cmd, ref renderingData, m_Materials.sharpenV2, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -673,7 +701,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.SharpenV3)))
                 {
-                    SetupSharpenV3(cmd, ref renderingData, m_Materials.sharpenV3);
+                    SetupSharpenV3(cmd, ref renderingData, m_Materials.sharpenV3, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -685,7 +714,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.BleachBypass)))
                 {
-                    SetupBleachBypass(cmd, ref renderingData, m_Materials.bleachBypass);
+                    SetupBleachBypass(cmd, ref renderingData, m_Materials.bleachBypass, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -693,7 +723,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Brightness)))
                 {
-                    SetupBrightness(cmd, ref renderingData, m_Materials.brightness);
+                    SetupBrightness(cmd, ref renderingData, m_Materials.brightness, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -701,7 +732,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Hue)))
                 {
-                    SetupHue(cmd, ref renderingData, m_Materials.hue);
+                    SetupHue(cmd, ref renderingData, m_Materials.hue, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
 
                 }
             }
@@ -710,7 +742,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Tint)))
                 {
-                    SetupTint(cmd, ref renderingData, m_Materials.tint);
+                    SetupTint(cmd, ref renderingData, m_Materials.tint, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -718,7 +751,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.WhiteBalance)))
                 {
-                    SetupWhiteBalance(cmd, ref renderingData, m_Materials.whiteBalance);
+                    SetupWhiteBalance(cmd, ref renderingData, m_Materials.whiteBalance, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -726,7 +760,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.LensFilter)))
                 {
-                    SetupLensFilter(cmd, ref renderingData, m_Materials.lensFilter);
+                    SetupLensFilter(cmd, ref renderingData, m_Materials.lensFilter, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -734,7 +769,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Saturation)))
                 {
-                    SetupSaturation(cmd, ref renderingData, m_Materials.saturation);
+                    SetupSaturation(cmd, ref renderingData, m_Materials.saturation, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -742,7 +778,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Technicolor)))
                 {
-                    SetupTechnicolor(cmd, ref renderingData, m_Materials.technicolor);
+                    SetupTechnicolor(cmd, ref renderingData, m_Materials.technicolor, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -750,7 +787,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ColorReplace)))
                 {
-                    SetupColorReplace(cmd, ref renderingData, m_Materials.colorReplace);
+                    SetupColorReplace(cmd, ref renderingData, m_Materials.colorReplace, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
             
@@ -758,7 +796,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ColorReplace)))
                 {
-                    SetupColorReplaceV2(cmd, ref renderingData, m_Materials.colorReplaceV2);
+                    SetupColorReplaceV2(cmd, ref renderingData, m_Materials.colorReplaceV2, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -766,7 +805,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.Contrast)))
                 {
-                    SetupContrast(cmd, ref renderingData, m_Materials.contrast);
+                    SetupContrast(cmd, ref renderingData, m_Materials.contrast, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -774,7 +814,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ContrastV2)))
                 {
-                    SetupContrastV2(cmd, ref renderingData, m_Materials.contrastV2);
+                    SetupContrastV2(cmd, ref renderingData, m_Materials.contrastV2, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -782,7 +823,8 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 using (new ProfilingScope(cmd, ProfilingSampler.Get(CustomPostProcessingProfileId.ContrastV3)))
                 {
-                    SetupContrastV3(cmd, ref renderingData, m_Materials.contrastV3);
+                    SetupContrastV3(cmd, ref renderingData, m_Materials.contrastV3, _tempRT0,  _tempRT1);
+                    CoreUtils.Swap(ref _tempRT0, ref _tempRT1);
                 }
             }
 
@@ -791,90 +833,42 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             Blitter.BlitCameraTexture(cmd, _tempRT0, cameraData.renderer.cameraColorTargetHandle);
 
         }
-        
-        // public void Draw(CommandBuffer cmd, Material mat, in RTHandle source, in RTHandle destination, int pass = -1)
-        // {
-        //     Material material = mat;
-        //     
-        //     cmd.SetGlobalTexture(_SourceTextureId, source);
-        //     cmd.SetRenderTarget(destination, RenderBufferLoadAction.DontCare, RenderBufferStoreAction.Store);
-        //     if (pass == -1 || material == null)
-        //     {
-        //         cmd.DrawProcedural(Matrix4x4.identity, m_Materials.copyMaterial, 0, MeshTopology.Triangles, 3);
-        //     }
-        //     else
-        //     {
-        //         cmd.DrawProcedural(Matrix4x4.identity, material, pass, MeshTopology.Triangles, 3);
-        //     }
-        // }
 
         #region Contrast
 
-        private void SetupContrastV3(CommandBuffer cmd, ref RenderingData renderingData, Material contrastV3)
+        private void SetupContrastV3(CommandBuffer cmd, ref RenderingData renderingData, Material contrastV3, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ContrastV3");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // contrastV3.SetVector(CustomPostProcessingShaderConstants._Contrast, m_ContrastV3.contrast.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrastV3);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ContrastV3");
+            
             int contrastV3Keyword = Shader.PropertyToID("ContrastV3");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(contrastV3Keyword, m_ContrastV3.contrast.value);
-            // Draw(cmd, contrastV3, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, contrastV3, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, contrastV3, 0);
         }
 
-        private void SetupContrastV2(CommandBuffer cmd, ref RenderingData renderingData, Material contrastV2)
+        private void SetupContrastV2(CommandBuffer cmd, ref RenderingData renderingData, Material contrastV2, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ContrastV2");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // contrastV2.SetFloat(CustomPostProcessingShaderConstants._Contrast, m_ContrastV2.contrast.value + 1);
-            // contrastV2.SetColor(CustomPostProcessingShaderConstants._ContrastFactorRGB, new Color(m_ContrastV2.contrastFactorR.value, m_ContrastV2.contrastFactorG.value,m_ContrastV2.contrastFactorB.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrastV2);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ContrastV2");
             
             int contrastV2Keyword = Shader.PropertyToID("_ContrastV2");
             int contrastV2ColorKeyword = Shader.PropertyToID("_ContrastV2FactorRGB");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(contrastV2Keyword, m_ContrastV2.contrast.value + 1);
             cmd.SetGlobalColor(contrastV2ColorKeyword, new Color(m_ContrastV2.contrastFactorR.value, m_ContrastV2.contrastFactorG.value,m_ContrastV2.contrastFactorB.value));
-            // Draw(cmd, contrastV2, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, contrastV2,0);
+            Blitter.BlitCameraTexture(cmd, source, dest, contrastV2,0);
         }
 
-        private void SetupContrast(CommandBuffer cmd, ref RenderingData renderingData, Material contrast)
+        private void SetupContrast(CommandBuffer cmd, ref RenderingData renderingData, Material contrast, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Contrast");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // contrast.SetFloat(CustomPostProcessingShaderConstants._Contrast, m_Contrast.contrast.value + 1);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, contrast);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Contrast");
+            
             int contrastKeyword = Shader.PropertyToID("_Contrast");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(contrastKeyword, m_Contrast.contrast.value + 1);
-            // Draw(cmd, contrast, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, contrast,0);
+            Blitter.BlitCameraTexture(cmd, source, dest, contrast,0);
 
         }
 
@@ -883,108 +877,37 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region ColorReplace
 
-        private void SetupColorReplace(CommandBuffer cmd, ref RenderingData renderingData, Material colorReplace)
+        private void SetupColorReplace(CommandBuffer cmd, ref RenderingData renderingData, Material colorReplace, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ColorReplace");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // colorReplace.SetFloat(CustomPostProcessingShaderConstants._Range, m_ColorReplace.Range.value);
-            // colorReplace.SetFloat(CustomPostProcessingShaderConstants._Fuzziness, m_ColorReplace.Fuzziness.value);
-            // if (m_ColorReplace.colorType == ColorType.Original)
-            // {
-            //     colorReplace.SetColor(CustomPostProcessingShaderConstants._FromColor, m_ColorReplace.FromColor.value);
-            //     colorReplace.SetColor(CustomPostProcessingShaderConstants._ToColor, m_ColorReplace.ToColor.value);
-            // }
-            // else
-            // {
-            //     TimeX += (Time.deltaTime * m_ColorReplace.gridentSpeed.value);
-            //     if (TimeX > 100)
-            //     {
-            //         TimeX = 0;
-            //     }
-            //
-            //     if (m_ColorReplace.FromGradientColor.value != null)
-            //     {
-            //         colorReplace.SetColor(CustomPostProcessingShaderConstants._FromColor, m_ColorReplace.FromGradientColor.value.Evaluate(TimeX * 0.01f));
-            //     }
-            //
-            //     if (m_ColorReplace.ToGradientColor.value != null)
-            //     {
-            //         colorReplace.SetColor(CustomPostProcessingShaderConstants._ToColor, m_ColorReplace.ToGradientColor.value.Evaluate(TimeX * 0.01f));
-            //     }
-            // }
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, colorReplace);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ColorReplace");
             
             int rangeKeyword = Shader.PropertyToID("_ColorReplaceRange");
             int fuzzinessKeyword = Shader.PropertyToID("_ColorReplaceFuzziness");
             int fromColorKeyword = Shader.PropertyToID("_ColorReplaceFromColor");
             int toColorKeyword = Shader.PropertyToID("_ColorReplaceToColor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            
             cmd.SetGlobalFloat(rangeKeyword, m_ColorReplace.Range.value);
             cmd.SetGlobalFloat(fuzzinessKeyword, m_ColorReplace.Fuzziness.value);
             cmd.SetGlobalColor(fromColorKeyword, m_ColorReplace.FromColor.value);
             cmd.SetGlobalColor(toColorKeyword, m_ColorReplace.ToColor.value);
             
-            // Draw(cmd, colorReplace, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, colorReplace, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, colorReplace, 0);
         }
 
         #endregion
 
         #region ColorReplaceV2
 
-        private void SetupColorReplaceV2(CommandBuffer cmd, ref RenderingData renderingData, Material colorReplaceV2)
+        private void SetupColorReplaceV2(CommandBuffer cmd, ref RenderingData renderingData, Material colorReplaceV2, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ColorReplace");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // colorReplace.SetFloat(CustomPostProcessingShaderConstants._Range, m_ColorReplace.Range.value);
-            // colorReplace.SetFloat(CustomPostProcessingShaderConstants._Fuzziness, m_ColorReplace.Fuzziness.value);
-            // if (m_ColorReplace.colorType == ColorType.Original)
-            // {
-            //     colorReplace.SetColor(CustomPostProcessingShaderConstants._FromColor, m_ColorReplace.FromColor.value);
-            //     colorReplace.SetColor(CustomPostProcessingShaderConstants._ToColor, m_ColorReplace.ToColor.value);
-            // }
-            // else
-            // {
-            //     TimeX += (Time.deltaTime * m_ColorReplace.gridentSpeed.value);
-            //     if (TimeX > 100)
-            //     {
-            //         TimeX = 0;
-            //     }
-            //
-            //     if (m_ColorReplace.FromGradientColor.value != null)
-            //     {
-            //         colorReplace.SetColor(CustomPostProcessingShaderConstants._FromColor, m_ColorReplace.FromGradientColor.value.Evaluate(TimeX * 0.01f));
-            //     }
-            //
-            //     if (m_ColorReplace.ToGradientColor.value != null)
-            //     {
-            //         colorReplace.SetColor(CustomPostProcessingShaderConstants._ToColor, m_ColorReplace.ToGradientColor.value.Evaluate(TimeX * 0.01f));
-            //     }
-            // }
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, colorReplace);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ColorReplace");
             
             int rangeKeyword = Shader.PropertyToID("_ColorReplaceV2Range");
             int fuzzinessKeyword = Shader.PropertyToID("_ColorReplaceV2Fuzziness");
             int fromColorKeyword = Shader.PropertyToID("_ColorReplaceV2FromColor");
             int toColorKeyword = Shader.PropertyToID("_ColorReplaceV2ToColor");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             cmd.SetGlobalFloat(rangeKeyword, m_ColorReplaceV2.Range.value);
             cmd.SetGlobalFloat(fuzzinessKeyword, m_ColorReplaceV2.Fuzziness.value);
@@ -1005,40 +928,26 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 cmd.SetGlobalColor(toColorKeyword, m_ColorReplaceV2.ToGradientColor.value.Evaluate(_TimeX * 0.01f));
             }
             
-            // Draw(cmd, colorReplaceV2, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, colorReplaceV2, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, colorReplaceV2, 0);
         }
 
         #endregion
 
         #region Technicolor
 
-        private void SetupTechnicolor(CommandBuffer cmd, ref RenderingData renderingData, Material technicolor)
+        private void SetupTechnicolor(CommandBuffer cmd, ref RenderingData renderingData, Material technicolor, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Technicolor");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // technicolor.SetFloat(CustomPostProcessingShaderConstants._Exposure, 8.01f - m_Technicolor.exposure.value);
-            // technicolor.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_Technicolor.indensity.value);
-            // technicolor.SetColor(CustomPostProcessingShaderConstants._ColorBalance, Color.white - new Color(m_Technicolor.colorBalanceR.value, m_Technicolor.colorBalanceG.value, m_Technicolor.colorBalanceB.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, technicolor);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Technicolor");
             
             int exposureKeyword = Shader.PropertyToID("_TechnicolorExposure");
             int indensityKeyword = Shader.PropertyToID("_TechnicolorIndensity");
             int TechnicolorKeyword = Shader.PropertyToID("_Technicolor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(exposureKeyword, 8.01f - m_Technicolor.exposure.value);
             cmd.SetGlobalFloat(indensityKeyword, m_Technicolor.indensity.value);
             cmd.SetGlobalColor(TechnicolorKeyword, Color.white - new Color(m_Technicolor.colorBalanceR.value, m_Technicolor.colorBalanceG.value, m_Technicolor.colorBalanceB.value));
-            // Draw(cmd, technicolor, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, technicolor, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, technicolor, 0);
         }
 
         #endregion
@@ -1046,25 +955,15 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Saturation
 
-        private void SetupSaturation(CommandBuffer cmd, ref RenderingData renderingData, Material saturation)
+        private void SetupSaturation(CommandBuffer cmd, ref RenderingData renderingData, Material saturation, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Saturation");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // saturation.SetFloat(CustomPostProcessingShaderConstants._Saturation, m_Saturation.saturation.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, saturation);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Saturation");
+            
             int saturationKeyword = Shader.PropertyToID("_Saturation");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(saturationKeyword, m_Saturation.saturation.value);
-            // Draw(cmd, saturation, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, saturation,0);
+            Blitter.BlitCameraTexture(cmd, source, dest, saturation,0);
         }
 
         #endregion
@@ -1072,29 +971,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region LensFilter
 
-        private void SetupLensFilter(CommandBuffer cmd, ref RenderingData renderingData, Material lensFilter)
+        private void SetupLensFilter(CommandBuffer cmd, ref RenderingData renderingData, Material lensFilter, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("LensFilter");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // lensFilter.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_LensFilter.Indensity.value);
-            // lensFilter.SetColor(CustomPostProcessingShaderConstants._LensColor, m_LensFilter.LensColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, lensFilter);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("LensFilter");
             
             int indensityKeyword = Shader.PropertyToID("_LensFilterIndensity");
             int lensColorKeyword = Shader.PropertyToID("_LensColor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(indensityKeyword, m_LensFilter.Indensity.value);
             cmd.SetGlobalColor(lensColorKeyword, m_LensFilter.LensColor.value);
-            // Draw(cmd, lensFilter, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, lensFilter, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, lensFilter, 0);
         }
 
         #endregion
@@ -1102,29 +989,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region WhiteBalance
 
-        private void SetupWhiteBalance(CommandBuffer cmd, ref RenderingData renderingData, Material whiteBalance)
+        private void SetupWhiteBalance(CommandBuffer cmd, ref RenderingData renderingData, Material whiteBalance, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("WhiteBalance");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // whiteBalance.SetFloat(CustomPostProcessingShaderConstants._Temperature, m_WhiteBalance.temperature.value);
-            // whiteBalance.SetFloat(CustomPostProcessingShaderConstants._Tint, m_WhiteBalance.tint.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, whiteBalance);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("WhiteBalance");
             
             int temperatureKeyword = Shader.PropertyToID("_WhiteBalanceTemperature");
             int tintKeyword = Shader.PropertyToID("_WhiteBalanceTint");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(temperatureKeyword, m_WhiteBalance.temperature.value);
             cmd.SetGlobalFloat(tintKeyword, m_WhiteBalance.tint.value);
-            // Draw(cmd, whiteBalance, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, whiteBalance, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, whiteBalance, 0);
         }
 
         #endregion
@@ -1132,29 +1007,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Tint
 
-        private void SetupTint(CommandBuffer cmd, ref RenderingData renderingData, Material tint)
+        private void SetupTint(CommandBuffer cmd, ref RenderingData renderingData, Material tint, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Tint");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // tint.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_Tint.indensity.value);
-            // tint.SetColor(CustomPostProcessingShaderConstants._ColorTint, m_Tint.colorTint.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tint);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Tint");
             
             int indensityKeyword = Shader.PropertyToID("_TintIndensity");
             int colorTintKeyword = Shader.PropertyToID("_ColorTint");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(indensityKeyword, m_Tint.indensity.value);
             cmd.SetGlobalColor(colorTintKeyword, m_Tint.colorTint.value);
-            // Draw(cmd, tint, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, tint, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, tint, 0);
         }
 
         #endregion
@@ -1162,26 +1025,15 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Hue
 
-        private void SetupHue(CommandBuffer cmd, ref RenderingData renderingData, Material hue)
+        private void SetupHue(CommandBuffer cmd, ref RenderingData renderingData, Material hue, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Hue");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // hue.SetFloat(CustomPostProcessingShaderConstants._HueDegree, m_Hue.HueDegree.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hue);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Hue");
             
             int hueDegreeKeyword = Shader.PropertyToID("_HueDegree");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(hueDegreeKeyword, m_Hue.HueDegree.value);
-            // Draw(cmd, hue, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, hue, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, hue, 0);
         }
 
         #endregion
@@ -1189,25 +1041,14 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Brightness
 
-        private void SetupBrightness(CommandBuffer cmd, ref RenderingData renderingData, Material brightness)
+        private void SetupBrightness(CommandBuffer cmd, ref RenderingData renderingData, Material brightness, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Brightness");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // brightness.SetFloat(CustomPostProcessingShaderConstants._Brightness, m_Brightness.brightness.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, brightness);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Brightness");
             
             int _brightnessKeyword = Shader.PropertyToID("_Brightness");
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(_brightnessKeyword, m_Brightness.brightness.value);
-            // Draw(cmd, brightness, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, brightness, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, brightness, 0);
         }
 
         #endregion
@@ -1215,26 +1056,15 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region BleachBypass
 
-        private void SetupBleachBypass(CommandBuffer cmd, ref RenderingData renderingData, Material bleachBypass)
+        private void SetupBleachBypass(CommandBuffer cmd, ref RenderingData renderingData, Material bleachBypass, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("BleachBypass");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // bleachBypass.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_BleachBypass.Indensity.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, bleachBypass);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("BleachBypass");
             
             int indensityKeyword = Shader.PropertyToID("_BleachBypassIndensity");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(indensityKeyword, m_BleachBypass.Indensity.value);
-            // Draw(cmd, bleachBypass, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, bleachBypass, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, bleachBypass, 0);
         }
 
         #endregion
@@ -1242,72 +1072,38 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Sharpen
 
-        private void SetupSharpenV3(CommandBuffer cmd, ref RenderingData renderingData, Material v3)
+        private void SetupSharpenV3(CommandBuffer cmd, ref RenderingData renderingData, Material v3, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("SharpenV3");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // Vector2 p = new Vector2(1.0f + (3.2f * m_V3.Sharpness.value), 0.8f * m_V3.Sharpness.value);
-            // v3.SetVector(CustomPostProcessingShaderConstants._Params, p);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v3);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("SharpenV3");
             
             int parametersKeyword = Shader.PropertyToID("_SharpenV3");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             Vector2 p = new Vector2(1.0f + (3.2f * m_V3.Sharpness.value), 0.8f * m_V3.Sharpness.value);
             cmd.SetGlobalVector(parametersKeyword, p);
-            // Draw(cmd, v3, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, v3, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, v3, 0);
         }
 
-        private void SetupSharpenV2(CommandBuffer cmd, ref RenderingData renderingData, Material v2)
+        private void SetupSharpenV2(CommandBuffer cmd, ref RenderingData renderingData, Material v2, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("SharpenV2");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // v2.SetFloat(CustomPostProcessingShaderConstants._Sharpness, m_V2.Sharpness.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v2);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("SharpenV2");
             
             int parametersKeyword = Shader.PropertyToID("_SharpenV2");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(parametersKeyword, m_V2.Sharpness.value);
-            // Draw(cmd, v2, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, v2, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, v2, 0);
         }
 
-        private void SetupSharpenV1(CommandBuffer cmd, ref RenderingData renderingData, Material v1)
+        private void SetupSharpenV1(CommandBuffer cmd, ref RenderingData renderingData, Material v1, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("SharpenV1");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // v1.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_V1.Strength.value, m_V1.Threshold.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, v1);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("SharpenV1");
             
             int parametersKeyword = Shader.PropertyToID("_SharpenV1");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(parametersKeyword, new Vector2(m_V1.Strength.value, m_V1.Threshold.value));
-            // Draw(cmd, v1, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, v1, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, v1, 0);
         }
 
         #endregion
@@ -1315,28 +1111,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region RapidV2
 
-        private void SetupRapidV2(CommandBuffer cmd, ref RenderingData renderingData, Material rapidV2)
+        private void SetupRapidV2(CommandBuffer cmd, ref RenderingData renderingData, Material rapidV2, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Rapid");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // rapidV2.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_RapidV2.vignetteIndensity.value, m_RapidV2.vignetteSharpness.value, m_RapidV2.vignetteCenter.value.x, m_RapidV2.vignetteCenter.value.y));
-            // if (m_RapidV2.vignetteType.value == VignetteType.ColorMode)
-            // {
-            //     rapidV2.SetColor(CustomPostProcessingShaderConstants._VignetteColor, m_RapidV2.vignetteColor.value);
-            // }
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapidV2, (int)m_RapidV2.vignetteType.value);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Rapid");
             
             int parametersKeyword = Shader.PropertyToID("_RapidV2Parameters");
             int colorKeyword = Shader.PropertyToID("_RapidV2Color");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             cmd.SetGlobalVector(parametersKeyword, new Vector4(m_RapidV2.vignetteIndensity.value, m_RapidV2.vignetteSharpness.value, m_RapidV2.vignetteCenter.value.x, m_RapidV2.vignetteCenter.value.y));
             if (m_RapidV2.vignetteType.value == VignetteType.ColorMode)
@@ -1344,8 +1125,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 cmd.SetGlobalColor(colorKeyword, m_RapidV2.vignetteColor.value);
             }
             
-            // Draw(cmd, rapidV2, m_TemporaryColorTexture01, m_ColorAttachment, (int)m_RapidV2.vignetteType.value);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, rapidV2, (int)m_RapidV2.vignetteType.value);
+            Blitter.BlitCameraTexture(cmd, source, dest, rapidV2, (int)m_RapidV2.vignetteType.value);
         }
 
         #endregion
@@ -1353,28 +1133,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Rapid
 
-        private void SetupRapid(CommandBuffer cmd, ref RenderingData renderingData, Material rapid)
+        private void SetupRapid(CommandBuffer cmd, ref RenderingData renderingData, Material rapid, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Rapid");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // rapid.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(m_Rapid.vignetteIndensity.value, m_Rapid.vignetteCenter.value.x, m_Rapid.vignetteCenter.value.y));
-            // if (m_Rapid.vignetteType.value == VignetteType.ColorMode)
-            // {
-            //     rapid.SetColor(CustomPostProcessingShaderConstants._VignetteColor, m_Rapid.vignetteColor.value);
-            // }
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapid, (int)m_Rapid.vignetteType.value);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Rapid");
             
             int parametersKeyword = Shader.PropertyToID("_RapidParameters");
             int colorKeyword = Shader.PropertyToID("_RapidColor");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             cmd.SetGlobalVector(parametersKeyword, new Vector3(m_Rapid.vignetteIndensity.value, m_Rapid.vignetteCenter.value.x, m_Rapid.vignetteCenter.value.y));
             if (m_Rapid.vignetteType.value == VignetteType.ColorMode)
@@ -1382,8 +1147,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 cmd.SetGlobalColor(colorKeyword, m_Rapid.vignetteColor.value);
             }
             
-            // Draw(cmd, rapid, m_TemporaryColorTexture01, m_ColorAttachment, (int)m_Rapid.vignetteType.value);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, rapid, (int)m_Rapid.vignetteType.value);
+            Blitter.BlitCameraTexture(cmd, source, dest, rapid, (int)m_Rapid.vignetteType.value);
         }
 
         #endregion
@@ -1391,28 +1155,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region RapidOldTVV2
 
-        private void SetupRapidOldTVV2(CommandBuffer cmd, ref RenderingData renderingData, Material rapidOldTvv2)
+        private void SetupRapidOldTVV2(CommandBuffer cmd, ref RenderingData renderingData, Material rapidOldTvv2, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("RapidOldTVV2");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // rapidOldTvv2.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_RapidOldTVV2.vignetteSize.value, m_RapidOldTVV2.sizeOffset.value));
-            // if (m_RapidOldTVV2.vignetteType.value == VignetteType.ColorMode)
-            // {
-            //     rapidOldTvv2.SetColor(CustomPostProcessingShaderConstants._VignetteColor, m_RapidOldTVV2.vignetteColor.value);
-            // }
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapidOldTvv2, (int)m_RapidOldTVV2.vignetteType.value);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("RapidOldTVV2");
             
             int parametersKeyword = Shader.PropertyToID("_RapidOldTVV2Parameters");
             int colorKeyword = Shader.PropertyToID("_RapidOldTVV2Color");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             cmd.SetGlobalVector(parametersKeyword, new Vector2(m_RapidOldTVV2.vignetteSize.value, m_RapidOldTVV2.sizeOffset.value));
             if (m_RapidOldTVV2.vignetteType.value == VignetteType.ColorMode)
@@ -1420,8 +1169,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 cmd.SetGlobalColor(colorKeyword, m_RapidOldTVV2.vignetteColor.value);
             }
             
-            // Draw(cmd, rapidOldTvv2, m_TemporaryColorTexture01, m_ColorAttachment, (int)m_RapidOldTVV2.vignetteType.value);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, rapidOldTvv2, (int)m_RapidOldTVV2.vignetteType.value);
+            Blitter.BlitCameraTexture(cmd, source, dest, rapidOldTvv2, (int)m_RapidOldTVV2.vignetteType.value);
         }
 
         #endregion
@@ -1429,28 +1177,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region RapidOldTV
 
-        private void SetupRapidOldTV(CommandBuffer cmd, ref RenderingData renderingData, Material rapidOldTV)
+        private void SetupRapidOldTV(CommandBuffer cmd, ref RenderingData renderingData, Material rapidOldTV, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("RapidOldTV");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // rapidOldTV.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(m_RapidOldTV.vignetteIndensity.value, m_RapidOldTV.vignetteCenter.value.x, m_RapidOldTV.vignetteCenter.value.y));
-            // if (m_RapidOldTV.vignetteType.value == VignetteType.ColorMode)
-            // {
-            //     rapidOldTV.SetColor(CustomPostProcessingShaderConstants._VignetteColor, m_RapidOldTV.vignetteColor.value);
-            // }
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rapidOldTV, (int)m_RapidOldTV.vignetteType.value);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("RapidOldTV");
             
             int parametersKeyword = Shader.PropertyToID("_RapidOldTVParameters");
             int colorKeyword = Shader.PropertyToID("_RapidOldTVColor");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             cmd.SetGlobalVector(parametersKeyword, new Vector3(m_RapidOldTV.vignetteIndensity.value, m_RapidOldTV.vignetteCenter.value.x, m_RapidOldTV.vignetteCenter.value.y));
             if (m_RapidOldTV.vignetteType.value == VignetteType.ColorMode)
@@ -1458,8 +1191,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 cmd.SetGlobalColor(colorKeyword, m_RapidOldTV.vignetteColor.value);
             }
             
-            // Draw(cmd, rapidOldTV, m_TemporaryColorTexture01, m_ColorAttachment, (int)m_RapidOldTV.vignetteType.value);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, rapidOldTV, (int)m_RapidOldTV.vignetteType.value);
+            Blitter.BlitCameraTexture(cmd, source, dest, rapidOldTV, (int)m_RapidOldTV.vignetteType.value);
         }
 
         #endregion
@@ -1467,29 +1199,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Aurora
 
-        private void SetupAurora(CommandBuffer cmd, ref RenderingData renderingData, Material aurora)
+        private void SetupAurora(CommandBuffer cmd, ref RenderingData renderingData, Material aurora, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Aurora");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // TimeX += Time.deltaTime;
-            // if (TimeX > 100)
-            // {
-            //     TimeX = 0;
-            // }
-            // aurora.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_Aurora.vignetteArea.value, m_Aurora.vignetteSmothness.value, m_Aurora.colorChange.value, TimeX));
-            // aurora.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector4(m_Aurora.colorFactorR.value, m_Aurora.colorFactorG.value,m_Aurora.colorFactorB.value, m_Aurora.vignetteFading.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, aurora);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Aurora");
             
             int parametersKeyword = Shader.PropertyToID("_AuroraParameters");
             int parameters2Keyword = Shader.PropertyToID("_AuroraParameters2");
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             _TimeX += Time.deltaTime;
             if (_TimeX > 100)
@@ -1499,8 +1215,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.SetGlobalVector(parametersKeyword, new Vector4(m_Aurora.vignetteArea.value, m_Aurora.vignetteSmothness.value, m_Aurora.colorChange.value, _TimeX * m_Aurora.flowSpeed.value));
             cmd.SetGlobalVector(parameters2Keyword, new Vector4(m_Aurora.colorFactorR.value, m_Aurora.colorFactorG.value,m_Aurora.colorFactorB.value, m_Aurora.vignetteFading.value));
             
-            // Draw(cmd, aurora, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, aurora, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, aurora, 0);
         }
 
         #endregion
@@ -1508,34 +1223,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Triangle
 
-        private void SetupTriangle(CommandBuffer cmd, ref RenderingData renderingData, Material triangle)
+        private void SetupTriangle(CommandBuffer cmd, ref RenderingData renderingData, Material triangle, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Triangle");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // float size = (1.01f - m_Triangle.pixelSize.value) * 5f;
-            //
-            // float ratio = m_Triangle.pixelRatio.value;
-            // if (m_Triangle.useAutoScreenRatio.value)
-            // {
-            //     ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height);
-            //     if (ratio == 0)
-            //     {
-            //         ratio = 1f;
-            //     }
-            // }
-            // triangle.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(size, ratio, m_Triangle.pixelScaleX.value * 20, m_Triangle.pixelScaleY.value * 20));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, triangle);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Triangle");
             
             int paramsKeyword = Shader.PropertyToID("_TriangleParams");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             float size = (1.01f - m_Triangle.pixelSize.value) * 5f;
 
@@ -1550,8 +1243,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.SetGlobalVector(paramsKeyword, new Vector4(size, ratio, m_Triangle.pixelScaleX.value * 20, m_Triangle.pixelScaleY.value * 20));
             
-            // Draw(cmd, triangle, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, triangle, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, triangle, 0);
         }
 
         #endregion
@@ -1559,29 +1251,14 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Sector
 
-        private void SetupSector(CommandBuffer cmd, ref RenderingData renderingData, Material sector)
+        private void SetupSector(CommandBuffer cmd, ref RenderingData renderingData, Material sector, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Sector");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // float size = (1.01f - m_Sector.pixelSize.value) * 300f;
-            // Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / (float)opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Sector.circleRadius.value, 0f);
-            // sector.SetVector(CustomPostProcessingShaderConstants._Params, parameters);
-            // sector.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector2(m_Sector.pixelIntervalX.value, m_Sector.pixelIntervalY.value));
-            // sector.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Sector.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, sector);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Sector");
             
             int paramsKeyword = Shader.PropertyToID("_SectorParams");
             int params2Keyword = Shader.PropertyToID("_SectorParams2");
             int backgroundKeyword = Shader.PropertyToID("_SectorBackground");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             float size = (1.01f - m_Sector.pixelSize.value) * 300f;
             Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / (float)opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Sector.circleRadius.value, 0f);
@@ -1589,8 +1266,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.SetGlobalVector(params2Keyword, new Vector2(m_Sector.pixelIntervalX.value, m_Sector.pixelIntervalY.value));
             cmd.SetGlobalColor(backgroundKeyword, m_Sector.backgroundColor.value);
             
-            // Draw(cmd, sector, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, sector, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, sector, 0);
         }
 
         #endregion
@@ -1598,34 +1274,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Quad
 
-        private void SetupQuad(CommandBuffer cmd, ref RenderingData renderingData, Material quad)
+        private void SetupQuad(CommandBuffer cmd, ref RenderingData renderingData, Material quad, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Quad");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // float size = (1.01f - m_Quad.pixelSize.value) * 200f;
-            // quad.SetFloat(CustomPostProcessingShaderConstants._PixelSize, size);
-            // float ratio = m_Quad.pixelRatio.value;
-            // if (m_Quad.useAutoScreenRatio.value)
-            // {
-            //     ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height) ;
-            //     if (ratio==0)
-            //     {
-            //         ratio = 1f;
-            //     }
-            // }
-            // quad.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(size, ratio, m_Quad.pixelScaleX.value, m_Quad.pixelScaleY.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, quad);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Quad");
             
             int paramsKeyword = Shader.PropertyToID("_QuadParams");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             float size = (1.01f - m_Quad.pixelSize.value) * 200f;
             float ratio = m_Quad.pixelRatio.value;
@@ -1639,8 +1293,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.SetGlobalVector(paramsKeyword, new Vector4(size, ratio, m_Quad.pixelScaleX.value, m_Quad.pixelScaleY.value));
             
-            // Draw(cmd, quad, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, quad, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, quad, 0);
         }
 
 
@@ -1649,36 +1302,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Led
 
-        private void SetupLed(CommandBuffer cmd, ref RenderingData renderingData, Material led)
+        private void SetupLed(CommandBuffer cmd, ref RenderingData renderingData, Material led, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Led");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // float size = (1.01f - m_Led.pixelSize.value) * 300f;
-            //
-            // float ratio = m_Led.pixelRatio.value;
-            // if (m_Led.useAutoScreenRatio.value)
-            // {
-            //     ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height);
-            //     if (ratio == 0)
-            //     {
-            //         ratio = 1f;
-            //     }
-            // }
-            // led.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(size, ratio, m_Led.ledRadius.value));
-            // led.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Led.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, led);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Led");
             
             int paramsKeyword = Shader.PropertyToID("_LedParams");
             int backgroundKeyword = Shader.PropertyToID("_LedBackground");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             float size = (1.01f - m_Led.pixelSize.value) * 300f;
 
@@ -1694,8 +1324,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.SetGlobalVector(paramsKeyword, new Vector3(size, ratio, m_Led.ledRadius.value));
             cmd.SetGlobalColor(backgroundKeyword, m_Led.backgroundColor.value);
             
-            // Draw(cmd, led, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, led, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, led, 0);
         }
 
         #endregion
@@ -1703,35 +1332,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Leaf
 
-        private void SetupLeaf(CommandBuffer cmd, ref RenderingData renderingData, Material leaf)
+        private void SetupLeaf(CommandBuffer cmd, ref RenderingData renderingData, Material leaf, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Leaf");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // float size = (1.01f - m_Leaf.pixelSize.value) * 10f;
-            //
-            // float ratio = m_Leaf.pixelRatio.value;
-            // if (m_Leaf.useAutoScreenRatio.value)
-            // {
-            //     ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height);
-            //     if (ratio == 0)
-            //     {
-            //         ratio = 1f;
-            //     }
-            // }
-            // leaf.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(size,ratio, m_Leaf.pixelScaleX.value * 20,m_Leaf.pixelScaleY.value * 20));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, leaf);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Leaf");
             
             int paramsKeyword = Shader.PropertyToID("_LeafParams");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            
             float size = (1.01f - m_Leaf.pixelSize.value) * 10f;
 
             float ratio = m_Leaf.pixelRatio.value;
@@ -1745,8 +1351,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.SetGlobalVector(paramsKeyword, new Vector4(size,ratio, m_Leaf.pixelScaleX.value * 20,m_Leaf.pixelScaleY.value * 20));
             
-            // Draw(cmd, leaf, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, leaf, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, leaf, 0);
         }
 
         #endregion
@@ -1754,28 +1359,15 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region HexagonGrid
 
-        private void SetupHexagonGrid(CommandBuffer cmd, ref RenderingData renderingData, Material hexagonGrid)
+        private void SetupHexagonGrid(CommandBuffer cmd, ref RenderingData renderingData, Material hexagonGrid, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("HexagonGrid");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // hexagonGrid.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_HexagonGrid.pixelSize.value, m_HexagonGrid.gridWidth.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hexagonGrid);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("HexagonGrid");
             
             int paramsKeyword = Shader.PropertyToID("_HexagonGridParams");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            
             cmd.SetGlobalVector(paramsKeyword, new Vector2(m_HexagonGrid.pixelSize.value, m_HexagonGrid.gridWidth.value));
             
-            // Draw(cmd, hexagonGrid, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, hexagonGrid, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, hexagonGrid, 0);
         }
 
         #endregion
@@ -1783,36 +1375,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Hexagon
 
-        private void SetupHexagon(CommandBuffer cmd, ref RenderingData renderingData, Material hexagon)
+        private void SetupHexagon(CommandBuffer cmd, ref RenderingData renderingData, Material hexagon, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Hexagon");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // hexagon.SetFloat(CustomPostProcessingShaderConstants._PixelSize, m_Hexagon.pixelSize.value);
-            // float size = m_Hexagon.pixelSize.value * 0.2f;
-            // float ratio = m_Hexagon.pixelRatio.value;
-            // if (m_Hexagon.useAutoScreenRatio.value)
-            // {
-            //     ratio = (float)(opaqueDesc.width / (float)opaqueDesc.height);
-            //     if (ratio == 0)
-            //     {
-            //         ratio = 1f;
-            //     }
-            // }
-            // hexagon.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(size,ratio, m_Hexagon.pixelScaleX.value,m_Hexagon.pixelScaleY.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, hexagon);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Hexagon");
             
             int paramsKeyword = Shader.PropertyToID("_HexagonParams");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            
-            // cmd.SetGlobalFloat(_pixelSizeKeyword, pixelSize.value);
             float size = m_Hexagon.pixelSize.value * 0.2f;
             float ratio = m_Hexagon.pixelRatio.value;
             if (m_Hexagon.useAutoScreenRatio.value)
@@ -1825,8 +1393,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             }
             cmd.SetGlobalVector(paramsKeyword, new Vector4(size,ratio, m_Hexagon.pixelScaleX.value,m_Hexagon.pixelScaleY.value));
             
-            // Draw(cmd, hexagon, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, hexagon, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, hexagon, 0);
         }
 
         #endregion
@@ -1834,28 +1401,15 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Diamond
 
-        private void SetupDiamond(CommandBuffer cmd, ref RenderingData renderingData, Material diamond)
+        private void SetupDiamond(CommandBuffer cmd, ref RenderingData renderingData, Material diamond, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Diamond");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // diamond.SetFloat(CustomPostProcessingShaderConstants._PixelSize, m_Diamond.pixelSize.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, diamond);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Diamond");
             
             int pixelSizeKeyword = Shader.PropertyToID("_DiamondPixelSize");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            
             cmd.SetGlobalFloat(pixelSizeKeyword, m_Diamond.pixelSize.value);
             
-            // Draw(cmd, diamond, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, diamond, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, diamond, 0);
         }
 
         #endregion
@@ -1863,30 +1417,15 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Circle
 
-        private void SetupCircle(CommandBuffer cmd, ref RenderingData renderingData, Material circle)
+        private void SetupCircle(CommandBuffer cmd, ref RenderingData renderingData, Material circle, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
             // opaqueDesc.depthBufferBits = 0;
-
-            // cmd.BeginSample("Circle");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // float size = (1.01f - m_Circle.pixelSize.value) * 300f;
-            // Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / (float)opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Circle.circleRadius.value, 0f);
-            // circle.SetVector(CustomPostProcessingShaderConstants._Params, parameters);
-            // circle.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector2(m_Circle.pixelIntervalX.value, m_Circle.pixelIntervalY.value));
-            // circle.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Circle.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, circle);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Circle");
             
             int paramsKeyword = Shader.PropertyToID("_CircleParams");
             int params2Keyword = Shader.PropertyToID("_CircleParams2");
             int backgroundKeyword = Shader.PropertyToID("_CircleBackground");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            // Blitter.BlitCameraTexture(cmd, m_ColorAttachment, m_TemporaryColorTexture01);
             
             float size = (1.01f - m_Circle.pixelSize.value) * 300f;
             Vector4 parameters = new Vector4(size, ((opaqueDesc.width * 2 / (float)opaqueDesc.height) * size / Mathf.Sqrt(3f)), m_Circle.circleRadius.value, 0f);
@@ -1894,8 +1433,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             cmd.SetGlobalVector(params2Keyword, new Vector2(m_Circle.pixelIntervalX.value, m_Circle.pixelIntervalY.value));
             cmd.SetGlobalColor(backgroundKeyword, m_Circle.backgroundColor.value);
             
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, circle, 0);
-            // Draw(cmd, circle, m_TemporaryColorTexture01, destination, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, circle, 0);
         }
 
         #endregion
@@ -1903,29 +1441,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region SobelNeon
 
-        private void SetupSobelNeon(CommandBuffer cmd, ref RenderingData renderingData, Material sobelNeon)
+        private void SetupSobelNeon(CommandBuffer cmd, ref RenderingData renderingData, Material sobelNeon, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("SobelNeon");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // sobelNeon.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_SobelNeon.edgeWidth.value, m_SobelNeon.edgeNeonFade.value, m_SobelNeon.brightness.value, m_SobelNeon.backgroundFade.value));
-            // sobelNeon.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_SobelNeon.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, sobelNeon);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("SobelNeon");
             
             int paramsKeyword = Shader.PropertyToID("_SobelNeonParams");
             int backgroundKeyword = Shader.PropertyToID("_SobelNeonBackgroundColor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector4(m_SobelNeon.edgeWidth.value, m_SobelNeon.edgeNeonFade.value, m_SobelNeon.brightness.value, m_SobelNeon.backgroundFade.value));
             cmd.SetGlobalColor(backgroundKeyword, m_SobelNeon.backgroundColor.value);
-            // Draw(cmd, sobelNeon, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, sobelNeon, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, sobelNeon, 0);
         }
 
         #endregion
@@ -1933,32 +1459,19 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Sobel
 
-        private void SetupSobel(CommandBuffer cmd, ref RenderingData renderingData, Material sobel)
+        private void SetupSobel(CommandBuffer cmd, ref RenderingData renderingData, Material sobel, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Sobel");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // sobel.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_Sobel.edgeWidth.value, m_Sobel.backgroundFade.value));
-            // sobel.SetColor(CustomPostProcessingShaderConstants._EdgeColor, m_Sobel.edgeColor.value);
-            // sobel.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Sobel.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, sobel);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Sobel");
             
             int paramsKeyword = Shader.PropertyToID("_SobelParams");
             int edgeColorKeyword = Shader.PropertyToID("_SobelEdgeColor");
             int backgroundKeyword = Shader.PropertyToID("_SobelBackgroundColor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector2(m_Sobel.edgeWidth.value, m_Sobel.backgroundFade.value));
             cmd.SetGlobalColor(edgeColorKeyword, m_Sobel.edgeColor.value);
             cmd.SetGlobalColor(backgroundKeyword, m_Sobel.backgroundColor.value);
-            // Draw(cmd, sobel, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, sobel, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, sobel, 0);
         }
 
         #endregion
@@ -1966,29 +1479,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region ScharrNeon
 
-        private void SetupScharrNeon(CommandBuffer cmd, ref RenderingData renderingData, Material scharrNeon)
+        private void SetupScharrNeon(CommandBuffer cmd, ref RenderingData renderingData, Material scharrNeon, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ScharrNeon");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // scharrNeon.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_ScharrNeon.edgeWidth.value, m_ScharrNeon.edgeNeonFade.value, m_ScharrNeon.brightness.value, m_ScharrNeon.backgroundFade.value));
-            // scharrNeon.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_ScharrNeon.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scharrNeon);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ScharrNeon");
             
             int paramsKeyword = Shader.PropertyToID("_ScharrNeonParams");
             int backgroundKeyword = Shader.PropertyToID("_ScharrNeonBackgroundColor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector4(m_ScharrNeon.edgeWidth.value, m_ScharrNeon.edgeNeonFade.value, m_ScharrNeon.brightness.value, m_ScharrNeon.backgroundFade.value));
             cmd.SetGlobalColor(backgroundKeyword, m_ScharrNeon.backgroundColor.value);
-            // Draw(cmd, scharrNeon, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, scharrNeon, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, scharrNeon, 0);
         }
 
         #endregion
@@ -1996,32 +1497,19 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Scharr
 
-        private void SetupScharr(CommandBuffer cmd, ref RenderingData renderingData, Material scharr)
+        private void SetupScharr(CommandBuffer cmd, ref RenderingData renderingData, Material scharr, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Scharr");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // scharr.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_Scharr.edgeWidth.value, m_Scharr.backgroundFade.value));
-            // scharr.SetColor(CustomPostProcessingShaderConstants._EdgeColor, m_Scharr.edgeColor.value);
-            // scharr.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Scharr.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scharr);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Scharr");
             
             int paramsKeyword = Shader.PropertyToID("_ScharrParams");
             int edgeColorKeyword = Shader.PropertyToID("_ScharrEdgeColor");
             int backgroundKeyword = Shader.PropertyToID("_ScharrBackgroundColor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector2(m_Scharr.edgeWidth.value, m_Scharr.backgroundFade.value));
             cmd.SetGlobalColor(edgeColorKeyword, m_Scharr.edgeColor.value);
             cmd.SetGlobalColor(backgroundKeyword, m_Scharr.backgroundColor.value);
-            // Draw(cmd, scharr, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, scharr, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, scharr, 0);
         }
 
         #endregion
@@ -2029,29 +1517,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region RobertsNeon
 
-        private void SetupRobertsNeon(CommandBuffer cmd, ref RenderingData renderingData, Material robertsNeon)
+        private void SetupRobertsNeon(CommandBuffer cmd, ref RenderingData renderingData, Material robertsNeon, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("RobertsNeon");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // robertsNeon.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_RobertsNeon.edgeWidth.value, m_RobertsNeon.edgeNeonFade.value, m_RobertsNeon.brightness.value, m_RobertsNeon.backgroundFade.value));
-            // robertsNeon.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_RobertsNeon.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, robertsNeon);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("RobertsNeon");
             
             int paramsKeyword = Shader.PropertyToID("_RobertsNeonParams");
             int backgroundKeyword = Shader.PropertyToID("_RobertsNeonBackgroundColor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector4(m_RobertsNeon.edgeWidth.value, m_RobertsNeon.edgeNeonFade.value, m_RobertsNeon.brightness.value, m_RobertsNeon.backgroundFade.value));
             cmd.SetGlobalColor(backgroundKeyword, m_RobertsNeon.backgroundColor.value);
-            // Draw(cmd, robertsNeon, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, robertsNeon, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, robertsNeon, 0);
         }
 
         #endregion
@@ -2059,32 +1535,19 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region Roberts
 
-        private void SetupRoberts(CommandBuffer cmd, ref RenderingData renderingData, Material roberts)
+        private void SetupRoberts(CommandBuffer cmd, ref RenderingData renderingData, Material roberts, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("Roberts");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // roberts.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_Roberts.edgeWidth.value, m_Roberts.backgroundFade.value));
-            // roberts.SetColor(CustomPostProcessingShaderConstants._EdgeColor, m_Roberts.edgeColor.value);
-            // roberts.SetColor(CustomPostProcessingShaderConstants._BackgroundColor, m_Roberts.backgroundColor.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, roberts);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("Roberts");
             
             int paramsKeyword = Shader.PropertyToID("_RobertsParams");
             int edgeColorKeyword = Shader.PropertyToID("_RobertsEdgeColor");
             int backgroundKeyword = Shader.PropertyToID("_RobertsBackgroundColor");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector2(m_Roberts.edgeWidth.value, m_Roberts.backgroundFade.value));
             cmd.SetGlobalColor(edgeColorKeyword, m_Roberts.edgeColor.value);
             cmd.SetGlobalColor(backgroundKeyword, m_Roberts.backgroundColor.value);
-            // Draw(cmd, roberts, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, roberts, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, roberts, 0);
         }
 
         #endregion
@@ -2092,33 +1555,20 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region WaveJitter
 
-        private void SetupWaveJitter(CommandBuffer cmd, ref RenderingData renderingData, Material waveJitter)
+        private void SetupWaveJitter(CommandBuffer cmd, ref RenderingData renderingData, Material waveJitter, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("WaveJitter");
-            // UpdateFrequencyWJ(waveJitter);
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // waveJitter.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_WaveJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_WaveJitter.Frequency.value, m_WaveJitter.RGBSplit.value , m_WaveJitter.Speed.value, m_WaveJitter.Amount.value));
-            // waveJitter.SetVector(CustomPostProcessingShaderConstants._Resolution, m_WaveJitter.CustomResolution.value ? m_WaveJitter.Resolution.value : new Vector2(opaqueDesc.width,opaqueDesc.height));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, waveJitter, (int)m_WaveJitter.JitterDirection.value);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("WaveJitter");
             
             int paramsKeyword = Shader.PropertyToID("_WaveJitterParams");
             int resolutionKeyword = Shader.PropertyToID("_WaveJitterResolution");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             UpdateFrequencyWJ(waveJitter);
             cmd.SetGlobalVector(paramsKeyword, new Vector4(m_WaveJitter.IntervalType.value == IntervalType.Random ? _randomFrequency : m_WaveJitter.Frequency.value, m_WaveJitter.RGBSplit.value , m_WaveJitter.Speed.value, m_WaveJitter.Amount.value));
             cmd.SetGlobalVector(resolutionKeyword, m_WaveJitter.CustomResolution.value ? m_WaveJitter.Resolution.value : new Vector2(opaqueDesc.width,opaqueDesc.height));
             
-            // Draw(cmd, waveJitter, m_TemporaryColorTexture01, m_ColorAttachment, (int)m_WaveJitter.JitterDirection.value);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, waveJitter, (int)m_WaveJitter.JitterDirection.value);
+            Blitter.BlitCameraTexture(cmd, source, dest, waveJitter, (int)m_WaveJitter.JitterDirection.value);
         }
 
         private void UpdateFrequencyWJ(Material waveJitter)
@@ -2143,27 +1593,16 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region ScreenShake
 
-        private void SetupScreenShake(CommandBuffer cmd, ref RenderingData renderingData, Material screenShake)
+        private void SetupScreenShake(CommandBuffer cmd, ref RenderingData renderingData, Material screenShake, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ScreenShake");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // screenShake.SetFloat(CustomPostProcessingShaderConstants._ScreenShake, m_ScreenShake.ScreenShakeIndensity.value);
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, screenShake, (int)m_ScreenShake.ScreenShakeDirection.value);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ScreenShake");
             
             int paramsKeyword = Shader.PropertyToID("_ScreenShakeParams");
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             cmd.SetGlobalFloat(paramsKeyword, m_ScreenShake.ScreenShakeIndensity.value);
             
-            // Draw(cmd, screenShake, m_TemporaryColorTexture01, m_ColorAttachment, (int)m_ScreenShake.ScreenShakeDirection.value);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, screenShake, (int)m_ScreenShake.ScreenShakeDirection.value);
+            Blitter.BlitCameraTexture(cmd, source, dest, screenShake, (int)m_ScreenShake.ScreenShakeDirection.value);
         }
 
         #endregion
@@ -2171,29 +1610,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region ScreenJump
 
-        private void SetupScreenJump(CommandBuffer cmd, ref RenderingData renderingData, Material screenJump)
+        private void SetupScreenJump(CommandBuffer cmd, ref RenderingData renderingData, Material screenJump, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ScreenJump");
-            // ScreenJumpTime += Time.deltaTime * m_ScreenJump.ScreenJumpIndensity.value * 9.8f;
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // screenJump.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_ScreenJump.ScreenJumpIndensity.value, m_ScreenJump.isHorizontalReverse.value ? -ScreenJumpTime : ScreenJumpTime));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, screenJump, (int)m_ScreenJump.ScreenJumpDirection.value);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ScreenJump");
             
             int paramsKeyword = Shader.PropertyToID("_ScanLineJitterParams");
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             _screenJumpTime += Time.deltaTime * m_ScreenJump.ScreenJumpIndensity.value * 9.8f;
             cmd.SetGlobalVector(paramsKeyword, new Vector2(m_ScreenJump.ScreenJumpIndensity.value, m_ScreenJump.isHorizontalReverse.value ? -_screenJumpTime : _screenJumpTime));
             
-            // Draw(cmd, screenJump, m_TemporaryColorTexture01, m_ColorAttachment, (int)m_ScreenJump.ScreenJumpDirection.value);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, screenJump, (int)m_ScreenJump.ScreenJumpDirection.value);
+            Blitter.BlitCameraTexture(cmd, source, dest, screenJump, (int)m_ScreenJump.ScreenJumpDirection.value);
         }
 
         #endregion
@@ -2201,24 +1628,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region AnalogNoise
 
-        private void SetupAnalogNoise(CommandBuffer cmd, ref RenderingData renderingData, Material analogNoise)
+        private void SetupAnalogNoise(CommandBuffer cmd, ref RenderingData renderingData, Material analogNoise, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("AnalogNoise");
-            // TimeX += Time.deltaTime;
-            // if (TimeX > 100)
-            // {
-            //     TimeX = 0;
-            // }
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // analogNoise.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_AnalogNoise.NoiseSpeed.value, m_AnalogNoise.NoiseFading.value, m_AnalogNoise.LuminanceJitterThreshold.value, TimeX));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, analogNoise);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("AnalogNoise");
             
             int paramsKeyword = Shader.PropertyToID("_AnalogNoiseParams");
             _TimeX += Time.deltaTime;
@@ -2226,12 +1639,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 _TimeX = 0;
             }
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             cmd.SetGlobalVector(paramsKeyword, new Vector4(m_AnalogNoise.NoiseSpeed.value, m_AnalogNoise.NoiseFading.value, m_AnalogNoise.LuminanceJitterThreshold.value, _TimeX));
             
-            // Draw(cmd, analogNoise, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, analogNoise, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, analogNoise, 0);
         }
 
         #endregion
@@ -2239,34 +1650,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region DigitalStripe
 
-        private void SetupDigitalStripe(CommandBuffer cmd, ref RenderingData renderingData, Material digitalStripe)
+        private void SetupDigitalStripe(CommandBuffer cmd, ref RenderingData renderingData, Material digitalStripe, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("DigitalStripe");
-            // UpdateFrequencyDS(m_DigitalStripe.frequency.value, m_DigitalStripe.noiseTextureWidth.value, m_DigitalStripe.noiseTextureHeight.value, m_DigitalStripe.stripeLength.value);
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // digitalStripe.SetFloat(CustomPostProcessingShaderConstants._Indensity, m_DigitalStripe.indensity.value);
-            // if (_noiseTexture != null)
-            // {
-            //     digitalStripe.SetTexture(CustomPostProcessingShaderConstants._NoiseTex, _noiseTexture);
-            // }
-            // if (m_DigitalStripe.needStripColorAdjust.value)
-            // {
-            //     digitalStripe.EnableKeyword("NEED_TRASH_FRAME");
-            //     digitalStripe.SetColor(CustomPostProcessingShaderConstants._StripColorAdjustColor, m_DigitalStripe.stripColorAdjustColor.value);
-            //     digitalStripe.SetFloat(CustomPostProcessingShaderConstants._StripColorAdjustIndensity, m_DigitalStripe.stripColorAdjustIndensity.value);
-            // }
-            // else
-            // {
-            //     digitalStripe.DisableKeyword("NEED_TRASH_FRAME");
-            // }
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, digitalStripe);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("DigitalStripe");
             
             int colorKeyword = Shader.PropertyToID("_StripColorAdjustColor");
             int indensityKeyword = Shader.PropertyToID("_DigitalStripeIndensity");
@@ -2274,7 +1661,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             int texKeyword = Shader.PropertyToID("_DigitalStripeNoiseTex");
             
             UpdateFrequencyDS(m_DigitalStripe.frequency.value, m_DigitalStripe.noiseTextureWidth.value, m_DigitalStripe.noiseTextureHeight.value, m_DigitalStripe.stripeLength.value);
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalFloat(indensityKeyword, m_DigitalStripe.indensity.value);
             if (_noiseTexture != null)
             {
@@ -2291,8 +1677,7 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
                 digitalStripe.DisableKeyword("NEED_TRASH_FRAME");
             }
             
-            // Draw(cmd, digitalStripe, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, digitalStripe, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, digitalStripe, 0);
         }
 
         private void UpdateFrequencyDS(int frame, int noiseTextureWidth, int noiseTextureHeight, float stripLength)
@@ -2306,11 +1691,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             _noiseTexture = new Texture2D(noiseTextureWidth, noiseTextureHeight, TextureFormat.ARGB32, false);
             _noiseTexture.wrapMode = TextureWrapMode.Clamp;
             _noiseTexture.filterMode = FilterMode.Point;
-
-            // _trashFrame1 = new RenderTexture(Screen.width, Screen.height, 0);
-            // _trashFrame2 = new RenderTexture(Screen.width, Screen.height, 0);
-            // _trashFrame1.hideFlags = HideFlags.DontSave;
-            // _trashFrame2.hideFlags = HideFlags.DontSave;
 
             Color color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
 
@@ -2337,34 +1717,19 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region ScanLineJitter
 
-        private void SetupScanLineJitter(CommandBuffer cmd, ref RenderingData renderingData, Material scanLineJitter)
+        private void SetupScanLineJitter(CommandBuffer cmd, ref RenderingData renderingData, Material scanLineJitter, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ScanLineJitter");
-            // UpdateFrequencySLJ(scanLineJitter);
-            // float displacement = 0.005f + Mathf.Pow(m_ScanLineJitter.JitterIndensity.value, 3) * 0.1f;
-            // float threshold = Mathf.Clamp01(1.0f - m_ScanLineJitter.JitterIndensity.value * 1.2f);
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // scanLineJitter.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(displacement, threshold, m_ScanLineJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_ScanLineJitter.Frequency.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, scanLineJitter, (int)m_ScanLineJitter.JitterDirection.value);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ScanLineJitter");
             
             int paramsKeyword = Shader.PropertyToID("_ScanLineJitterParams");
-
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             
             UpdateFrequencySLJ(scanLineJitter);
             float displacement = 0.005f + Mathf.Pow(m_ScanLineJitter.JitterIndensity.value, 3) * 0.1f;
             float threshold = Mathf.Clamp01(1.0f - m_ScanLineJitter.JitterIndensity.value * 1.2f);
             cmd.SetGlobalVector(paramsKeyword, new Vector3(displacement, threshold, m_ScanLineJitter.IntervalType.value == IntervalType.Random ? _randomFrequency : m_ScanLineJitter.Frequency.value));
             
-            // Draw(cmd, scanLineJitter, m_TemporaryColorTexture01, m_ColorAttachment, (int)m_ScanLineJitter.JitterDirection.value);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, scanLineJitter, (int)m_ScanLineJitter.JitterDirection.value);
+            Blitter.BlitCameraTexture(cmd, source, dest, scanLineJitter, (int)m_ScanLineJitter.JitterDirection.value);
         }
 
         private void UpdateFrequencySLJ(Material scanLineJitter)
@@ -2389,28 +1754,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region TileJitter
 
-        private void SetupTileJitter(CommandBuffer cmd, ref RenderingData renderingData, Material tileJitter)
+        private void SetupTileJitter(CommandBuffer cmd, ref RenderingData renderingData, Material tileJitter, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("TileJitter");
-            // UpdateFrequencyTJ(tileJitter);
-            // if (m_TileJitter.JitterDirection.value == Direction.Horizontal)
-            // {
-            //     tileJitter.EnableKeyword("JITTER_DIRECTION_HORIZONTAL");
-            // }
-            // else
-            // {
-            //     tileJitter.DisableKeyword("JITTER_DIRECTION_HORIZONTAL");
-            // }
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // tileJitter.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_TileJitter.SplittingNumber.value, m_TileJitter.Amount.value , m_TileJitter.Speed.value * 100f, m_TileJitter.IntervalType.value == IntervalType.Random ? randomFrequency : m_TileJitter.Frequency.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tileJitter, m_TileJitter.SplittingDirection.value == Direction.Horizontal ? 0 : 1);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("TileJitter");
             
             int paramsKeyword = Shader.PropertyToID("_TileJitterParams");
 
@@ -2423,11 +1770,9 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 tileJitter.DisableKeyword("JITTER_DIRECTION_HORIZONTAL");
             }
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector4(m_TileJitter.SplittingNumber.value, m_TileJitter.Amount.value , m_TileJitter.Speed.value * 100f, m_TileJitter.IntervalType.value == IntervalType.Random ? _randomFrequency : m_TileJitter.Frequency.value));
             
-            // Draw(cmd, tileJitter, m_TemporaryColorTexture01, m_ColorAttachment, m_TileJitter.SplittingDirection.value == Direction.Horizontal ? 0 : 1);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, tileJitter, m_TileJitter.SplittingDirection.value == Direction.Horizontal ? 0 : 1);
+            Blitter.BlitCameraTexture(cmd, source, dest, tileJitter, m_TileJitter.SplittingDirection.value == Direction.Horizontal ? 0 : 1);
         }
 
         private void UpdateFrequencyTJ(Material tileJitter)
@@ -2452,29 +1797,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region LineBlock
 
-        private void SetupLineBlock(CommandBuffer cmd, ref RenderingData renderingData, Material lineBlock)
+        private void SetupLineBlock(CommandBuffer cmd, ref RenderingData renderingData, Material lineBlock, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("LineBlock");
-            // UpdateFrequency(lineBlock);
-            // TimeX += Time.deltaTime;
-            // if (TimeX > 100)
-            // {
-            //     TimeX = 0;
-            // }
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // lineBlock.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(
-            //     m_LineBlock.IntervalType.value == IntervalType.Random ? randomFrequency : m_LineBlock.Frequency.value,
-            //     TimeX * m_LineBlock.Speed.value * 0.2f , m_LineBlock.Amount.value));
-            // lineBlock.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector3(m_LineBlock.Offset.value, 1 / m_LineBlock.LinesWidth.value, m_LineBlock.Alpha.value));
-            // int pass = (int)m_LineBlock.BlockDirection.value;
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, lineBlock,pass);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("LineBlock");
             
             int paramsKeyword = Shader.PropertyToID("_LineBlockParams");
             int params2Keyword = Shader.PropertyToID("_LineBlockParams2");
@@ -2486,15 +1812,13 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             
             UpdateFrequency(lineBlock);
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector3(
                 m_LineBlock.IntervalType.value == IntervalType.Random ? _randomFrequency : m_LineBlock.Frequency.value,
                 _TimeX * m_LineBlock.Speed.value * 0.2f , m_LineBlock.Amount.value));
             cmd.SetGlobalVector(params2Keyword, new Vector3(m_LineBlock.Offset.value, 1 / m_LineBlock.LinesWidth.value, m_LineBlock.Alpha.value));
             int pass = (int)m_LineBlock.BlockDirection.value;
             
-            // Draw(cmd, lineBlock, m_TemporaryColorTexture01, m_ColorAttachment, pass);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, lineBlock, pass);
+            Blitter.BlitCameraTexture(cmd, source, dest, lineBlock, pass);
         }
 
         private void UpdateFrequency(Material lineBlock)
@@ -2525,26 +1849,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region ImageBlock
 
-        private void SetupImageBlock(CommandBuffer cmd, ref RenderingData renderingData, Material imageBlock)
+        private void SetupImageBlock(CommandBuffer cmd, ref RenderingData renderingData, Material imageBlock, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("ImageBlock");
-            // TimeX += Time.deltaTime;
-            // if (TimeX > 100)
-            // {
-            //     TimeX = 0;
-            // }
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // imageBlock.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(TimeX * m_ImageBlock.Speed.value, m_ImageBlock.Amount.value, m_ImageBlock.Fade.value));
-            // imageBlock.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector4(m_ImageBlock.BlockLayer1_U.value, m_ImageBlock.BlockLayer1_V.value, m_ImageBlock.BlockLayer2_U.value, m_ImageBlock.BlockLayer2_V.value));
-            // imageBlock.SetVector(CustomPostProcessingShaderConstants._Params3, new Vector3(m_ImageBlock.RGBSplitIndensity.value, m_ImageBlock.BlockLayer1_Indensity.value, m_ImageBlock.BlockLayer2_Indensity.value));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, imageBlock);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("ImageBlock");
             
             int paramsKeyword = Shader.PropertyToID("_ImageBlockParams");
             int params2Keyword = Shader.PropertyToID("_ImageBlockParams2");
@@ -2554,14 +1862,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 _TimeX = 0;
             }
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
 
             cmd.SetGlobalVector(paramsKeyword, new Vector3(_TimeX * m_ImageBlock.Speed.value, m_ImageBlock.Amount.value, m_ImageBlock.Fade.value));
             cmd.SetGlobalVector(params2Keyword, new Vector4(m_ImageBlock.BlockLayer1_U.value, m_ImageBlock.BlockLayer1_V.value, m_ImageBlock.BlockLayer2_U.value, m_ImageBlock.BlockLayer2_V.value));
             cmd.SetGlobalVector(params3Keyword, new Vector3(m_ImageBlock.RGBSplitIndensity.value, m_ImageBlock.BlockLayer1_Indensity.value, m_ImageBlock.BlockLayer2_Indensity.value));
             
-            // Draw(cmd, imageBlock, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, imageBlock, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, imageBlock, 0);
         }
 
         #endregion
@@ -2573,22 +1879,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("RGBSplit");
-            // TimeX += Time.deltaTime;
-            // if (TimeX > 100)
-            // {
-            //     TimeX = 0;
-            // }
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // rgbSplit.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_RGBSplit.Fading.value, m_RGBSplit.Amount.value, m_RGBSplit.Speed.value, m_RGBSplit.CenterFading.value));
-            // rgbSplit.SetVector(CustomPostProcessingShaderConstants._Params2, new Vector3(TimeX, m_RGBSplit.AmountR.value, m_RGBSplit.AmountB.value));
-            // int pass = (int)m_RGBSplit.SplitDirection.value;
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, rgbSplit,pass);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("RGBSplit");
             
             int paramsKeyword = Shader.PropertyToID("_RGBSplitParams");
             int params2Keyword = Shader.PropertyToID("_RGBSplitParams2");
@@ -2597,12 +1887,10 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             {
                 _TimeX = 0;
             }
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(paramsKeyword, new Vector4(m_RGBSplit.Fading.value, m_RGBSplit.Amount.value, m_RGBSplit.Speed.value, m_RGBSplit.CenterFading.value));
             cmd.SetGlobalVector(params2Keyword, new Vector3(_TimeX, m_RGBSplit.AmountR.value, m_RGBSplit.AmountB.value));
             int pass = (int)m_RGBSplit.SplitDirection.value;
             
-            // Draw(cmd, rgbSplit, m_TemporaryColorTexture01, m_ColorAttachment, pass);
             Blitter.BlitCameraTexture(cmd, source, dest, rgbSplit, pass);
         }
         
@@ -2619,17 +1907,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
             opaqueDesc.width = (int)(opaqueDesc.width / m_DirectionalBlur.downScaling.value);
             opaqueDesc.height = (int)(opaqueDesc.height / m_DirectionalBlur.downScaling.value);
             opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("DirectionalBlur");
-            // cmd.GetTemporaryRT(m_TemporaryBlurTexture03.id, opaqueDesc, FilterMode.Point);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryBlurTexture03.Identifier());
-            // float sinVal = (Mathf.Sin(m_DirectionalBlur.angle.value) * m_DirectionalBlur.indensity.value * 0.05f) / m_DirectionalBlur.blurCount.value;
-            // float cosVal = (Mathf.Cos(m_DirectionalBlur.angle.value) * m_DirectionalBlur.indensity.value * 0.05f) / m_DirectionalBlur.blurCount.value;  
-            // directionalBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(m_DirectionalBlur.blurCount.value, sinVal, cosVal));
-            // cmd.Blit(m_TemporaryBlurTexture03.Identifier(), m_ColorAttachment, directionalBlur);
-            // cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture03.id);
-            // cmd.EndSample("DirectionalBlur");
             
             int blurSizeKeyword = Shader.PropertyToID("_DirectionalBlurSize");
             RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture03, opaqueDesc,
@@ -2641,15 +1918,12 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
             if (m_DirectionalBlur.downScaling.value > 1.0f)
             {
-                // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-                // Draw(cmd, directionalBlur, m_TemporaryColorTexture01, m_ColorAttachment, 0);
                 Blit(cmd, source, m_TemporaryBlurTexture03);
                 Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture03, dest, directionalBlur, 0);
 
             }
             else
             {
-                // Draw(cmd, directionalBlur,m_ColorAttachment, m_ColorAttachment, 0);
                 Blitter.BlitCameraTexture(cmd, source, dest, directionalBlur, 0);
             }
 
@@ -2660,26 +1934,15 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region RadialBlur
 
-        private void SetupRadialBlur(CommandBuffer cmd, ref RenderingData renderingData, Material radialBlur)
+        private void SetupRadialBlur(CommandBuffer cmd, ref RenderingData renderingData, Material radialBlur, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("RadialBlur");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // radialBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector3(m_RadialBlur.indensity.value * 0.02f, m_RadialBlur.RadialCenterX.value, m_RadialBlur.RadialCenterY.value));
-            // int pass = (int)m_RadialBlur.qualityLevel.value;
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, radialBlur, pass);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("RadialBlur");
             
             int blurParametersKeyword = Shader.PropertyToID("_RadialBlurParameters");
             
             cmd.SetGlobalVector(blurParametersKeyword, new Vector4(m_RadialBlur.iteration.value, m_RadialBlur.blurSize.value * 0.02f,m_RadialBlur.RadialCenterX.value, m_RadialBlur.RadialCenterY.value));
-            // Draw(cmd, null, m_ColorAttachment, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, radialBlur, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, radialBlur, 0);
             
         }
 
@@ -2687,39 +1950,29 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region GrainyBlur
 
-        private void SetupGrainyBlur(CommandBuffer cmd, ref RenderingData renderingData, Material grainyBlur)
+        private void SetupGrainyBlur(CommandBuffer cmd, ref RenderingData renderingData, Material grainyBlur, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.width = (int)(opaqueDesc.width / m_GrainyBlur.downSample.value);
             opaqueDesc.height = (int)(opaqueDesc.height / m_GrainyBlur.downSample.value);
             opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("GrainyBlur");
-            // cmd.GetTemporaryRT(m_TemporaryBlurTexture03.id, opaqueDesc, FilterMode.Point);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryBlurTexture03.Identifier());
-            // grainyBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector2(m_GrainyBlur.indensity.value / opaqueDesc.height, m_GrainyBlur.blurCount.value));
-            // cmd.Blit(m_TemporaryBlurTexture03.Identifier(), m_ColorAttachment, grainyBlur);
-            // cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture03.id);
-            // cmd.EndSample("GrainyBlur");
             
             int blurSizeKeyword = Shader.PropertyToID("_GrainyBlurSize");
             int iterationKeyword = Shader.PropertyToID("_GrainyIteration");
-
+            RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture03, opaqueDesc, name: "_TemporaryBokeBlurRT",
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
+            
             cmd.SetGlobalFloat(blurSizeKeyword, m_GrainyBlur.blurRadius.value);
             cmd.SetGlobalFloat(iterationKeyword, m_GrainyBlur.iteration.value);
 
             if (m_GrainyBlur.downSample.value > 1.0f)
             {
-                // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-                // Draw(cmd, grainyBlur, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-                Blit(cmd, m_ColorAttachment, m_TemporaryColorTexture01);
-                Blitter.BlitCameraTexture(cmd, m_TemporaryColorTexture01, destination, grainyBlur, 0);
+                Blit(cmd, source, m_TemporaryBlurTexture03);
+                Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture03, dest, grainyBlur, 0);
             }
             else
             {
-                Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, grainyBlur, 0);
-                // Draw(cmd, grainyBlur, m_ColorAttachment, m_ColorAttachment, 0);
+                Blitter.BlitCameraTexture(cmd, source, dest, grainyBlur, 0);
 
             }
         }
@@ -2728,30 +1981,17 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region IrisBlur
 
-        private void SetupIrisBlur(CommandBuffer cmd, ref RenderingData renderingData, Material irisBlur)
+        private void SetupIrisBlur(CommandBuffer cmd, ref RenderingData renderingData, Material irisBlur, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("IrisBlur");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // irisBlur.SetVector(CustomPostProcessingShaderConstants._GoldenRot, mGoldenRot);
-            // irisBlur.SetVector(CustomPostProcessingShaderConstants._Gradient, new Vector3(m_IrisBlur.centerOffsetX.value, m_IrisBlur.centerOffsetY.value, m_IrisBlur.areaSize.value * 0.1f));
-            // irisBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_IrisBlur.blurCount.value, m_IrisBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, irisBlur);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("IrisBlur");
             
             int gradientKeyword = Shader.PropertyToID("_IrisGradient");
             int parametersKeyword = Shader.PropertyToID("_IrisParameters");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(gradientKeyword, new Vector3(m_IrisBlur.centerOffsetX.value, m_IrisBlur.centerOffsetY.value, m_IrisBlur.areaSize.value * 0.1f));
             cmd.SetGlobalVector(parametersKeyword, new Vector2(m_IrisBlur.iteration.value, m_IrisBlur.blurSize.value));
-            // Draw(cmd, irisBlur, m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, irisBlur, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, irisBlur, 0);
 
         }
 
@@ -2759,293 +1999,130 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
 
         #region TiltShiftBlur
 
-        private void SetupTiltShiftBlur(CommandBuffer cmd, ref RenderingData renderingData, Material tiltShiftBlur)
+        private void SetupTiltShiftBlur(CommandBuffer cmd, ref RenderingData renderingData, Material tiltShiftBlur, in RTHandle source, in RTHandle dest)
         {
             // RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             // opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("TiltShiftBlur");
-            // // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Bilinear);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // tiltShiftBlur.SetVector(CustomPostProcessingShaderConstants._GoldenRot, mGoldenRot);
-            // tiltShiftBlur.SetVector(CustomPostProcessingShaderConstants._Gradient, new Vector3(m_TiltShiftBlur.centerOffset.value, m_TiltShiftBlur.areaSize.value, m_TiltShiftBlur.areaSmooth.value));
-            // tiltShiftBlur.SetVector(CustomPostProcessingShaderConstants._Params, new Vector4(m_TiltShiftBlur.blurCount.value, m_TiltShiftBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment, tiltShiftBlur);
-            // // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.EndSample("TiltShiftBlur");
             
             int gradientKeyword = Shader.PropertyToID("_TiltShiftBlurGradient");
             int parametersKeyword = Shader.PropertyToID("_TiltShiftBlurParameters");
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
             cmd.SetGlobalVector(gradientKeyword, new Vector3(m_TiltShiftBlur.centerOffset.value, m_TiltShiftBlur.areaSize.value, m_TiltShiftBlur.areaSmooth.value));
             cmd.SetGlobalVector(parametersKeyword, new Vector2(m_TiltShiftBlur.iteration.value, m_TiltShiftBlur.blurSize.value));
-            // Draw(cmd, tiltShiftBlur,m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_ColorAttachment, destination, tiltShiftBlur, 0);
+            Blitter.BlitCameraTexture(cmd, source, dest, tiltShiftBlur, 0);
         }
 
         #endregion
 
         #region BokehBlur
 
-        private void SetupBokehBlur(CommandBuffer cmd, ref RenderingData renderingData, Material bokehBlur)
+        private void SetupBokehBlur(CommandBuffer cmd, ref RenderingData renderingData, Material bokehBlur, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.width = (int)(opaqueDesc.width / m_BokehBlur.downScaling.value);
             opaqueDesc.height = (int)(opaqueDesc.height / m_BokehBlur.downScaling.value);
             opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("BokehBlur");
-            // cmd.GetTemporaryRT(m_TemporaryBlurTexture03.id, opaqueDesc, FilterMode.Point);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryBlurTexture03.Identifier());
-            // bokehBlur.SetVector(CustomPostProcessingShaderConstants._GoldenRot, mGoldenRot);
-            // bokehBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(m_BokehBlur.blurCount.value, m_BokehBlur.indensity.value, 1f / opaqueDesc.width, 1f / opaqueDesc.height));
-            // cmd.Blit(m_TemporaryBlurTexture03.Identifier(), m_ColorAttachment, bokehBlur);
-            // cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture03.id);
-            // cmd.EndSample("BokehBlur");
             
             int blurSizeKeyword = Shader.PropertyToID("_BokehBlurSize");
             int iterationKeyword = Shader.PropertyToID("_BokehIteration");
             RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture03, opaqueDesc, name: "_TemporaryBokeBlurRT",
                 wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            Blit(cmd, m_ColorAttachment, m_TemporaryBlurTexture03);
+            Blit(cmd, source, m_TemporaryBlurTexture03);
             
             cmd.SetGlobalFloat(blurSizeKeyword, m_BokehBlur.blurRadius.value);
             cmd.SetGlobalFloat(iterationKeyword, m_BokehBlur.iteration.value);
             
-            // Draw(cmd, bokehBlur,m_TemporaryColorTexture01, m_ColorAttachment, 0);
-            Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture03, destination, bokehBlur, 0);
+            Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture03, dest, bokehBlur, 0);
             
-        }
-
-        #endregion
-
-        #region DualKawaseBlur
-
-        private void SetupDualKawaseBlur(CommandBuffer cmd, ref RenderingData renderingData, Material dualKawaseBlur)
-        {
-            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
-            opaqueDesc.width = (int)(opaqueDesc.width / m_DualKawaseBlur.downScaling.value);
-            opaqueDesc.height = (int)(opaqueDesc.height / m_DualKawaseBlur.downScaling.value);
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("DualKawaseBlur");
-            // dualKawaseBlur.SetFloat(CustomPostProcessingShaderConstants._Offset, m_DualKawaseBlur.indensity.value);
-            // RenderTargetIdentifier lastDown = m_ColorAttachment;
-            // for (int i = 0; i < m_DualKawaseBlur.blurCount.value; i++)
-            // {
-            //     int mipDown = m_Pyramid[i].down;
-            //     int mipUp = m_Pyramid[i].up;
-            //     cmd.GetTemporaryRT(mipDown, width, height, 0, FilterMode.Point);
-            //     cmd.GetTemporaryRT(mipUp, width, height, 0, FilterMode.Point);
-            //     cmd.Blit(lastDown, mipDown, dualKawaseBlur,0);
-            //
-            //     lastDown = mipDown;
-            //     width = Mathf.Max(width / 2, 1);
-            //     height = Mathf.Max(height / 2, 1);
-            // }
-            //
-            // int lastUp = m_Pyramid[m_DualKawaseBlur.blurCount.value - 1].down;
-            // for (int i = m_DualKawaseBlur.blurCount.value - 2; i >= 0; i--)
-            // {
-            //     int minUp = m_Pyramid[i].up;
-            //     cmd.Blit(lastUp,minUp,dualKawaseBlur,1);
-            //     lastUp = minUp;
-            // }
-            // cmd.Blit(lastUp,m_ColorAttachment,dualKawaseBlur,1);
-            // for (int i = 0; i < m_DualKawaseBlur.blurCount.value; i++)
-            // {
-            //     if (m_Pyramid[i].down != lastUp)
-            //         cmd.ReleaseTemporaryRT(m_Pyramid[i].down);
-            //     if (m_Pyramid[i].up != lastUp)
-            //         cmd.ReleaseTemporaryRT(m_Pyramid[i].up);
-            // }
-            // cmd.EndSample("DualKawaseBlur");
-            
-            int blurSizeKeyword = Shader.PropertyToID("_DualKawaseBlurSize");
-            
-            RTHandle[] tempRT = new RTHandle[m_DualKawaseBlur.iteration.value + 1];
-            RenderingUtils.ReAllocateIfNeeded(ref tempRT[0], opaqueDesc, name: "tempRTName_0",
-                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
-
-            for (int i = 1; i <= m_DualKawaseBlur.iteration.value; i++)
-            {
-                opaqueDesc.width = Math.Max(opaqueDesc.width / 2, 1);
-                opaqueDesc.height = Math.Max(opaqueDesc.height / 2, 1);
-                
-                RenderingUtils.ReAllocateIfNeeded(ref tempRT[i], opaqueDesc, name: "tempRTName_i",
-                    wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
-                
-            }
-            
-            // Draw(cmd, null, m_ColorAttachment, tempRT[0]);
-            Blit(cmd, m_ColorAttachment, tempRT[0]);
-            for (int i = 0; i < m_DualKawaseBlur.iteration.value; i++)
-            {
-                cmd.SetGlobalFloat(blurSizeKeyword, 1.0f + i * m_DualKawaseBlur.blurSize.value);
-                // Draw(cmd, dualKawaseBlur, tempRT[i], tempRT[i+1],0);
-                Blitter.BlitCameraTexture(cmd, tempRT[i], tempRT[i+1], dualKawaseBlur, 0);
-            }
-            for (int i = m_DualKawaseBlur.iteration.value; i > 1; i--)
-            {
-                cmd.SetGlobalFloat(blurSizeKeyword, 1.0f + i * m_DualKawaseBlur.blurSize.value);
-                // Draw(cmd, dualKawaseBlur, tempRT[i], tempRT[i-1],1);
-                Blitter.BlitCameraTexture(cmd, tempRT[i], tempRT[i-1], dualKawaseBlur, 1);
-            }
-            // Draw(cmd, dualKawaseBlur, tempRT[1], m_ColorAttachment,1);
-            Blitter.BlitCameraTexture(cmd, tempRT[1], destination, dualKawaseBlur, 1);
-            
-            for (int i = 0; i < m_DualKawaseBlur.iteration.value; i++)
-            {
-                tempRT[i]?.Release();
-            }
-
         }
 
         #endregion
 
         #region KawaseBlur
 
-        private void SetupKawaseBlur(CommandBuffer cmd, ref RenderingData renderingData, Material kawaseBlur)
+        private void SetupKawaseBlur(CommandBuffer cmd, ref RenderingData renderingData, Material kawaseBlur, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.width = (int)(opaqueDesc.width / m_KawaseBlur.downSample.value);
             opaqueDesc.height = (int)(opaqueDesc.height / m_KawaseBlur.downSample.value);
             opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("KawaseBlur");
-            // cmd.GetTemporaryRT(m_TemporaryBlurTexture03.id, opaqueDesc, FilterMode.Point);
-            // cmd.GetTemporaryRT(m_TemporaryBlurTexture04.id, opaqueDesc, FilterMode.Point);
-            // bool needSwitch = true;
-            // cmd.Blit(m_ColorAttachment, m_TemporaryBlurTexture03.Identifier());
-            // for (int i = 0; i < m_KawaseBlur.blurCount.value; i++) {
-            //     kawaseBlur.SetFloat(CustomPostProcessingShaderConstants._Offset, i / m_KawaseBlur.downSample.value + m_KawaseBlur.indensity.value);
-            //     cmd.Blit(needSwitch ? m_TemporaryBlurTexture03.Identifier() : m_TemporaryBlurTexture04.Identifier(), needSwitch ? m_TemporaryBlurTexture04.Identifier() : m_TemporaryBlurTexture03.Identifier(),kawaseBlur);
-            //     needSwitch = !needSwitch;
-            // }
-            // kawaseBlur.SetFloat(CustomPostProcessingShaderConstants._Offset, m_KawaseBlur.blurCount.value / m_KawaseBlur.downSample.value + m_KawaseBlur.indensity.value);
-            // cmd.Blit(needSwitch ? m_TemporaryBlurTexture03.Identifier() : m_TemporaryBlurTexture04.Identifier(), m_ColorAttachment);
-            // cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture03.id);
-            // cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture04.id);
-            // cmd.EndSample("KawaseBlur");
             
             int blurSizeKeyword = Shader.PropertyToID("_KawaseBlurSize");
+            RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture03, opaqueDesc, name: "_tempGaussianBlurRT03",
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
+            RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture04, opaqueDesc, name: "_tempGaussianBlurRT04",
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            Blit(cmd, m_ColorAttachment, m_TemporaryColorTexture01);
+            Blit(cmd, source, m_TemporaryBlurTexture03);
             for (int i = 0; i < m_KawaseBlur.iteration.value; i++)
             {
                 cmd.SetGlobalFloat(blurSizeKeyword, 1.0f + i * m_KawaseBlur.blurSize.value);
-                // Draw(cmd, kawaseBlur, m_TemporaryColorTexture01, m_TemporaryColorTexture02, 0);
-                Blitter.BlitCameraTexture(cmd, m_TemporaryColorTexture01, m_TemporaryColorTexture02, kawaseBlur, 0);
-                CoreUtils.Swap(ref m_TemporaryColorTexture02, ref m_TemporaryColorTexture01);
+                Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture03, m_TemporaryBlurTexture04, kawaseBlur, 0);
+                CoreUtils.Swap(ref m_TemporaryBlurTexture04, ref m_TemporaryBlurTexture03);
             }
-            // Draw(cmd, null, m_TemporaryColorTexture01, m_ColorAttachment);
-            Blit(cmd, m_TemporaryColorTexture01, destination);
+            Blit(cmd, m_TemporaryBlurTexture03, dest);
         }
 
         #endregion
 
         #region BoxBlur
 
-        private void SetupBoxBlur(CommandBuffer cmd, ref RenderingData renderingData, Material boxBlur)
+        private void SetupBoxBlur(CommandBuffer cmd, ref RenderingData renderingData, Material boxBlur, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.width = (int)(opaqueDesc.width / m_BoxBlur.downScaling.value);
             opaqueDesc.height = (int)(opaqueDesc.height / m_BoxBlur.downScaling.value);
             opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.BeginSample("BoxBlur");
-            // cmd.GetTemporaryRT(m_TemporaryBlurTexture03.id, opaqueDesc, FilterMode.Point);
-            // cmd.GetTemporaryRT(m_TemporaryBlurTexture04.id, opaqueDesc, FilterMode.Point);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryBlurTexture03.Identifier());
-            // for (int i = 0; i < m_BoxBlur.blurCount.value; i++) {
-            //     boxBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(m_BoxBlur.indensity.value, 0, 0, 0));
-            //     cmd.Blit(m_TemporaryBlurTexture03.Identifier(), m_TemporaryBlurTexture04.Identifier(), boxBlur);
-            //     boxBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(0, m_BoxBlur.indensity.value, 0, 0));
-            //     cmd.Blit(m_TemporaryBlurTexture04.Identifier(), m_TemporaryBlurTexture03.Identifier(), boxBlur);
-            // }
-            // cmd.Blit(m_TemporaryBlurTexture03.Identifier(), m_ColorAttachment);
-            // cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture03.id);
-            // cmd.ReleaseTemporaryRT(m_TemporaryBlurTexture04.id);
-            // cmd.EndSample("BoxBlur");
             
             int blurSizeKeyword = Shader.PropertyToID("_BoxBlurSize");
-            
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            Blit(cmd, m_ColorAttachment, m_TemporaryColorTexture01);
+            RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture03, opaqueDesc, name: "_tempGaussianBlurRT03",
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
+            RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture04, opaqueDesc, name: "_tempGaussianBlurRT04",
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
+            Blit(cmd, source, m_TemporaryBlurTexture03);
 
             for (int i = 0; i < m_BoxBlur.iteration.value; i++) {
                 cmd.SetGlobalVector(blurSizeKeyword, new Vector4(1.0f + m_BoxBlur.blurRadius.value, 0, 0, 0));
-                // Draw(cmd, boxBlur, m_TemporaryColorTexture01, m_TemporaryColorTexture02, 0);
-                Blitter.BlitCameraTexture(cmd, m_TemporaryColorTexture01, m_TemporaryColorTexture02, boxBlur, 0);
+                Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture03, m_TemporaryBlurTexture04, boxBlur, 0);
                 cmd.SetGlobalVector(blurSizeKeyword, new Vector4(0, 1.0f + m_BoxBlur.blurRadius.value, 0, 0));
-                // Draw(cmd, boxBlur, m_TemporaryColorTexture02, m_TemporaryColorTexture01, 0);
-                Blitter.BlitCameraTexture(cmd, m_TemporaryColorTexture02, m_TemporaryColorTexture01, boxBlur, 0);
+                Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture04, m_TemporaryBlurTexture03, boxBlur, 0);
 
             }
             
-            // Draw(cmd, null, m_TemporaryColorTexture01, m_ColorAttachment);
-            Blit(cmd, m_TemporaryColorTexture01, destination);
+            Blit(cmd, m_TemporaryBlurTexture03, dest);
         }
 
         #endregion
 
         #region GaussianBlur
 
-        private void SetupGaussianBlur(CommandBuffer cmd, ref RenderingData renderingData, Material gaussianBlur)
+        private void SetupGaussianBlur(CommandBuffer cmd, ref RenderingData renderingData, Material gaussianBlur, in RTHandle source, in RTHandle dest)
         {
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.width = (int)(opaqueDesc.width / m_GaussianBlur.downScaling.value);
             opaqueDesc.height = (int)(opaqueDesc.height / m_GaussianBlur.downScaling.value);
             opaqueDesc.depthBufferBits = 0;
-            RTHandle destination = renderingData.cameraData.renderer.cameraColorTargetHandle;
-
-            // cmd.GetTemporaryRT(m_TemporaryColorTexture03.id, opaqueDesc, m_GaussianBlur.filterMode.value);
-
-            // cmd.BeginSample("GaussianBlur");
-            // cmd.GetTemporaryRT(m_TemporaryColorTexture01.id, opaqueDesc, FilterMode.Point);
-            // cmd.GetTemporaryRT(m_TemporaryColorTexture02.id, opaqueDesc, FilterMode.Point);
-            // cmd.Blit(m_ColorAttachment, m_TemporaryColorTexture01.Identifier());
-            // for (int i = 0; i < m_GaussianBlur.blurCount.value; i++) {
-            //     //y-direction
-            //     gaussianBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(0, m_GaussianBlur.indensity.value, 0, 0));
-            //     cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_TemporaryColorTexture02.Identifier(), gaussianBlur);
-            //     //x-direction
-            //     gaussianBlur.SetVector(CustomPostProcessingShaderConstants._Offset, new Vector4(m_GaussianBlur.indensity.value, 0, 0, 0));
-            //     cmd.Blit(m_TemporaryColorTexture02.Identifier(), m_TemporaryColorTexture01.Identifier(), gaussianBlur);
-            //
-            // }
-            // cmd.Blit(m_TemporaryColorTexture01.Identifier(), m_ColorAttachment);
-            // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
-            // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
-            // cmd.EndSample("GaussianBlur");
 
             int blurSizeKeyword = Shader.PropertyToID("_GaussianBlurSize");
+            RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture03, opaqueDesc, name: "_tempGaussianBlurRT03",
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
+            RenderingUtils.ReAllocateIfNeeded(ref m_TemporaryBlurTexture04, opaqueDesc, name: "_tempGaussianBlurRT04",
+                wrapMode: TextureWrapMode.Clamp, filterMode: FilterMode.Bilinear);
             
-            // Draw(cmd, null, m_ColorAttachment, m_TemporaryColorTexture01);
-            Blit(cmd, m_ColorAttachment, m_TemporaryColorTexture01);
+            Blit(cmd, source, m_TemporaryBlurTexture03);
             
             for (int i = 0; i < m_GaussianBlur.iteration.value; i++) {
                 //y-direction
                 cmd.SetGlobalVector(blurSizeKeyword, new Vector4(0, 1.0f + i * m_GaussianBlur.blurRadius.value, 0, 0));
-                // Draw(cmd, gaussianBlur, m_TemporaryColorTexture01, m_TemporaryColorTexture02, 0);
-                Blitter.BlitCameraTexture(cmd, m_TemporaryColorTexture01, m_TemporaryColorTexture02, gaussianBlur, 0);
+                Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture03, m_TemporaryBlurTexture04, gaussianBlur, 0);
                 //x-direction
                 cmd.SetGlobalVector(blurSizeKeyword, new Vector4( 1.0f + i * m_GaussianBlur.blurRadius.value, 0, 0, 0));
-                // Draw(cmd, gaussianBlur, m_TemporaryColorTexture02, m_TemporaryColorTexture01, 0);
-                Blitter.BlitCameraTexture(cmd, m_TemporaryColorTexture02, m_TemporaryColorTexture01, gaussianBlur, 0);
+                Blitter.BlitCameraTexture(cmd, m_TemporaryBlurTexture04, m_TemporaryBlurTexture03, gaussianBlur, 0);
                 
             }
             
-            // Draw(cmd, null, m_TemporaryColorTexture01, m_ColorAttachment);
-            Blit(cmd, m_TemporaryColorTexture01, destination);
+            Blit(cmd, m_TemporaryBlurTexture03, dest);
         }
 
         #endregion
