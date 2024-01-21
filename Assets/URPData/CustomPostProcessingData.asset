@@ -16,7 +16,6 @@ MonoBehaviour:
     gaussianBlur: {fileID: 4800000, guid: 3c802762de6da4a37aa53a68ba40767a, type: 3}
     boxBlur: {fileID: 4800000, guid: 8247a682d4fd04d188b4ccbb33ac950d, type: 3}
     kawaseBlur: {fileID: 4800000, guid: c260ddd246efd4830a12d35166bf04db, type: 3}
-    dualKawaseBlur: {fileID: 4800000, guid: 5f353561ec7ca447b9820ab126f34840, type: 3}
     bokehBlur: {fileID: 4800000, guid: 29b73c02b240842c6a586840fa975c08, type: 3}
     tiltShfitBlur: {fileID: 4800000, guid: c86202f35d30f4823b98805529231b16, type: 3}
     irisBlur: {fileID: 4800000, guid: 35611a79d6b0e4580afe218cc67dc4f0, type: 3}
