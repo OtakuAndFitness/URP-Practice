@@ -21,7 +21,14 @@ Shader "Otaku/FunctionalShader"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Common.hlsl"
 
-            Varyings vert (Attributes input)
+            struct Attribute
+            {
+                float4 positionOS : POSITION;
+                // float4 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+            
+            Varyings vert (Attribute input)
             {
                 Varyings output;
                 
@@ -33,7 +40,7 @@ Shader "Otaku/FunctionalShader"
 
             half4 frag (Varyings i) : SV_Target
             {
-                float4 col = SampleSceneDepth(i.uv);
+                float4 col = SampleSceneDepth(i.texcoord);
 
                 return col;
             }
@@ -54,6 +61,12 @@ Shader "Otaku/FunctionalShader"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/PostProcessing/Common.hlsl"
 
+            struct Attribute
+            {
+                float4 positionOS : POSITION;
+                float4 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
             
             struct VaryingsWS
             {
@@ -64,7 +77,7 @@ Shader "Otaku/FunctionalShader"
             };
 
 
-            VaryingsWS vert (Attributes input)
+            VaryingsWS vert (Attribute input)
             {
                 VaryingsWS output;
                 UNITY_SETUP_INSTANCE_ID(input)

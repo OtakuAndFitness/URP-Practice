@@ -113,8 +113,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         RTHandle m_TemporaryBlurTexture04;
 
         // RenderTargetHandle m_TemporaryColorTexture03;
-        // private RTHandle _sourceRT;
-        // private RTHandle _destinationRT;
         private RTHandle _tempRT0;
         private RTHandle _tempRT1;
         
@@ -197,8 +195,6 @@ public class CustomPostProcessingPassFeature : ScriptableRendererFeature
         {
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture01.id);
             // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture02.id);
-            // _sourceRT = null;
-            // _destinationRT = null;
         }
 
         public void Setup(RenderPassEvent @event, RTHandle cameraColorTarget)
