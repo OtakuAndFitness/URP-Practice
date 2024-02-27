@@ -48,7 +48,6 @@ namespace PostProcessingExtends
             public Shader gaussianBlur;
             public Shader boxBlur;
             public Shader kawaseBlur;
-            public Shader dualKawaseBlur;
             public Shader bokehBlur;
             public Shader tiltShfitBlur;
             public Shader irisBlur;
@@ -130,7 +129,6 @@ namespace PostProcessingExtends
             customShaders.gaussianBlur = Shader.Find("Custom/PostProcessing/Blur/GaussianBlur");
             customShaders.boxBlur = Shader.Find("Custom/PostProcessing/Blur/BoxBlur");
             customShaders.kawaseBlur = Shader.Find("Custom/PostProcessing/Blur/KawaseBlur");
-            customShaders.dualKawaseBlur = Shader.Find("Custom/PostProcessing/Blur/DualKawaseBlur");
             customShaders.bokehBlur = Shader.Find("Custom/PostProcessing/Blur/BokehBlur");
             customShaders.tiltShfitBlur = Shader.Find("Custom/PostProcessing/Blur/TiltShiftBlur");
             customShaders.irisBlur = Shader.Find("Custom/PostProcessing/Blur/IrisBlur");
