@@ -201,7 +201,7 @@ MonoBehaviour:
     failOperation: 0
     zFailOperation: 0
   m_ShadowTransparentReceive: 1
-  m_RenderingMode: 0
+  m_RenderingMode: 2
   m_DepthPrimingMode: 0
   m_CopyDepthMode: 0
   m_AccurateGbufferNormals: 0
@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Name: CustomPostProcessingPassFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  evt: 600
+  evt: 550
   m_CustomPostProcessingData: {fileID: 11400000, guid: 08f67fe0e3b21e54d89394e11705c431,
     type: 2}
 --- !u!114 &8218266213018616331
