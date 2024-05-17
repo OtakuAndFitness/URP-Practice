@@ -97,7 +97,8 @@ Shader "Unlit/Dither"
                     UNITY_SETUP_INSTANCE_ID(IN);
                     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(IN);
 
-                    DistanceFade(IN.positionWS, _DistanceFade, _HeightFade, IN.positionSS, _Fade);
+                    // DistanceFade(IN.positionWS, _DistanceFade, _HeightFade, IN.positionSS, _Fade);
+                    Dither(IN.positionSS, _Fade);
                     
     		        half4 col = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv) * _BaseColor;
                     return col;
