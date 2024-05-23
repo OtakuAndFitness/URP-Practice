@@ -209,6 +209,9 @@
         },
         {
             "m_Id": "0410dfbc0ddc4e1cac0af6cc006f6894"
+        },
+        {
+            "m_Id": "6b7899b62f25484283638a6726e66e9b"
         }
     ],
     "m_GroupDatas": [],
@@ -849,6 +852,9 @@
             },
             {
                 "m_Id": "20efbe7d0ace4193ad03f560674a8894"
+            },
+            {
+                "m_Id": "6b7899b62f25484283638a6726e66e9b"
             }
         ]
     },
@@ -1479,9 +1485,9 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -2711.0,
-            "y": -308.0,
-            "width": 140.0,
+            "x": -2859.0,
+            "y": -308.00006103515627,
+            "width": 341.0,
             "height": 34.0
         }
     },
@@ -1947,11 +1953,11 @@
     "m_Guid": {
         "m_GuidSerialized": "335aba04-7aaa-4a32-9636-a2a082180b7a"
     },
-    "m_Name": "Detail Map",
+    "m_Name": "Detail Map:Albedo(R)Normal.y(G)S(B)Normal.x(A)",
     "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "Detail Map",
-    "m_DefaultReferenceName": "_Detail_Map",
-    "m_OverrideReferenceName": "",
+    "m_RefNameGeneratedByDisplayName": "Detail Map:Albedo(R)Normal.y(G)S(B)Normal.x(A)",
+    "m_DefaultReferenceName": "_Detail_Map_Albedo_R_Normal_y_G_S_B_Normal_x_A",
+    "m_OverrideReferenceName": "_Detail_Map",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
@@ -2307,13 +2313,13 @@
     "m_ActiveSubTarget": {
         "m_Id": "c01d21e028dd48e68b93119e9dcbca39"
     },
-    "m_AllowMaterialOverride": false,
+    "m_AllowMaterialOverride": true,
     "m_SurfaceType": 0,
     "m_ZTestMode": 4,
     "m_ZWriteControl": 0,
     "m_AlphaMode": 0,
     "m_RenderFace": 2,
-    "m_AlphaClip": true,
+    "m_AlphaClip": false,
     "m_CastShadows": true,
     "m_ReceiveShadows": true,
     "m_SupportsLODCrossFade": false,
@@ -2764,6 +2770,36 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.ColorRGBMaterialSlot",
+    "m_ObjectId": "660e6dcc3cf542848741ee408ada7d3a",
+    "m_Id": 0,
+    "m_DisplayName": "Specular Color",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Specular",
+    "m_StageCapability": 2,
+    "m_Value": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": 0.5
+    },
+    "m_DefaultValue": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+    },
+    "m_Labels": [],
+    "m_ColorMode": 0,
+    "m_DefaultColor": {
+        "r": 0.5,
+        "g": 0.5,
+        "b": 0.5,
+        "a": 1.0
+    }
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.MultiplyNode",
     "m_ObjectId": "66a7a5d1a8dc4e57a450ecf4aed50606",
     "m_Group": {
@@ -2905,6 +2941,40 @@
     "m_CustomColors": {
         "m_SerializableColors": []
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
+    "m_ObjectId": "6b7899b62f25484283638a6726e66e9b",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "SurfaceDescription.Specular",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 0.0,
+            "height": 0.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "660e6dcc3cf542848741ee408ada7d3a"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_SerializedDescriptor": "SurfaceDescription.Specular"
 }
 
 {
@@ -3510,7 +3580,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Texture2DMaterialSlot",
     "m_ObjectId": "8ddfd09988cf429380a542ee2b259451",
     "m_Id": 0,
-    "m_DisplayName": "Detail Map",
+    "m_DisplayName": "Detail Map:Albedo(R)Normal.y(G)S(B)Normal.x(A)",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",
@@ -4142,11 +4212,11 @@
     "m_Guid": {
         "m_GuidSerialized": "bb713a5c-56dd-44fb-a768-4ae86b24f4fc"
     },
-    "m_Name": "MaskMap",
+    "m_Name": "MaskMap:M(R)AO(G)Detail(B)S(A)",
     "m_DefaultRefNameVersion": 1,
-    "m_RefNameGeneratedByDisplayName": "MaskMap",
-    "m_DefaultReferenceName": "_MaskMap",
-    "m_OverrideReferenceName": "",
+    "m_RefNameGeneratedByDisplayName": "MaskMap:M(R)AO(G)Detail(B)S(A)",
+    "m_DefaultReferenceName": "_MaskMap_M_R_AO_G_Detail_B_S_A",
+    "m_OverrideReferenceName": "_MaskMap",
     "m_GeneratePropertyBlock": true,
     "m_UseCustomSlotLabel": false,
     "m_CustomSlotLabel": "",
@@ -4771,7 +4841,7 @@
     "m_Type": "UnityEditor.ShaderGraph.Texture2DMaterialSlot",
     "m_ObjectId": "c693506194294d148bc5233ca003a4d6",
     "m_Id": 0,
-    "m_DisplayName": "MaskMap",
+    "m_DisplayName": "MaskMap:M(R)AO(G)Detail(B)S(A)",
     "m_SlotType": 1,
     "m_Hidden": false,
     "m_ShaderOutputName": "Out",

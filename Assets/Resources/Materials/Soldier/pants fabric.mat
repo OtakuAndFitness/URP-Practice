@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: pants fabric
-  m_Shader: {fileID: -6465566751694194690, guid: 0e0d1c2fd98715c47b400c5db3695f40,
+  m_Shader: {fileID: -6465566751694194690, guid: 643dc5c3d6457084ab5b39ef5088bfa7,
     type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -37,6 +37,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BaseColorMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -69,6 +73,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Fuzz_Map:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -97,6 +105,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ThreadMap_AO_R_Normal_y_G_S_B_Normal_x_A:
+        m_Texture: {fileID: 2800000, guid: 651d2165c4259fa478b0a56eeb109592, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -113,6 +125,7 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaToMask: 0
+    - _Anisotropy: -0.55
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -128,10 +141,13 @@ Material:
     - _DstBlendAlpha: 0
     - _Dtail_Smoothness_Scale: 0.274
     - _EnvironmentReflections: 1
+    - _FuzzMapUVScale: 0.1
+    - _FuzzStrength: 1
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0.726
+    - _NormalMapStrength: 0.3
     - _NormalScale: 0.15
     - _OcclusionStrength: 1
     - _Parallax: 0.005
@@ -139,18 +155,22 @@ Material:
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
-    - _SmoothnessMax: 0.438
+    - _SmoothnessMax: 0.2
     - _SmoothnessMin: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
+    - _ThreadAOStrength: 0.16
+    - _ThreadNormalScale: 1.41
+    - _ThreadSmoothnessScale: 0.134
     - _Use_Detail_Map: 1
+    - _Use_Thread_Map: 1
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.6117647, g: 0.5411765, b: 0.24705882, a: 1}
+    - _BaseColor: {r: 0.14901961, g: 0.38431373, b: 0.49019608, a: 1}
     - _BaseUV: {r: 1, g: 0, b: 0, a: 0}
     - _BaseUVScale: {r: 1, g: 1, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
@@ -159,4 +179,9 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _SpecularColor: {r: 0.078431346, g: 0.31372547, b: 0.41568625, a: 1}
+    - _ThreadUVMask: {r: 1, g: 0, b: 0, a: 0}
+    - _ThreadUVScale: {r: 40, g: 40, b: 0, a: 0}
+    - _uvBaseMask: {r: 1, g: 0, b: 0, a: 0}
+    - _uvBaseST: {r: 1.7, g: 1.7, b: 0, a: 0}
   m_BuildTextureStacks: []
