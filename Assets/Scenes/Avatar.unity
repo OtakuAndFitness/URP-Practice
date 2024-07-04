@@ -2325,7 +2325,7 @@ MonoBehaviour:
     glassesMesh: {fileID: 4300000, guid: 919c772690cf4b140ba090e319259435, type: 2}
     glassesMat: {fileID: 2100000, guid: 6eaf4021a0ac0424d89bb5cec1ee744b, type: 2}
   - thumb: {fileID: 21300000, guid: f077a46a6255af844821174264868cc2, type: 3}
-    glassesMesh: {fileID: 0}
+    glassesMesh: {fileID: 4300000, guid: a3f6897597dcb8c48a403e75f23d8d4c, type: 2}
     glassesMat: {fileID: 2100000, guid: 69ec89134dd3a604181ea25e6239de68, type: 2}
   BeardList:
   - thumb: {fileID: 21300000, guid: 5ec84383c52bfc14198b4e517f7add2c, type: 3}
