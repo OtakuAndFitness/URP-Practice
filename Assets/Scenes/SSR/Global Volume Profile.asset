@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1730641427993329422
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b778fe5b8d16a645941a00096705890, type: 3}
+  m_Name: SSRVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  isActive:
+    m_OverrideState: 1
+    m_Value: 1
+  minimumSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.8
+  dithering:
+    m_OverrideState: 1
+    m_Value: 0.2
+  objectThickness:
+    m_OverrideState: 1
+    m_Value: 0.75
+  stride:
+    m_OverrideState: 1
+    m_Value: 4
+  maxRaySteps:
+    m_OverrideState: 1
+    m_Value: 64
+  blurRadius:
+    m_OverrideState: 0
+    m_Value: 6.37
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: Global Volume Profile
+  m_EditorClassIdentifier: 
+  components:
+  - {fileID: -1730641427993329422}
