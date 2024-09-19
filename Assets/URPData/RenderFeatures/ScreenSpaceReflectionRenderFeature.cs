@@ -121,15 +121,15 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
                 {
                     Blitter.BlitCameraTexture(cmd, cameraTargetHandle, _ssrRTHandle, _material, 0);
                     
-                    // // Horizontal Blur
-                    // cmd.SetGlobalVector(blurRadiusID, new Vector4(_ssrVolume.blurRadius.value, 0.0f, 0.0f, 0.0f));
-                    // Blitter.BlitCameraTexture(cmd, _ssrRTHandle, _ssr1RTHandle, _material, 1);
-                    //
-                    // // Vertical Blur
-                    // cmd.SetGlobalVector(blurRadiusID, new Vector4(0.0f, _ssrVolume.blurRadius.value, 0.0f, 0.0f));
-                    // Blitter.BlitCameraTexture(cmd, _ssr1RTHandle, _ssrRTHandle, _material, 2);
+                    // Horizontal Blur
+                    cmd.SetGlobalFloat(blurRadiusID, _ssrVolume.blurRadius.value);
+                    Blitter.BlitCameraTexture(cmd, _ssrRTHandle, _ssr1RTHandle, _material, 1);
                     
-                    Blitter.BlitCameraTexture(cmd, _ssrRTHandle, cameraTargetHandle);
+                    // Vertical Blur
+                    cmd.SetGlobalFloat(blurRadiusID, _ssrVolume.blurRadius.value);
+                    Blitter.BlitCameraTexture(cmd, _ssr1RTHandle, _ssrRTHandle, _material, 2);
+                    
+                    Blitter.BlitCameraTexture(cmd, _ssrRTHandle, cameraTargetHandle, _material, 3);
                 }
             }
             

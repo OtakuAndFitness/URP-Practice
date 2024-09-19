@@ -51,5 +51,21 @@ Shader "Hidden/SSR"
             #pragma fragment BlurVertical
             ENDHLSL
         }
+
+        Pass {
+            Name "SSR Blur Final"
+
+            ZTest NotEqual
+            ZWrite Off
+            Cull Off
+            Blend One One, One Zero
+
+            HLSLPROGRAM
+            #include "SSRPass.hlsl"
+            #pragma target 2.0
+            #pragma vertex Vert
+            #pragma fragment BlurFinalFragment
+            ENDHLSL
+        }
     }
 }

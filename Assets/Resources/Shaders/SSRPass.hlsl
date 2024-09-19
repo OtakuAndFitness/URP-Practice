@@ -286,5 +286,9 @@ float4 BlurHorizontal(Varyings input) : SV_Target
     return color;
 }
 
+half4 BlurFinalFragment(Varyings input) : SV_Target {  
+    return half4(GetBlitTexture2D(input.texcoord).rgb, 1.0);  
+}
+
 
 #endif

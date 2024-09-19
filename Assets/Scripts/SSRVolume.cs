@@ -21,7 +21,7 @@ public class SSRVolume : VolumeComponent
 
     [Header("射线与物体相交之前的最大迭代次数")] 
     public ClampedIntParameter maxRaySteps = new ClampedIntParameter(64, 16, 128);
-    
+
     [Header("模糊半径")] 
-    public FloatParameter blurRadius = new FloatParameter(1.0f);
+    public ClampedFloatParameter blurRadius = new ClampedFloatParameter(0.0008f, 0.0f, 0.001f);
 }

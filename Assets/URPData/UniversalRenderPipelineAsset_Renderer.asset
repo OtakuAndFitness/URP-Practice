@@ -222,7 +222,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   _hiZSettings:
-    mipCount: 5
+    mipCount: 3
     renderPassEvent: 220
 --- !u!114 &4294093632362265474
 MonoBehaviour:
