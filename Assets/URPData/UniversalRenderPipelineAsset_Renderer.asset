@@ -223,7 +223,7 @@ MonoBehaviour:
   m_Active: 1
   _hiZSettings:
     mipCount: 3
-    renderPassEvent: 220
+    renderPassEvent: 300
 --- !u!114 &4294093632362265474
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,9 +237,8 @@ MonoBehaviour:
   m_Name: ScreenSpaceReflectionRenderFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  _renderPassEvent: 400
+  _renderPassEvent: 300
   _ssrSettings:
-    minimumSmoothness: 0.241
     dithering: 0
     objectThickness: 0.1
     stride: 8
