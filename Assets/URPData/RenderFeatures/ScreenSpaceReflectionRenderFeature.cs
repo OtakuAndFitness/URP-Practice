@@ -8,7 +8,7 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
     [Serializable]
     public class SSRSettings
     {
-        [Range(0f,1f)] public float minimumSmoothness = 0.5f;
+        // [Range(0f,1f)] public float minimumSmoothness = 0.5f;
 
         [Range(0f, 1f)] public float dithering = 0f;
 
@@ -35,7 +35,7 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
             cameraViewXExtentID = Shader.PropertyToID("_CameraViewXExtent"),
             cameraViewYExtentID = Shader.PropertyToID("_CameraViewYExtent"),
             sourceSizeID = Shader.PropertyToID("_SourceSize"),
-            minSmoothnessID = Shader.PropertyToID("_MinSmoothness"),
+            // minSmoothnessID = Shader.PropertyToID("_MinSmoothness"),
             ditheringID = Shader.PropertyToID("_Dithering"),
             objectThicknessID = Shader.PropertyToID("_ObjectThickness"),
             maxRayStepsID = Shader.PropertyToID("_MaxRaySteps"),
@@ -59,7 +59,7 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
                 TextureWrapMode.Mirror);
             RenderingUtils.ReAllocateIfNeeded(ref _ssr1RTHandle, _ssrRTDescriptor, FilterMode.Bilinear,
                 TextureWrapMode.Mirror);
-
+            
         }
 
         // This method is called before executing the render pass.
@@ -101,11 +101,13 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
             _material.SetVector(cameraViewYExtentID, cameraYExtent);
             _material.SetVector(cameraParamsID, new Vector4(1.0f / near, 0, 0, 0));
             _material.SetVector(sourceSizeID, new Vector4(_ssrRTDescriptor.width, _ssrRTDescriptor.height, 1.0f / _ssrRTDescriptor.width, 1.0f / _ssrRTDescriptor.height));
-            _material.SetFloat(minSmoothnessID, _ssrSettings.minimumSmoothness);
+            // _material.SetFloat(minSmoothnessID, _ssrSettings.minimumSmoothness);
             _material.SetFloat(ditheringID, _ssrSettings.dithering);
             _material.SetFloat(objectThicknessID, _ssrSettings.objectThickness);
             _material.SetFloat(maxRayStepsID, _ssrSettings.maxRaySteps);
             _material.SetFloat(strideID, _ssrSettings.stride);
+            
+            ConfigureInput(ScriptableRenderPassInput.Normal);
             
         }
 

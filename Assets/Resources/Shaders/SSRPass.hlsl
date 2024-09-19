@@ -11,7 +11,7 @@ float4 _CameraViewTopLeftCorner;
 float4 _CameraViewXExtent;  
 float4 _CameraViewYExtent;
 float4 _SourceSize;
-float _MinSmoothness;
+// float _MinSmoothness;
 float _Dithering;
 float _ObjectThickness;
 int _MaxRaySteps;
@@ -47,8 +47,10 @@ half4 GetHitResult(float2 hitUV, float2 UV)
 {
     half4 hit = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, hitUV);
     half4 color = SAMPLE_TEXTURE2D_X(_BlitTexture, sampler_LinearClamp, UV);
-    half smoothness = smoothstep(_MinSmoothness, 1.0, SAMPLE_TEXTURE2D_X(_GBuffer2, sampler_LinearClamp, UV).a);
-    return lerp(color, hit, smoothness);
+    // half smoothness = smoothstep(_MinSmoothness, 1.0, SAMPLE_TEXTURE2D_X(_GBuffer2, sampler_LinearClamp, UV).a);
+    // half smoothness = smoothstep(_MinSmoothness, 1.0, SAMPLE_TEXTURE2D_X(_CameraNormalsTexture, sampler_CameraNormalsTexture, UV).a);
+    // return lerp(color, hit, smoothness);
+    return hit + color;
 }
 
 
@@ -92,9 +94,9 @@ float GetHiZLinearEyeDepth(float2 uv,float mipLevel=0.0)
 }
 
 half4 SSRPassFragment(Varyings input) : SV_Target {  
-    float linearDepth = SampleAndGetLinearEyeDepth(input.texcoord); 
-    float3 vpos = ReconstructViewPos(input.texcoord, linearDepth);  
-    float3 normal = SAMPLE_TEXTURE2D_X(_GBuffer2, sampler_LinearClamp, input.texcoord).xyz;
+    float linearDepth = SampleAndGetLinearEyeDepth(input.texcoord);
+    float3 vpos = ReconstructViewPos(input.texcoord, linearDepth);
+    float3 normal = SampleSceneNormals(input.texcoord);//SAMPLE_TEXTURE2D_X(_GBuffer2, sampler_LinearClamp, input.texcoord).xyz;
     float3 vDir = normalize(vpos);  
     float3 rDir = TransformWorldToViewDir(normalize(reflect(vDir, normal)));
     float2 uv = input.texcoord;
