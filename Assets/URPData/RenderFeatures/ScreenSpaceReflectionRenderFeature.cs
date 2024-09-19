@@ -5,14 +5,30 @@ using UnityEngine.Rendering.Universal;
 
 public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
 {
+    [Serializable]
+    public class SSRSettings
+    {
+        [Range(0f,1f)] public float minimumSmoothness = 0.5f;
+
+        [Range(0f, 1f)] public float dithering = 0f;
+
+        [Range(0.1f, 1f)] public float objectThickness = 0.1f;
+
+        [Range(1, 8)] public int stride = 8;
+
+        [Range(16, 128)] public int maxRaySteps = 128;
+
+        [Range(0f, 0.001f)] public float blurRadius = 0.0008f;
+
+    }
     class ScreenSpaceReflectionRenderPass : ScriptableRenderPass
     {
         private Shader _shader;
         private Material _material;
         private RenderTextureDescriptor _ssrRTDescriptor;
         private RTHandle _ssrRTHandle, _ssr1RTHandle;
-        private SSRVolume _ssrVolume;
         private ProfilingSampler _profilingSampler = new ProfilingSampler("SSR");
+        private SSRSettings _ssrSettings;
 
         private static readonly int cameraParamsID = Shader.PropertyToID("_CameraProjectionParams"),
             cameraViewTopLeftCornerID = Shader.PropertyToID("_CameraViewTopLeftCorner"),
@@ -27,9 +43,10 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
             blurRadiusID = Shader.PropertyToID("_BlurRadius");
 
             
-        public ScreenSpaceReflectionRenderPass(Shader shader)
+        public ScreenSpaceReflectionRenderPass(Shader shader, SSRSettings ssrSettings)
         {
             _shader = shader;
+            _ssrSettings = ssrSettings;
             _ssrRTDescriptor =
                 new RenderTextureDescriptor(Screen.width, Screen.height, RenderTextureFormat.RGB111110Float, 0);
         }
@@ -42,7 +59,6 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
                 TextureWrapMode.Mirror);
             RenderingUtils.ReAllocateIfNeeded(ref _ssr1RTHandle, _ssrRTDescriptor, FilterMode.Bilinear,
                 TextureWrapMode.Mirror);
-            _ssrVolume = VolumeManager.instance.stack.GetComponent<SSRVolume>();
 
         }
 
@@ -53,11 +69,6 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
         // The render pipeline will ensure target setup and clearing happens in a performant manner.
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
-            if (_ssrVolume is null)
-            {
-                return;
-            }
-            
             var camData = renderingData.cameraData;
 
             Matrix4x4 view = camData.GetViewMatrix();
@@ -90,11 +101,11 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
             _material.SetVector(cameraViewYExtentID, cameraYExtent);
             _material.SetVector(cameraParamsID, new Vector4(1.0f / near, 0, 0, 0));
             _material.SetVector(sourceSizeID, new Vector4(_ssrRTDescriptor.width, _ssrRTDescriptor.height, 1.0f / _ssrRTDescriptor.width, 1.0f / _ssrRTDescriptor.height));
-            _material.SetFloat(minSmoothnessID, _ssrVolume.minimumSmoothness.value);
-            _material.SetFloat(ditheringID, _ssrVolume.dithering.value);
-            _material.SetFloat(objectThicknessID, _ssrVolume.objectThickness.value);
-            _material.SetFloat(maxRayStepsID, _ssrVolume.maxRaySteps.value);
-            _material.SetFloat(strideID, _ssrVolume.stride.value);
+            _material.SetFloat(minSmoothnessID, _ssrSettings.minimumSmoothness);
+            _material.SetFloat(ditheringID, _ssrSettings.dithering);
+            _material.SetFloat(objectThicknessID, _ssrSettings.objectThickness);
+            _material.SetFloat(maxRayStepsID, _ssrSettings.maxRaySteps);
+            _material.SetFloat(strideID, _ssrSettings.stride);
             
         }
 
@@ -104,11 +115,6 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
         // You don't have to call ScriptableRenderContext.submit, the render pipeline will call it at specific points in the pipeline.
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
-            if (_ssrVolume is null || !_ssrVolume.isActive.value)
-            {
-                return;
-            }
-
             var cameraTargetHandle = renderingData.cameraData.renderer.cameraColorTargetHandle;
             
             var cmd = CommandBufferPool.Get();
@@ -117,16 +123,16 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
             
             using (new ProfilingScope(cmd, _profilingSampler))
             {
-                if (cameraTargetHandle != null && _ssrRTHandle != null && _material != null && _ssrVolume != null)
+                if (cameraTargetHandle != null && _ssrRTHandle != null && _material != null)
                 {
                     Blitter.BlitCameraTexture(cmd, cameraTargetHandle, _ssrRTHandle, _material, 0);
                     
                     // Horizontal Blur
-                    cmd.SetGlobalFloat(blurRadiusID, _ssrVolume.blurRadius.value);
+                    cmd.SetGlobalFloat(blurRadiusID, _ssrSettings.blurRadius);
                     Blitter.BlitCameraTexture(cmd, _ssrRTHandle, _ssr1RTHandle, _material, 1);
                     
                     // Vertical Blur
-                    cmd.SetGlobalFloat(blurRadiusID, _ssrVolume.blurRadius.value);
+                    cmd.SetGlobalFloat(blurRadiusID, _ssrSettings.blurRadius);
                     Blitter.BlitCameraTexture(cmd, _ssr1RTHandle, _ssrRTHandle, _material, 2);
                     
                     Blitter.BlitCameraTexture(cmd, _ssrRTHandle, cameraTargetHandle, _material, 3);
@@ -159,11 +165,13 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
     [SerializeField]
     private RenderPassEvent _renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
 
+    [SerializeField] private SSRSettings _ssrSettings = new SSRSettings();
+
     /// <inheritdoc/>
     public override void Create()
     {
         _shader ??= Shader.Find(_shaderName);
-        m_ScriptablePass = new ScreenSpaceReflectionRenderPass(_shader)
+        m_ScriptablePass = new ScreenSpaceReflectionRenderPass(_shader, _ssrSettings)
         {
             renderPassEvent = _renderPassEvent
         };

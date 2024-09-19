@@ -238,6 +238,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   _renderPassEvent: 240
+  _ssrSettings:
+    minimumSmoothness: 0.241
+    dithering: 0
+    objectThickness: 0.1
+    stride: 8
+    maxRaySteps: 128
+    blurRadius: 0.0008
 --- !u!114 &4688981219480330176
 MonoBehaviour:
   m_ObjectHideFlags: 0
