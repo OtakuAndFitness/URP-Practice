@@ -19,6 +19,8 @@ public class HiZRenderFeature : ScriptableRendererFeature
         private static readonly int
             maxHiZBufferMipLevelID = Shader.PropertyToID("_MaxHiZBufferMipLevel"),
             hiZBufferTextureID = Shader.PropertyToID("_HiZBuffer");
+
+        private const string _shaderName = "Hidden/HiZ";
             
         public HiZRenderPass(HiZSettings hiZSettings)
         {
@@ -60,7 +62,7 @@ public class HiZRenderFeature : ScriptableRendererFeature
             }
 
             RenderingUtils.ReAllocateIfNeeded(ref _hiZBuffer, _hiZBufferDescriptor);
-            _material = new Material(Shader.Find("Hidden/HiZ"));
+            _material = new Material(Shader.Find(_shaderName));
             
             ConfigureTarget(renderer.cameraColorTargetHandle);
             ConfigureClear(ClearFlag.None, Color.white);
