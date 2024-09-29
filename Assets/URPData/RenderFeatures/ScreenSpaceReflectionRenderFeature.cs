@@ -92,9 +92,9 @@ public class ScreenSpaceReflectionRenderFeature : ScriptableRendererFeature
             Vector4 cameraYExtent = bottomLeftCorner - topLeftCorner;
 
             float near = camData.camera.nearClipPlane;
-            if (_material is null)
+            if (_material == null)
             {
-                _material = new Material(_shader);
+                _material = CoreUtils.CreateEngineMaterial(_shader);
             }
             _material.SetVector(cameraViewTopLeftCornerID, topLeftCorner);
             _material.SetVector(cameraViewXExtentID, cameraXExtent);
