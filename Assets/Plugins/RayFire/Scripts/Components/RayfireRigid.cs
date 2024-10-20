@@ -803,7 +803,7 @@ namespace RayFire
         {
             // Cache velocity
             if (physics.rb != null)
-                physics.velocity = physics.rb.velocity;
+                physics.velocity = physics.rb.linearVelocity;
             
             // TODO obj without rb: save tm, set dmlShould, compare tm at next frame at dml
             

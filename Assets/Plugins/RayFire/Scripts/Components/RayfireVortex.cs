@@ -293,7 +293,7 @@ namespace RayFire
                 forceVector = vectorUp + vectorCenter + vectorSwirl;
 
                 // Apply force
-                rb.velocity = Vector3.zero;
+                rb.linearVelocity = Vector3.zero;
                 rb.AddForce (forceVector, forceMode);
 
                 // Set rotation impulse TODO add variation

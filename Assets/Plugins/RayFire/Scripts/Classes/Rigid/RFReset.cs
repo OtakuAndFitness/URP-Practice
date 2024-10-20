@@ -441,7 +441,7 @@ namespace RayFire
                 // Reset velocity
                 if (scr.cluster.shards[i].rb != null)
                 {
-                    scr.cluster.shards[i].rb.velocity        = Vector3.zero;
+                    scr.cluster.shards[i].rb.linearVelocity        = Vector3.zero;
                     scr.cluster.shards[i].rb.angularVelocity = Vector3.zero;
                 }
             }
@@ -731,7 +731,7 @@ namespace RayFire
             // Restore rigidbody TODO save initial velocity into vars and reset to them
             if (scr.physics.rb != null)
             {
-                scr.physics.rb.velocity        = Vector3.zero;
+                scr.physics.rb.linearVelocity        = Vector3.zero;
                 scr.physics.rb.angularVelocity = Vector3.zero;
             }
         }
@@ -760,7 +760,7 @@ namespace RayFire
             if (scr.simTp == SimType.Sleeping)
             {
                 scr.physics.velocity           = Vector3.zero;
-                scr.physics.rb.velocity        = Vector3.zero;
+                scr.physics.rb.linearVelocity        = Vector3.zero;
                 scr.physics.rb.angularVelocity = Vector3.zero;
                 scr.physics.rb.Sleep();
             }

@@ -24,6 +24,8 @@ public class DistortionMaskRenderPassFeature : ScriptableRendererFeature
         private RenderMaskSetting m_RenderMaskSetting;
     
         private FilteringSettings m_FilteringSettings;
+
+        private RTHandle m_MaskRTHandle;
     
         public DistortionMask(RenderMaskSetting setting)
         {
@@ -37,15 +39,13 @@ public class DistortionMaskRenderPassFeature : ScriptableRendererFeature
         // The render pipeline will ensure target setup and clearing happens in a performant manner.
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
+            RenderTextureDescriptor desc = new RenderTextureDescriptor(m_RenderMaskSetting.RTWidth, m_RenderMaskSetting.RTHeight);
+            RenderingUtils.ReAllocateHandleIfNeeded(ref m_MaskRTHandle, desc, FilterMode.Bilinear, TextureWrapMode.Clamp, name:"_MaskTex");
         }
     
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
-            int temp = Shader.PropertyToID("_MaskTex");
-            // m_MaskTexID = temp;
-            RenderTextureDescriptor desc = new RenderTextureDescriptor(m_RenderMaskSetting.RTWidth, m_RenderMaskSetting.RTHeight);
-            cmd.GetTemporaryRT(temp, desc);
-            ConfigureTarget(temp);
+            ConfigureTarget(m_MaskRTHandle);
             ConfigureClear(ClearFlag.All, Color.black);
         }
     
@@ -65,6 +65,11 @@ public class DistortionMaskRenderPassFeature : ScriptableRendererFeature
         // Cleanup any allocated resources that were created during the execution of this render pass.
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
+            if (m_MaskRTHandle != null)
+            {
+                RTHandles.Release(m_MaskRTHandle);
+                m_MaskRTHandle = null;
+            }
         }
     }
     

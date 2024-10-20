@@ -14,7 +14,7 @@ namespace RayFire
         public  float          density;
         public  float          drag;
         public  float          angularDrag;
-        public  PhysicMaterial material;
+        public  PhysicsMaterial material;
         public  float          dynamicFriction;
         public  float          staticFriction;
         public  float          bounciness;
@@ -42,16 +42,16 @@ namespace RayFire
         }
 
         // Get Physic material
-        public PhysicMaterial Material
+        public PhysicsMaterial Material
         {
             get
             {
-                PhysicMaterial physMat = new PhysicMaterial();
+                PhysicsMaterial physMat = new PhysicsMaterial();
                 physMat.name = name;
                 physMat.dynamicFriction = dynamicFriction;
                 physMat.staticFriction = staticFriction;
                 physMat.bounciness = bounciness;
-                physMat.frictionCombine = PhysicMaterialCombine.Minimum;
+                physMat.frictionCombine = PhysicsMaterialCombine.Minimum;
                 return physMat;
             }
         }
@@ -70,7 +70,7 @@ namespace RayFire
         public float          dens;
         public float          drag;
         public float          ang;
-        public PhysicMaterial mat;
+        public PhysicsMaterial mat;
         public float          dyn;
         public float          stat;
         public float          bnc;
@@ -269,7 +269,7 @@ namespace RayFire
         }
         
         // Create material by material type
-        public static PhysicMaterial PhysicMaterial (MaterialType materialType)
+        public static PhysicsMaterial PhysicMaterial (MaterialType materialType)
         {
             switch (materialType)
             { 

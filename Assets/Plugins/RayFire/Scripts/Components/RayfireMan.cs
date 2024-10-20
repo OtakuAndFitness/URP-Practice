@@ -213,7 +213,7 @@ namespace RayFire
                         physicList.RemoveAt (i);
                         continue;
                     }
-                    physicList[i].velocity = physicList[i].rb.velocity;
+                    physicList[i].velocity = physicList[i].rb.linearVelocity;
                 }
         }
         

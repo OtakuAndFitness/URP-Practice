@@ -193,7 +193,7 @@ namespace RayFire
                 // Destroy rigid body
                 if (shard.rigid.physics.rb != null)
                 {
-                    shard.rigid.physics.rb.velocity = Vector3.zero;
+                    shard.rigid.physics.rb.linearVelocity = Vector3.zero;
                     Object.Destroy (shard.rigid.physics.rb);
                 }
                 

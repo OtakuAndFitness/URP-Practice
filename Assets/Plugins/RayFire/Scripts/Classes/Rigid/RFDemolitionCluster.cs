@@ -676,7 +676,7 @@ namespace RayFire
             scr.physics.rb.ResetCenterOfMass();
 
             // Set velocity after demolition
-            scr.physics.rb.velocity = scr.physics.velocity * scr.physics.dm;
+            scr.physics.rb.linearVelocity = scr.physics.velocity * scr.physics.dm;
         }
         
         // Demolish connected cluster by colliders
@@ -718,7 +718,7 @@ namespace RayFire
             scr.physics.rb.ResetCenterOfMass();
 
             // Set velocity after demolition
-            scr.physics.rb.velocity = scr.physics.velocity * scr.physics.dm;
+            scr.physics.rb.linearVelocity = scr.physics.velocity * scr.physics.dm;
         }
         
         /// /////////////////////////////////////////////////////////

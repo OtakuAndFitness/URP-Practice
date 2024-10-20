@@ -26,10 +26,10 @@ public class FunctionalRenderPassFeature : ScriptableRendererFeature
         private Material blitMaterial = null;
 
         public int blitShaderPassIndex = 0;
-        private RenderTargetIdentifier source { set; get; }
-        private RenderTargetHandle destination { set; get; }
+        private RTHandle source { set; get; }
+        private RTHandle destination { set; get; }
 
-        RenderTargetHandle m_TemporaryColorTexture;
+        RTHandle m_TemporaryColorTexture;
 
          string m_ProfilerTag;
 
@@ -37,7 +37,6 @@ public class FunctionalRenderPassFeature : ScriptableRendererFeature
         {
             blitMaterial = mat;
             m_ProfilerTag = tag;
-            m_TemporaryColorTexture.Init("_TemporaryColorTexture");
         }
         // This method is called before executing the render pass.
         // It can be used to configure render targets and their clear state. Also to create temporary render target textures.
@@ -46,9 +45,14 @@ public class FunctionalRenderPassFeature : ScriptableRendererFeature
         // The render pipeline will ensure target setup and clearing happens in a performant manner.
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            
+            RenderingUtils.ReAllocateHandleIfNeeded(ref m_TemporaryColorTexture, opaqueDesc, FilterMode.Bilinear, TextureWrapMode.Clamp, name:"_TemporaryColorTexture");
+
         }
 
-        public void Setup(RenderTargetIdentifier source, RenderTargetHandle destination)
+        public void Setup(RTHandle source, RTHandle destination)
         {
             this.source = source;
             this.destination = destination;
@@ -63,9 +67,9 @@ public class FunctionalRenderPassFeature : ScriptableRendererFeature
             CommandBuffer cmd = CommandBufferPool.Get(m_ProfilerTag);
             RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
             opaqueDesc.depthBufferBits = 0;
-            cmd.GetTemporaryRT(m_TemporaryColorTexture.id, opaqueDesc, FilterMode.Bilinear);
-            Blit(cmd, source, m_TemporaryColorTexture.Identifier(), blitMaterial, blitShaderPassIndex);
-            Blit(cmd, m_TemporaryColorTexture.Identifier(),source);
+            // cmd.GetTemporaryRT(Shader.PropertyToID(m_TemporaryColorTexture.name), opaqueDesc, FilterMode.Bilinear);
+            Blitter.BlitCameraTexture(cmd, source, m_TemporaryColorTexture, blitMaterial, blitShaderPassIndex);
+            Blitter.BlitCameraTexture(cmd, m_TemporaryColorTexture,source);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
         }
@@ -73,7 +77,12 @@ public class FunctionalRenderPassFeature : ScriptableRendererFeature
         // Cleanup any allocated resources that were created during the execution of this render pass.
         public override void OnCameraCleanup(CommandBuffer cmd)
         {
-            cmd.ReleaseTemporaryRT(m_TemporaryColorTexture.id);
+            // cmd.ReleaseTemporaryRT(Shader.PropertyToID(m_TemporaryColorTexture.name));
+            if (m_TemporaryColorTexture != null)
+            {
+                RTHandles.Release(m_TemporaryColorTexture);
+                m_TemporaryColorTexture = null;
+            }
         }
     }
 
@@ -93,7 +102,7 @@ public class FunctionalRenderPassFeature : ScriptableRendererFeature
     // This method is called when setting up the renderer once per-camera.
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        m_ScriptablePass.Setup(renderer.cameraColorTarget, RenderTargetHandle.CameraTarget);
+        m_ScriptablePass.Setup(renderer.cameraColorTargetHandle, RTHandles.Alloc(BuiltinRenderTextureType.CameraTarget));
         renderer.EnqueuePass(m_ScriptablePass);
     }
 }

@@ -42,12 +42,12 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
         
         private BlitSettings settings;
         
-        private RenderTargetIdentifier source { get; set; }
-        private RenderTargetIdentifier destination { get; set; }
+        private RTHandle source { get; set; }
+        private RTHandle destination { get; set; }
 
-        RenderTargetHandle m_TemporaryColorTexture;
+        RTHandle m_TemporaryColorTexture;
         private RenderTexture m_renderTexture;
-        RenderTargetHandle m_DestinationTexture;
+        RTHandle m_DestinationTexture;
         string m_ProfilerTag;
         public BlitPass(RenderPassEvent renderPassEvent, BlitSettings settings, string tag)
         {
@@ -55,11 +55,7 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
             this.settings = settings;
             blitMaterial = settings.blitMaterial;
             m_ProfilerTag = tag;
-            m_TemporaryColorTexture.Init("_TemporaryColorTexture");
-            if (settings.dstType == Target.TextureID)
-            {
-                m_DestinationTexture.Init(settings.dstTextureId);
-            }
+           
         }
         // This method is called before executing the render pass.
         // It can be used to configure render targets and their clear state. Also to create temporary render target textures.
@@ -68,6 +64,15 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
         // The render pipeline will ensure target setup and clearing happens in a performant manner.
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
+            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
+            opaqueDesc.depthBufferBits = 0;
+            RenderingUtils.ReAllocateHandleIfNeeded(ref m_TemporaryColorTexture, opaqueDesc, FilterMode.Bilinear,
+                TextureWrapMode.Clamp, name: "_TemporaryColorTexture");
+            if (settings.dstType == Target.TextureID)
+            {
+                RenderingUtils.ReAllocateHandleIfNeeded(ref m_DestinationTexture, opaqueDesc, FilterMode.Bilinear,
+                    TextureWrapMode.Clamp, name: settings.dstTextureId);
+            }
         }
 
         // Here you can implement the rendering logic.
@@ -85,24 +90,24 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
             if (settings.srcType == Target.CameraColor)
             {
                 // cmd.GenerateMips(renderer.cameraColorTarget);
-                source = renderer.cameraColorTarget;
+                source = renderer.cameraColorTargetHandle;
             }else if (settings.srcType == Target.TextureID)
             {
-                source = new RenderTargetIdentifier(settings.srcTextureId);
+                source = RTHandles.Alloc(settings.srcTextureId);
             }else if (settings.srcType == Target.RenderTextureObject)
             {
-                source = new RenderTargetIdentifier(settings.srcTextureObject);
+                source = RTHandles.Alloc(settings.srcTextureObject);
             }
 
             if (settings.dstType == Target.CameraColor)
             {
-                destination = renderer.cameraColorTarget;
+                destination = renderer.cameraColorTargetHandle;
             }else if (settings.dstType == Target.TextureID)
             {
-                destination = new RenderTargetIdentifier(settings.dstTextureId);
+                destination = RTHandles.Alloc(settings.dstTextureId);
             }else if (settings.dstType == Target.RenderTextureObject)
             {
-                destination = new RenderTargetIdentifier(settings.dstTextureObject);
+                destination = RTHandles.Alloc(settings.dstTextureObject);
             }
 
             if (settings.setInverseViewMatrix)
@@ -116,18 +121,22 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
                 {
                     opaqueDesc.graphicsFormat = settings.graphicsFormat;
                 }
-                cmd.GetTemporaryRT(m_DestinationTexture.id, opaqueDesc, filterMode);
+                RenderingUtils.ReAllocateHandleIfNeeded(ref m_DestinationTexture, opaqueDesc, filterMode,
+                    TextureWrapMode.Clamp, name: settings.dstTextureId);
+                // cmd.GetTemporaryRT(m_DestinationTexture.id, opaqueDesc, filterMode);
             }
             
             if (source == destination || (settings.srcType == settings.dstType && settings.srcType == Target.CameraColor))
             {
-                cmd.GetTemporaryRT(m_TemporaryColorTexture.id, opaqueDesc, filterMode);
-                Blit(cmd, source, m_TemporaryColorTexture.Identifier(), blitMaterial,settings.blitMaterialPassIndex);
-                Blit(cmd, m_TemporaryColorTexture.Identifier(), destination);
+                RenderingUtils.ReAllocateHandleIfNeeded(ref m_TemporaryColorTexture, opaqueDesc, filterMode,
+                    TextureWrapMode.Clamp, name: "_TemporaryColorTexture");
+                // cmd.GetTemporaryRT(m_TemporaryColorTexture.id, opaqueDesc, filterMode);
+                Blitter.BlitCameraTexture(cmd, source, m_TemporaryColorTexture, blitMaterial,settings.blitMaterialPassIndex);
+                Blitter.BlitCameraTexture(cmd, m_TemporaryColorTexture, destination);
             }
             else
             {
-                Blit(cmd,source,destination,blitMaterial,settings.blitMaterialPassIndex);
+                Blitter.BlitCameraTexture(cmd,source,destination,blitMaterial,settings.blitMaterialPassIndex);
             }
             
             context.ExecuteCommandBuffer(cmd);
@@ -143,13 +152,15 @@ public class BlitRenderPassFeature : ScriptableRendererFeature
         {
             if (settings.dstType == Target.TextureID)
             {
-                cmd.ReleaseTemporaryRT(m_DestinationTexture.id);
+                // cmd.ReleaseTemporaryRT(m_DestinationTexture.id);
+                RTHandles.Release(m_DestinationTexture);
             }
-
+            
             if (source == destination ||
                 (settings.srcType == settings.dstType && settings.srcType == Target.CameraColor))
             {
-                cmd.ReleaseTemporaryRT(m_TemporaryColorTexture.id);
+                // cmd.ReleaseTemporaryRT(m_TemporaryColorTexture.id);
+                RTHandles.Release(m_TemporaryColorTexture);
             }
         }
 

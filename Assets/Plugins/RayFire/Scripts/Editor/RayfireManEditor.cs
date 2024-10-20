@@ -277,7 +277,7 @@ namespace RayFireEditor
             mat.density         = sp_mat_dens.floatValue;
             mat.drag            = sp_mat_drag.floatValue;
             mat.angularDrag     = sp_mat_ang.floatValue;
-            mat.material        = (PhysicMaterial)sp_mat_mat.objectReferenceValue;
+            mat.material        = (PhysicsMaterial)sp_mat_mat.objectReferenceValue;
             mat.dynamicFriction = sp_mat_dyn.floatValue;
             mat.staticFriction  = sp_mat_stat.floatValue;
             mat.bounciness      = sp_mat_bnc.floatValue;
