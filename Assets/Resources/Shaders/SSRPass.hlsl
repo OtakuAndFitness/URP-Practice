@@ -240,7 +240,7 @@ half4 SSRPassFragment(Varyings input) : SV_Target {
 
 float _BlurRadius;
 
-float4 _BlitTexture_TexelSize;
+//float4 _BlitTexture_TexelSize;
 
 float4 BlurVertical(Varyings input) : SV_Target
 {
